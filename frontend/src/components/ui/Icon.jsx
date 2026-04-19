@@ -6,6 +6,9 @@ const PATHS = {
   filter: 'M4 5h16M7 12h10M10 19h4',
   menu: 'M4 6h16M4 12h16M4 18h16',
   star: 'M12 2l3 7 7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z',
+  upload:
+    'M12 15V4m0 0l-4 4m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2',
+  check: 'M4 12l5 5L20 6',
 };
 
 export function Icon({ name, size = 20, className = '' }) {

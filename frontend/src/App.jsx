@@ -9,6 +9,7 @@ import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
 import { CartPage } from './pages/CartPage.jsx';
 import { ConcoursPage } from './pages/ConcoursPage.jsx';
+import { PermisPage } from './pages/PermisPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
@@ -35,16 +36,7 @@ export default function App() {
                     />
                   }
                 />
-                <Route
-                  path="/permis"
-                  element={
-                    <PlaceholderPage
-                      eyebrow="Permis 2026"
-                      title="Votre demande de permis arrive."
-                      description="Formulaire en 4 étapes, traitement sous 2 jours ouvrés, suivi du statut en ligne. Cette section est en cours d'installation."
-                    />
-                  }
-                />
+                <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
                 <Route
                   path="/compte"
