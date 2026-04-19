@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './components/AuthProvider.jsx';
 import { CartProvider } from './components/CartProvider.jsx';
+import { ProductsProvider } from './components/ProductsProvider.jsx';
 import { ScrollToTop } from './components/ScrollToTop.jsx';
 import { TopNav } from './components/TopNav.jsx';
 import { SiteFooter } from './components/SiteFooter.jsx';
@@ -24,8 +25,9 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-        <CartProvider>
-          <ToastProvider>
+        <ProductsProvider>
+          <CartProvider>
+            <ToastProvider>
           <div className="app-shell">
             <TopNav />
             <main>
@@ -46,8 +48,9 @@ export default function App() {
             </main>
             <SiteFooter />
           </div>
-          </ToastProvider>
-        </CartProvider>
+            </ToastProvider>
+          </CartProvider>
+        </ProductsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
-import { categories, products, species, techniques } from '../data/catalog.js';
+import { categories, species, techniques } from '../data/catalog.js';
+import { useProducts } from '../lib/products.js';
 
 const SORT_OPTIONS = [
   { value: 'pertinence', label: 'Tri : pertinence' },
@@ -158,10 +159,14 @@ function filterProducts(items, filters, sort) {
 
 export function CataloguePage() {
   const { filters, toggle, toggleInStock, setQuery, reset } = useCatalogFilters();
+  const { products, loading } = useProducts();
   const [sort, setSort] = useState('pertinence');
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const visible = useMemo(() => filterProducts(products, filters, sort), [filters, sort]);
+  const visible = useMemo(
+    () => filterProducts(products, filters, sort),
+    [products, filters, sort],
+  );
   const activeCount = filters.species.length + filters.categories.length + filters.techniques.length;
 
   useEffect(() => {
@@ -265,7 +270,11 @@ export function CataloguePage() {
               </div>
             )}
 
-            {visible.length === 0 ? (
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}>
+                <p className="soft">Chargement du catalogue…</p>
+              </div>
+            ) : visible.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}>
                 <div
                   style={{

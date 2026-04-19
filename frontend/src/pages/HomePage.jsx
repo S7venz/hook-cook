@@ -5,8 +5,9 @@ import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
-import { carnet, contests, products, species } from '../data/catalog.js';
+import { carnet, contests, species } from '../data/catalog.js';
 import { formatPrice } from '../lib/format.js';
+import { useProducts } from '../lib/products.js';
 
 const CURRENT_MONTH = 4;
 
@@ -141,6 +142,7 @@ function contestLabel(contest) {
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { products } = useProducts();
   const featured = products.slice(0, 4);
   const upcomingContests = contests.slice(0, 3);
   const recentCatches = carnet.slice(0, 3);

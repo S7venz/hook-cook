@@ -7,6 +7,9 @@ class UrlMappings {
         post "/api/auth/login"(controller: 'auth', action: 'login')
         get "/api/auth/me"(controller: 'auth', action: 'me')
 
+        get "/api/products"(controller: 'product', action: 'list')
+        get "/api/products/$id"(controller: 'product', action: 'show')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

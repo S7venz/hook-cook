@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
@@ -6,9 +6,10 @@ import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
-import { categories, findProduct, species as speciesList } from '../data/catalog.js';
+import { categories, species as speciesList } from '../data/catalog.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
+import { useProduct, useProducts } from '../lib/products.js';
 import { useToast } from '../lib/toast.js';
 
 const TABS = [
@@ -81,13 +82,24 @@ function NotFound() {
 
 export function ProductPage() {
   const { id } = useParams();
-  const product = useMemo(() => findProduct(id), [id]);
+  const product = useProduct(id);
+  const { loading } = useProducts();
   const { push } = useToast();
   const { add } = useCart();
   const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState('specs');
   const [qty, setQty] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({});
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container" style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}>
+          <p className="soft">Chargement du produit…</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) return <NotFound />;
 
