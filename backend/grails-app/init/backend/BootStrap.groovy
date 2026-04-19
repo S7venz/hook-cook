@@ -23,7 +23,9 @@ class BootStrap {
                 [id: 'vetements', name: 'Vêtements', count: 56],
                 [id: 'accessoires', name: 'Accessoires', count: 81],
         ].each { data ->
-            new Category(id: data.id, name: data.name, displayCount: data.count).save(failOnError: true)
+            Category c = new Category(name: data.name, displayCount: data.count)
+            c.id = data.id
+            c.save(failOnError: true)
         }
         log.info('Seeded {} categories.', Category.count())
     }
@@ -38,7 +40,9 @@ class BootStrap {
                 [id: 'surfcasting', name: 'Surfcasting'],
                 [id: 'streetfishing', name: 'Street-fishing'],
         ].each { data ->
-            new Technique(data).save(failOnError: true)
+            Technique t = new Technique(name: data.name)
+            t.id = data.id
+            t.save(failOnError: true)
         }
         log.info('Seeded {} techniques.', Technique.count())
     }
@@ -55,7 +59,8 @@ class BootStrap {
                 [id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10]],
                 [id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12]],
         ].each { Map data ->
-            Species s = new Species(id: data.id, name: data.name, latin: data.latin, water: data.water)
+            Species s = new Species(name: data.name, latin: data.latin, water: data.water)
+            s.id = data.id
             s.months = data.months
             s.save(failOnError: true)
         }
@@ -123,7 +128,6 @@ class BootStrap {
                 ],
         ].each { Map data ->
             Contest c = new Contest(
-                    id         : data.id,
                     title      : data.title,
                     date       : data.date,
                     dateDisplay: data.dateDisplay,
@@ -135,6 +139,7 @@ class BootStrap {
                     max        : data.max,
                     reglement  : data.reglement,
             )
+            c.id = data.id
             c.species = data.species
             c.save(failOnError: true)
         }
