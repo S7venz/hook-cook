@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './components/AuthProvider.jsx';
 import { CartProvider } from './components/CartProvider.jsx';
 import { ScrollToTop } from './components/ScrollToTop.jsx';
 import { TopNav } from './components/TopNav.jsx';
@@ -12,14 +13,17 @@ import { CheckoutPage } from './pages/CheckoutPage.jsx';
 import { ConfirmationPage } from './pages/ConfirmationPage.jsx';
 import { ConcoursPage } from './pages/ConcoursPage.jsx';
 import { PermisPage } from './pages/PermisPage.jsx';
+import { LoginPage } from './pages/LoginPage.jsx';
+import { RegisterPage } from './pages/RegisterPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <CartProvider>
-        <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <ToastProvider>
           <div className="app-shell">
             <TopNav />
             <main>
@@ -30,6 +34,8 @@ export default function App() {
                 <Route path="/panier" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/confirmation/:orderId" element={<ConfirmationPage />} />
+                <Route path="/connexion" element={<LoginPage />} />
+                <Route path="/inscription" element={<RegisterPage />} />
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
                 <Route
@@ -46,8 +52,9 @@ export default function App() {
             </main>
             <SiteFooter />
           </div>
-        </ToastProvider>
-      </CartProvider>
+          </ToastProvider>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { Icon } from './ui/Icon.jsx';
+import { useAuth } from '../lib/auth.js';
 import { cartTotals, useCart } from '../lib/cart.js';
 
 const LINKS = [
@@ -11,6 +12,7 @@ const LINKS = [
 export function TopNav() {
   const { items } = useCart();
   const { count } = cartTotals(items);
+  const { user } = useAuth();
 
   return (
     <header className="topnav">
@@ -36,7 +38,12 @@ export function TopNav() {
           <button className="icon-btn" aria-label="Rechercher" type="button">
             <Icon name="search" />
           </button>
-          <Link to="/compte" className="icon-btn" aria-label="Mon compte">
+          <Link
+            to={user ? '/compte' : '/connexion'}
+            className="icon-btn"
+            aria-label={user ? `Compte de ${user.firstName}` : 'Se connecter'}
+            title={user ? `Compte de ${user.firstName}` : 'Se connecter'}
+          >
             <Icon name="user" />
           </Link>
           <Link
