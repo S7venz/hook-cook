@@ -35,8 +35,8 @@ class Product {
         name blank: false, maxSize: 200
         category blank: false, maxSize: 40
         technique nullable: true, maxSize: 40
-        price min: 0G
-        wasPrice nullable: true, min: 0G
+        price min: BigDecimal.ZERO
+        wasPrice nullable: true, min: BigDecimal.ZERO
         stock min: 0
         rating nullable: true
         reviews nullable: true
