@@ -3,10 +3,142 @@ package backend
 class BootStrap {
 
     def init = { servletContext ->
+        seedCategories()
+        seedTechniques()
+        seedSpecies()
+        seedContests()
         seedProducts()
     }
 
     def destroy = {
+    }
+
+    private void seedCategories() {
+        if (Category.count() > 0) return
+        [
+                [id: 'cannes', name: 'Cannes', count: 47],
+                [id: 'moulinets', name: 'Moulinets', count: 38],
+                [id: 'leurres', name: 'Leurres & appâts', count: 124],
+                [id: 'soies-lignes', name: 'Soies & lignes', count: 29],
+                [id: 'vetements', name: 'Vêtements', count: 56],
+                [id: 'accessoires', name: 'Accessoires', count: 81],
+        ].each { data ->
+            new Category(id: data.id, name: data.name, displayCount: data.count).save(failOnError: true)
+        }
+        log.info('Seeded {} categories.', Category.count())
+    }
+
+    private void seedTechniques() {
+        if (Technique.count() > 0) return
+        [
+                [id: 'mouche', name: 'Mouche'],
+                [id: 'carnassiers', name: 'Carnassiers'],
+                [id: 'peche-fond', name: 'Pêche au fond'],
+                [id: 'anglaise', name: 'Anglaise'],
+                [id: 'surfcasting', name: 'Surfcasting'],
+                [id: 'streetfishing', name: 'Street-fishing'],
+        ].each { data ->
+            new Technique(data).save(failOnError: true)
+        }
+        log.info('Seeded {} techniques.', Technique.count())
+    }
+
+    private void seedSpecies() {
+        if (Species.count() > 0) return
+        [
+                [id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9]],
+                [id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1]],
+                [id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1]],
+                [id: 'carpe', name: 'Carpe', latin: 'Cyprinus carpio', water: 'étang/lac', months: [4, 5, 6, 7, 8, 9, 10, 11]],
+                [id: 'bar', name: 'Bar', latin: 'Dicentrarchus labrax', water: 'mer', months: [3, 4, 5, 6, 7, 8, 9, 10, 11]],
+                [id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11]],
+                [id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10]],
+                [id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12]],
+        ].each { Map data ->
+            Species s = new Species(id: data.id, name: data.name, latin: data.latin, water: data.water)
+            s.months = data.months
+            s.save(failOnError: true)
+        }
+        log.info('Seeded {} species.', Species.count())
+    }
+
+    private void seedContests() {
+        if (Contest.count() > 0) return
+        [
+                [
+                        id         : 'vesoul-2026-05',
+                        title      : 'Open de Vesoul — Truite fario',
+                        date       : '2026-05-04',
+                        dateDisplay: '04 MAI',
+                        lieu       : 'Lac de Vesoul (70)',
+                        distance   : '18 km',
+                        format     : 'No-kill · Équipes de 2',
+                        price      : 25.0,
+                        species    : ['truite'],
+                        inscrits   : 42,
+                        max        : 60,
+                        reglement  : 'Le concours se tient sur le lac de Vesoul de 7h à 18h. Équipes de deux pêcheurs, sélection par tirage au sort des postes. Matériel libre — mouche, toc, lancer léger — mais hameçons sans ardillon obligatoires. Tous poissons mesurés et relâchés.',
+                ],
+                [
+                        id         : 'saone-2026-06',
+                        title      : 'Concours carpe 24h — Saône',
+                        date       : '2026-06-14',
+                        dateDisplay: '14 JUIN',
+                        lieu       : 'Saône — Chalon (71)',
+                        distance   : '62 km',
+                        format     : '24h · Individuel',
+                        price      : 45.0,
+                        species    : ['carpe'],
+                        inscrits   : 58,
+                        max        : 60,
+                        reglement  : 'Départ samedi 8h, pesée dimanche 8h. Pontons tirés au sort la veille. Amorçage libre, deux cannes max. Classement au poids total des 3 plus grosses prises.',
+                ],
+                [
+                        id         : 'doubs-2026-03',
+                        title      : 'Ouverture Truite — Le Doubs',
+                        date       : '2026-03-14',
+                        dateDisplay: '14 MAR',
+                        lieu       : 'Le Doubs, Montbéliard (25)',
+                        distance   : '8 km',
+                        format     : 'Classique · Individuel',
+                        price      : 0.0,
+                        species    : ['truite'],
+                        inscrits   : 89,
+                        max        : 120,
+                        reglement  : "Journée d'ouverture de la truite en première catégorie. Pêche de 6h30 au coucher du soleil. Pesée et remise de prix à 18h à la Maison de la pêche.",
+                ],
+                [
+                        id         : 'etang-carpe-nuit',
+                        title      : 'Nocturne Étang de la Forge',
+                        date       : '2026-07-19',
+                        dateDisplay: '19 JUIL',
+                        lieu       : 'Étang de la Forge (25)',
+                        distance   : '35 km',
+                        format     : 'Nocturne · Individuel',
+                        price      : 30.0,
+                        species    : ['carpe', 'silure'],
+                        inscrits   : 18,
+                        max        : 40,
+                        reglement  : 'Nocturne de 20h à 6h. Une canne par pêcheur. Classement combiné poids / nombre.',
+                ],
+        ].each { Map data ->
+            Contest c = new Contest(
+                    id         : data.id,
+                    title      : data.title,
+                    date       : data.date,
+                    dateDisplay: data.dateDisplay,
+                    lieu       : data.lieu,
+                    distance   : data.distance,
+                    format     : data.format,
+                    price      : data.price as BigDecimal,
+                    inscrits   : data.inscrits,
+                    max        : data.max,
+                    reglement  : data.reglement,
+            )
+            c.species = data.species
+            c.save(failOnError: true)
+        }
+        log.info('Seeded {} contests.', Contest.count())
     }
 
     private void seedProducts() {
@@ -61,11 +193,11 @@ class BootStrap {
                         story      : "Cordier Roubinet est l'un des derniers cordiers français à tresser ses soies manuellement. Le cœur est monté sur un métier vieux d'un siècle, la gaine lissée avec une cire préparée par le fils du fondateur.",
                         variants   : [grammage: ['WF4', 'WF5', 'WF6', 'WF7'], couleur: ['Ivoire', 'Vert mousse']],
                         specs      : [
-                                Grammage       : 'WF6F',
+                                Grammage         : 'WF6F',
                                 'Longueur totale': '27.4 m',
-                                Densité        : 'Flottante',
-                                Cœur           : 'Tressé 16 brins',
-                                Pointe         : '0.9 mm',
+                                Densité          : 'Flottante',
+                                Cœur             : 'Tressé 16 brins',
+                                Pointe           : '0.9 mm',
                         ],
                 ],
                 [
@@ -86,13 +218,7 @@ class BootStrap {
                         img        : 'Canne carnassiers Strike — vue complète',
                         description: 'Blank rigide pour lancer des swimbaits lourds en toute précision. Talon renforcé pour le combat avec les gros poissons.',
                         variants   : [longueur: ['2.10 m', '2.40 m', '2.70 m'], puissance: ['20-60 g', '40-100 g', '80-160 g']],
-                        specs      : [
-                                Longueur : '2.40 m',
-                                Puissance: '40-100 g',
-                                Action   : 'Rapide',
-                                Poids    : '184 g',
-                                Brins    : '2',
-                        ],
+                        specs      : [Longueur: '2.40 m', Puissance: '40-100 g', Action: 'Rapide', Poids: '184 g', Brins: '2'],
                 ],
                 [
                         id         : 'hc-leurre-chevesne',
@@ -129,13 +255,7 @@ class BootStrap {
                         img        : 'Moulinet Carp 8000 — profil',
                         description: 'Grande bobine long-cast, 5 roulements étanches. Frein arrière 12 kg, idéal pour la carpe de nuit.',
                         variants   : [taille: ['6000', '8000', '10000']],
-                        specs      : [
-                                Capacité   : '420 m / 0.35 mm',
-                                Ratio      : '4.6:1',
-                                Roulements : '5 + 1',
-                                Poids      : '618 g',
-                                Frein      : '12 kg',
-                        ],
+                        specs      : [Capacité: '420 m / 0.35 mm', Ratio: '4.6:1', Roulements: '5 + 1', Poids: '618 g', Frein: '12 kg'],
                 ],
                 [
                         id         : 'hc-veste-pluie',
@@ -272,6 +392,6 @@ class BootStrap {
             }
             p.save(failOnError: true)
         }
-        log.info("Seeded {} products.", seed.size())
+        log.info('Seeded {} products.', Product.count())
     }
 }

@@ -10,6 +10,12 @@ class UrlMappings {
         get "/api/products"(controller: 'product', action: 'list')
         get "/api/products/$id"(controller: 'product', action: 'show')
 
+        get "/api/categories"(controller: 'reference', action: 'categories')
+        get "/api/techniques"(controller: 'reference', action: 'techniques')
+        get "/api/species"(controller: 'reference', action: 'species')
+        get "/api/contests"(controller: 'reference', action: 'contests')
+        get "/api/contests/$id"(controller: 'reference', action: 'contest')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
