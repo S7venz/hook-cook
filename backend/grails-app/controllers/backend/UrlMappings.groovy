@@ -3,6 +3,10 @@ package backend
 class UrlMappings {
 
     static mappings = {
+        post "/api/auth/register"(controller: 'auth', action: 'register')
+        post "/api/auth/login"(controller: 'auth', action: 'login')
+        get "/api/auth/me"(controller: 'auth', action: 'me')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
