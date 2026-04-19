@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
 import { CartPage } from './pages/CartPage.jsx';
+import { ConcoursPage } from './pages/ConcoursPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
@@ -44,16 +45,7 @@ export default function App() {
                     />
                   }
                 />
-                <Route
-                  path="/concours"
-                  element={
-                    <PlaceholderPage
-                      eyebrow="Calendrier local"
-                      title="Les concours locaux, en pleine préparation."
-                      description="Ouvertures, open carpe, nocturnes — la liste complète et les inscriptions seront disponibles très bientôt."
-                    />
-                  }
-                />
+                <Route path="/concours" element={<ConcoursPage />} />
                 <Route
                   path="/compte"
                   element={

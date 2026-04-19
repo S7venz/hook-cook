@@ -341,10 +341,14 @@ export const contests = [
     date: '2026-05-04',
     dateDisplay: '04 MAI',
     lieu: 'Lac de Vesoul (70)',
+    distance: '18 km',
     format: 'No-kill · Équipes de 2',
     prix: 25,
+    species: ['truite'],
     inscrits: 42,
     max: 60,
+    reglement:
+      'Le concours se tient sur le lac de Vesoul de 7h à 18h. Équipes de deux pêcheurs, sélection par tirage au sort des postes. Matériel libre — mouche, toc, lancer léger — mais hameçons sans ardillon obligatoires. Tous poissons mesurés et relâchés.',
   },
   {
     id: 'saone-2026-06',
@@ -352,10 +356,14 @@ export const contests = [
     date: '2026-06-14',
     dateDisplay: '14 JUIN',
     lieu: 'Saône — Chalon (71)',
+    distance: '62 km',
     format: '24h · Individuel',
     prix: 45,
+    species: ['carpe'],
     inscrits: 58,
     max: 60,
+    reglement:
+      'Départ samedi 8h, pesée dimanche 8h. Pontons tirés au sort la veille. Amorçage libre, deux cannes max. Classement au poids total des 3 plus grosses prises.',
   },
   {
     id: 'doubs-2026-03',
@@ -363,12 +371,35 @@ export const contests = [
     date: '2026-03-14',
     dateDisplay: '14 MAR',
     lieu: 'Le Doubs, Montbéliard (25)',
+    distance: '8 km',
     format: 'Classique · Individuel',
     prix: 0,
+    species: ['truite'],
     inscrits: 89,
     max: 120,
+    reglement:
+      "Journée d'ouverture de la truite en première catégorie. Pêche de 6h30 au coucher du soleil. Pesée et remise de prix à 18h à la Maison de la pêche.",
+  },
+  {
+    id: 'etang-carpe-nuit',
+    title: 'Nocturne Étang de la Forge',
+    date: '2026-07-19',
+    dateDisplay: '19 JUIL',
+    lieu: 'Étang de la Forge (25)',
+    distance: '35 km',
+    format: 'Nocturne · Individuel',
+    prix: 30,
+    species: ['carpe', 'silure'],
+    inscrits: 18,
+    max: 40,
+    reglement:
+      'Nocturne de 20h à 6h. Une canne par pêcheur. Classement combiné poids / nombre.',
   },
 ];
+
+export function findContest(id) {
+  return contests.find((c) => c.id === id) ?? null;
+}
 
 export const carnet = [
   {
