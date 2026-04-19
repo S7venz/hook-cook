@@ -5,6 +5,7 @@ import { SiteFooter } from './components/SiteFooter.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
+import { ProductPage } from './pages/ProductPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/boutique" element={<CataloguePage />} />
+              <Route path="/boutique/:id" element={<ProductPage />} />
               <Route
                 path="/permis"
                 element={

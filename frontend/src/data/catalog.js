@@ -38,9 +38,29 @@ export const products = [
     wasPrice: null,
     stock: 14,
     rating: 4.6,
+    reviews: 38,
     species: ['truite', 'ombre'],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9],
     brand: 'Hook & Cook',
     img: 'Canne mouche Sauvage 9ft — vue complète',
+    description:
+      'Soie WF5F adaptée aux petites rivières et ruisseaux de montagne. Blank en carbone à fort module, dessiné pour charger le bas de canne en lancers courts — idéale pour pêcher sous branches.',
+    story:
+      "Fabriquée à Saint-Jean-Pied-de-Port par l'atelier Peyre, cette canne reprend le profil des cannes que Jean-Marc monte depuis trente-deux ans pour les guides du Pays basque. Chaque blank est scellé à la main, les anneaux alignés au fil, le porte-moulinet tourné dans un morceau de noyer local.\n\nElle est taillée pour la truite farios en eau vive — ce que Jean-Marc appelle \"le geste court et la remontée lente\". Vous n'achetez pas une canne de série.",
+    variants: {
+      longueur: ['8 ft', '9 ft', '10 ft'],
+      action: ['Moyenne', 'Moyenne-rapide', 'Rapide'],
+    },
+    specs: {
+      Longueur: '9 ft (2.74 m)',
+      Soie: 'WF5F',
+      Action: 'Moyenne-rapide',
+      Poids: '108 g',
+      Brins: '4',
+      Étui: 'Tube aluminium brossé',
+      Garantie: "5 ans pièces et main-d'œuvre",
+    },
   },
   {
     id: 'hc-wf6-soie',
@@ -52,9 +72,27 @@ export const products = [
     wasPrice: null,
     stock: 42,
     rating: 4.8,
+    reviews: 91,
     species: ['truite', 'brochet'],
+    water: 'rivière/lac',
+    months: [3, 4, 5, 6, 7, 8, 9, 10],
     brand: 'Cordier Roubinet',
     img: 'Soie WF6F — bobine + détail tresse',
+    description:
+      "Profil à avant lourd pour charger rapidement le bas de canne. Cœur tressé 16 brins, gaine lissée à la cire d'abeille. Lancers doux sur 25 mètres.",
+    story:
+      "Cordier Roubinet est l'un des derniers cordiers français à tresser ses soies manuellement. Le cœur est monté sur un métier vieux d'un siècle, la gaine lissée avec une cire préparée par le fils du fondateur.",
+    variants: {
+      grammage: ['WF4', 'WF5', 'WF6', 'WF7'],
+      couleur: ['Ivoire', 'Vert mousse'],
+    },
+    specs: {
+      Grammage: 'WF6F',
+      'Longueur totale': '27.4 m',
+      Densité: 'Flottante',
+      Cœur: 'Tressé 16 brins',
+      Pointe: '0.9 mm',
+    },
   },
   {
     id: 'hc-brochet-strike',
@@ -66,9 +104,25 @@ export const products = [
     wasPrice: 299.0,
     stock: 6,
     rating: 4.7,
+    reviews: 24,
     species: ['brochet', 'sandre', 'silure'],
+    water: 'lac/rivière',
+    months: [5, 6, 7, 8, 9, 10, 11, 12, 1],
     brand: 'Hook & Cook',
     img: 'Canne carnassiers Strike — vue complète',
+    description:
+      'Blank rigide pour lancer des swimbaits lourds en toute précision. Talon renforcé pour le combat avec les gros poissons.',
+    variants: {
+      longueur: ['2.10 m', '2.40 m', '2.70 m'],
+      puissance: ['20-60 g', '40-100 g', '80-160 g'],
+    },
+    specs: {
+      Longueur: '2.40 m',
+      Puissance: '40-100 g',
+      Action: 'Rapide',
+      Poids: '184 g',
+      Brins: '2',
+    },
   },
   {
     id: 'hc-leurre-chevesne',
@@ -80,9 +134,17 @@ export const products = [
     wasPrice: null,
     stock: 180,
     rating: 4.5,
+    reviews: 142,
     species: ['perche', 'sandre'],
+    water: 'lac/rivière',
+    months: [3, 4, 5, 6, 7, 8, 9, 10, 11],
     brand: 'Hook & Cook',
     img: 'Leurres souples — pack ouvert',
+    description:
+      'Imitation de vairon. Queue vibrante, odeur attractant. Idéal en finesse sur perches actives.',
+    variants: {
+      couleur: ['Naturel', 'Perch', 'Motor Oil', 'Chartreuse'],
+    },
   },
   {
     id: 'hc-moulinet-carp',
@@ -94,9 +156,24 @@ export const products = [
     wasPrice: null,
     stock: 9,
     rating: 4.6,
+    reviews: 56,
     species: ['carpe', 'silure'],
+    water: 'étang/lac',
+    months: [4, 5, 6, 7, 8, 9, 10, 11],
     brand: 'Hook & Cook',
     img: 'Moulinet Carp 8000 — profil',
+    description:
+      'Grande bobine long-cast, 5 roulements étanches. Frein arrière 12 kg, idéal pour la carpe de nuit.',
+    variants: {
+      taille: ['6000', '8000', '10000'],
+    },
+    specs: {
+      Capacité: '420 m / 0.35 mm',
+      Ratio: '4.6:1',
+      Roulements: '5 + 1',
+      Poids: '618 g',
+      Frein: '12 kg',
+    },
   },
   {
     id: 'hc-veste-pluie',
@@ -108,9 +185,18 @@ export const products = [
     wasPrice: null,
     stock: 22,
     rating: 4.9,
+    reviews: 74,
     species: [],
+    water: 'mer/rivière',
+    months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     brand: 'Hook & Cook',
     img: 'Veste Estuaire — silhouette 3/4',
+    description:
+      'Membrane 3 couches 20k/20k. Capuche ajustable, poches waders, ourlet bas pour pêcher en cuissardes.',
+    variants: {
+      taille: ['S', 'M', 'L', 'XL', 'XXL'],
+      couleur: ['Algue', 'Grès', 'Ardoise'],
+    },
   },
   {
     id: 'hc-boite-mouches',
@@ -122,9 +208,17 @@ export const products = [
     wasPrice: null,
     stock: 64,
     rating: 4.4,
+    reviews: 38,
     species: ['truite', 'ombre'],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9],
     brand: 'Hook & Cook',
     img: 'Boîte à mouches 24 — ouverte',
+    description:
+      'Boîte alu compartimentée, fermeture magnétique. 24 emplacements mousse anti-rouille.',
+    variants: {
+      couleur: ['Laiton', 'Noir mat'],
+    },
   },
   {
     id: 'hc-hamecons-truite',
@@ -136,9 +230,16 @@ export const products = [
     wasPrice: null,
     stock: 240,
     rating: 4.7,
+    reviews: 89,
     species: ['truite'],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9],
     brand: 'Tournon',
     img: 'Hameçons truite — boîte ouverte',
+    description: 'Hameçons anglais nº14, fil fin, ardillon écrasable. Finition noir mat.',
+    variants: {
+      taille: ['12', '14', '16', '18'],
+    },
   },
   {
     id: 'hc-epuisette-pliante',
@@ -150,9 +251,17 @@ export const products = [
     wasPrice: null,
     stock: 12,
     rating: 4.9,
+    reviews: 23,
     species: ['truite', 'ombre', 'perche'],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9, 10],
     brand: 'Atelier Peyre',
     img: 'Épuisette noyer — repliée',
+    description:
+      'Manche en noyer tourné main, filet caoutchouc sans nœuds. Pliable sur gilet.',
+    variants: {
+      longueur: ['50 cm', '60 cm', '80 cm'],
+    },
   },
   {
     id: 'hc-bas-ligne',
@@ -164,9 +273,16 @@ export const products = [
     wasPrice: null,
     stock: 140,
     rating: 4.5,
+    reviews: 68,
     species: ['truite', 'ombre'],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9],
     brand: 'Tournon',
     img: 'Bas de ligne fluorocarbone — bobine',
+    description: "Fluorocarbone japonais haute résistance. Invisible sous l'eau.",
+    variants: {
+      diametre: ['0.12', '0.14', '0.16', '0.18', '0.20'],
+    },
   },
   {
     id: 'hc-cuissardes',
@@ -178,9 +294,17 @@ export const products = [
     wasPrice: null,
     stock: 7,
     rating: 4.8,
+    reviews: 41,
     species: [],
+    water: 'rivière',
+    months: [3, 4, 5, 6, 7, 8, 9, 10, 11],
     brand: 'Hook & Cook',
     img: 'Cuissardes Source — silhouette',
+    description:
+      'Membrane 4 couches au genou, chaussons néoprène 4 mm, ceinture renforcée.',
+    variants: {
+      taille: ['S', 'M', 'L', 'XL'],
+    },
   },
   {
     id: 'hc-leurre-brochet',
@@ -192,11 +316,23 @@ export const products = [
     wasPrice: null,
     stock: 36,
     rating: 4.7,
+    reviews: 52,
     species: ['brochet', 'silure'],
+    water: 'lac/rivière',
+    months: [5, 6, 7, 8, 9, 10, 11, 12, 1],
     brand: 'Hook & Cook',
     img: 'Swimbait brochet 18cm',
+    description:
+      'Swimbait 3 sections, nage en S. Hameçons triples VMC. Pour prospection lente.',
+    variants: {
+      couleur: ['Gardon', 'Perch', 'Firetiger', 'Black'],
+    },
   },
 ];
+
+export function findProduct(id) {
+  return products.find((p) => p.id === id) ?? null;
+}
 
 export const contests = [
   {

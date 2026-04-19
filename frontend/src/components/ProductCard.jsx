@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
@@ -5,16 +6,26 @@ import { categories, species as speciesList } from '../data/catalog.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
 
-export function ProductCard({ product, onSelect }) {
+export function ProductCard({ product }) {
+  const navigate = useNavigate();
   const { push } = useToast();
   const category = categories.find((c) => c.id === product.category);
   const tags = product.species
     .map((id) => speciesList.find((s) => s.id === id)?.name)
     .filter(Boolean);
 
+  const open = () => navigate(`/boutique/${product.id}`);
+
   const handleAdd = (event) => {
     event.stopPropagation();
     push(`Ajouté : ${product.name}`);
+  };
+
+  const handleKey = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      open();
+    }
   };
 
   return (
@@ -22,7 +33,8 @@ export function ProductCard({ product, onSelect }) {
       className="product-card"
       role="button"
       tabIndex={0}
-      onClick={() => onSelect?.(product)}
+      onClick={open}
+      onKeyDown={handleKey}
     >
       <div className="card-media">
         <Placeholder label={product.img} />
