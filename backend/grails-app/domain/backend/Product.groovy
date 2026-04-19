@@ -60,6 +60,9 @@ class Product {
         specsJson type: 'text'
     }
 
+    // Helper getters/setters — not persisted (backed by the *Csv / *Json columns).
+    static transients = ['species', 'months', 'variants', 'specs']
+
     List<String> getSpecies() {
         speciesCsv ? speciesCsv.split(',').toList() : []
     }
