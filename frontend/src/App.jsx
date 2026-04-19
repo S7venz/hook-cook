@@ -8,6 +8,8 @@ import { HomePage } from './pages/HomePage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
 import { CartPage } from './pages/CartPage.jsx';
+import { CheckoutPage } from './pages/CheckoutPage.jsx';
+import { ConfirmationPage } from './pages/ConfirmationPage.jsx';
 import { ConcoursPage } from './pages/ConcoursPage.jsx';
 import { PermisPage } from './pages/PermisPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
@@ -26,16 +28,8 @@ export default function App() {
                 <Route path="/boutique" element={<CataloguePage />} />
                 <Route path="/boutique/:id" element={<ProductPage />} />
                 <Route path="/panier" element={<CartPage />} />
-                <Route
-                  path="/checkout"
-                  element={
-                    <PlaceholderPage
-                      eyebrow="Paiement sécurisé"
-                      title="Le tunnel de commande arrive."
-                      description="Coordonnées, livraison et paiement Stripe / PayPal — cette étape est la prochaine à être branchée."
-                    />
-                  }
-                />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/confirmation/:orderId" element={<ConfirmationPage />} />
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
                 <Route
