@@ -34,34 +34,28 @@ class AuthController {
 
     def me() {
         String header = request.getHeader('Authorization')
-        log.info("/api/auth/me called, Authorization header present: {}", header != null)
-        if (!header) {
+        log.info('/api/auth/me — Authorization header present: {}', header != null)
+        if (!header || !header.startsWith('Bearer ')) {
             response.status = 401
-            render([error: 'Header Authorization absent.'] as JSON)
-            return
-        }
-        if (!header.startsWith('Bearer ')) {
-            response.status = 401
-            render([error: "Format attendu 'Bearer <token>'."] as JSON)
+            render([error: 'Token requis.'] as JSON)
             return
         }
         String token = header.substring('Bearer '.length())
         def claims = authService.jwtService.parse(token)
         if (!claims) {
-            log.warn('Token JWT invalide ou expiré')
+            log.warn('/api/auth/me — JWT invalide')
             response.status = 401
             render([error: 'Token invalide ou expiré.'] as JSON)
             return
         }
-        String sub = claims.subject
-        User user = sub ? User.get(sub as Long) : null
-        if (!user) {
-            log.warn('Utilisateur introuvable pour sub={}', sub)
-            response.status = 401
-            render([error: 'Utilisateur introuvable.'] as JSON)
-            return
-        }
-        render(userPayload(user, null) as JSON)
+        Map user_data = [
+                id: claims.subject as Long,
+                email: claims.get('email'),
+                firstName: claims.get('firstName'),
+                lastName: claims.get('lastName'),
+                role: claims.get('role'),
+        ]
+        render([user: user_data] as JSON)
     }
 
     private Map userPayload(User user, String token) {
