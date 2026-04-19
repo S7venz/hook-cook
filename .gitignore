@@ -43,3 +43,6 @@ CLAUDE.md
 .aider*
 memory/
 AGENTS.md
+
+design-ref/
+*.pdf
