@@ -15,6 +15,7 @@ import { ConcoursPage } from './pages/ConcoursPage.jsx';
 import { PermisPage } from './pages/PermisPage.jsx';
 import { LoginPage } from './pages/LoginPage.jsx';
 import { RegisterPage } from './pages/RegisterPage.jsx';
+import { AccountPage } from './pages/AccountPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
@@ -38,16 +39,7 @@ export default function App() {
                 <Route path="/inscription" element={<RegisterPage />} />
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
-                <Route
-                  path="/compte"
-                  element={
-                    <PlaceholderPage
-                      eyebrow="Mon espace"
-                      title="Carnet de prise & historique."
-                      description="Votre carnet personnel, l'historique de commandes et de permis seront accessibles ici dès la mise en service du compte."
-                    />
-                  }
-                />
+                <Route path="/compte" element={<AccountPage />} />
               </Routes>
             </main>
             <SiteFooter />
