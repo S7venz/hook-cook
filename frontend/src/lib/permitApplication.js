@@ -116,5 +116,31 @@ export function useSubmittedPermit() {
 
   const reset = useCallback(() => setPermit(null), []);
 
-  return { permit, submit, reset };
+  const updateStatus = useCallback((status) => {
+    const decisions = {
+      approved: { label: 'Approuvé', historyLabel: 'Approuvé par la fédération' },
+      rejected: { label: 'Rejeté', historyLabel: 'Rejet notifié' },
+    };
+    const decision = decisions[status];
+    if (!decision) return;
+    setPermit((current) => {
+      if (!current) return current;
+      const timestamp = new Date();
+      const fmt = new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(timestamp);
+      const history = current.history.map((h) =>
+        h.label === 'Décision'
+          ? { ...h, done: true, date: fmt, label: decision.historyLabel, current: true }
+          : { ...h, current: false },
+      );
+      return { ...current, status, statusLabel: decision.label, history };
+    });
+  }, []);
+
+  return { permit, submit, reset, updateStatus };
 }

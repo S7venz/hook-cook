@@ -16,6 +16,7 @@ import { PermisPage } from './pages/PermisPage.jsx';
 import { LoginPage } from './pages/LoginPage.jsx';
 import { RegisterPage } from './pages/RegisterPage.jsx';
 import { AccountPage } from './pages/AccountPage.jsx';
+import { AdminPage } from './pages/AdminPage.jsx';
 import { PlaceholderPage } from './pages/PlaceholderPage.jsx';
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
                 <Route path="/compte" element={<AccountPage />} />
+                <Route path="/admin" element={<AdminPage />} />
               </Routes>
             </main>
             <SiteFooter />

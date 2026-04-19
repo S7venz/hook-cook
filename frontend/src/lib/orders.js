@@ -56,5 +56,21 @@ export function useOrders() {
     return order;
   }, []);
 
-  return { orders, createOrder };
+  const updateStatus = useCallback((id, status) => {
+    const labels = {
+      paid: 'Payée',
+      shipped: 'Expédiée',
+      delivered: 'Livrée',
+      cancelled: 'Annulée',
+    };
+    setOrders((current) =>
+      current.map((order) =>
+        order.id === id
+          ? { ...order, status, statusLabel: labels[status] ?? status }
+          : order,
+      ),
+    );
+  }, []);
+
+  return { orders, createOrder, updateStatus };
 }
