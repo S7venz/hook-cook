@@ -21,6 +21,7 @@ function useCatalogFilters() {
       categories: searchParams.getAll('category'),
       techniques: searchParams.getAll('technique'),
       inStock: searchParams.get('stock') === '1',
+      query: searchParams.get('q') ?? '',
     }),
     [searchParams],
   );
@@ -48,6 +49,12 @@ function useCatalogFilters() {
       update((next) => {
         if (next.get('stock') === '1') next.delete('stock');
         else next.set('stock', '1');
+      });
+    },
+    setQuery(query) {
+      update((next) => {
+        if (query) next.set('q', query);
+        else next.delete('q');
       });
     },
     reset() {
@@ -132,6 +139,17 @@ function filterProducts(items, filters, sort) {
   if (filters.inStock) {
     list = list.filter((p) => p.stock > 0);
   }
+  if (filters.query) {
+    const q = filters.query.trim().toLowerCase();
+    if (q) {
+      list = list.filter((p) => {
+        const haystack = [p.name, p.brand, p.sku, p.description ?? '']
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+  }
   if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
   if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
   if (sort === 'rating') list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
@@ -139,7 +157,7 @@ function filterProducts(items, filters, sort) {
 }
 
 export function CataloguePage() {
-  const { filters, toggle, toggleInStock, reset } = useCatalogFilters();
+  const { filters, toggle, toggleInStock, setQuery, reset } = useCatalogFilters();
   const [sort, setSort] = useState('pertinence');
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -186,7 +204,19 @@ export function CataloguePage() {
                   {new Intl.DateTimeFormat('fr-FR').format(new Date())}
                 </div>
               </div>
-              <div className="catalog-controls">
+              <div
+                className="catalog-controls"
+                style={{ display: 'flex', gap: 'var(--sp-2)' }}
+              >
+                <input
+                  type="search"
+                  className="input"
+                  placeholder="Rechercher un produit…"
+                  value={filters.query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  aria-label="Rechercher dans le catalogue"
+                  style={{ height: 40, width: 220 }}
+                />
                 <select
                   className="select"
                   value={sort}

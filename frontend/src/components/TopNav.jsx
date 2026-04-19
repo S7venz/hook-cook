@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Icon } from './ui/Icon.jsx';
 import { useAuth } from '../lib/auth.js';
 import { cartTotals, useCart } from '../lib/cart.js';
@@ -10,6 +10,7 @@ const LINKS = [
 ];
 
 export function TopNav() {
+  const navigate = useNavigate();
   const { items } = useCart();
   const { count } = cartTotals(items);
   const { user } = useAuth();
@@ -35,7 +36,12 @@ export function TopNav() {
         </nav>
 
         <div className="topnav-actions">
-          <button className="icon-btn" aria-label="Rechercher" type="button">
+          <button
+            className="icon-btn"
+            aria-label="Rechercher dans la boutique"
+            type="button"
+            onClick={() => navigate('/boutique')}
+          >
             <Icon name="search" />
           </button>
           <Link
