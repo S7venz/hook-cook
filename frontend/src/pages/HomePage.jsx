@@ -1,10 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
-import { SiteFooter } from '../components/SiteFooter.jsx';
 import { carnet, contests, products, species } from '../data/catalog.js';
 import { formatPrice } from '../lib/format.js';
 
@@ -19,7 +19,7 @@ const cardTitleStyle = {
   lineHeight: 1.1,
 };
 
-function PermisCard() {
+function PermisCard({ onStart }) {
   const steps = ['Type', 'Identité', 'Pièces', 'Paiement'];
   return (
     <div className="card" style={cardStyle}>
@@ -54,7 +54,7 @@ function PermisCard() {
           </div>
         ))}
       </div>
-      <Button variant="ghost" size="sm">
+      <Button variant="ghost" size="sm" onClick={onStart}>
         Commencer
       </Button>
     </div>
@@ -140,9 +140,16 @@ function contestLabel(contest) {
 }
 
 export function HomePage() {
+  const navigate = useNavigate();
   const featured = products.slice(0, 4);
   const upcomingContests = contests.slice(0, 3);
   const recentCatches = carnet.slice(0, 3);
+
+  const openShop = () => navigate('/boutique');
+  const openShopForSpecies = (id) => navigate(`/boutique?species=${id}`);
+  const openPermis = () => navigate('/permis');
+  const openContests = () => navigate('/concours');
+  const openAccount = () => navigate('/compte');
 
   return (
     <div className="page">
@@ -162,10 +169,10 @@ export function HomePage() {
                 pêcheurs, pas par des algorithmes.
               </p>
               <div className="hero-actions">
-                <Button variant="accent" size="lg">
+                <Button variant="accent" size="lg" onClick={openPermis}>
                   Obtenir mon permis →
                 </Button>
-                <Button variant="ghost" size="lg">
+                <Button variant="ghost" size="lg" onClick={openShop}>
                   Voir la boutique
                 </Button>
               </div>
@@ -201,12 +208,26 @@ export function HomePage() {
               <div className="eyebrow">Je m'équipe par</div>
               <h2>Espèce ciblée</h2>
             </div>
-            <a className="more">Voir toutes →</a>
+            <a className="more" onClick={openShop}>
+              Voir toutes →
+            </a>
           </div>
 
           <div className="species-grid">
             {species.map((sp) => (
-              <div key={sp.id} className="species-card" role="button" tabIndex={0}>
+              <div
+                key={sp.id}
+                className="species-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => openShopForSpecies(sp.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openShopForSpecies(sp.id);
+                  }
+                }}
+              >
                 <div className="media">
                   <SpeciesIllus species={sp.id} />
                 </div>
@@ -235,7 +256,7 @@ export function HomePage() {
               gap: 'var(--sp-5)',
             }}
           >
-            <PermisCard />
+            <PermisCard onStart={openPermis} />
             <SeasonsCard />
             <ConditionsCard />
           </div>
@@ -249,7 +270,9 @@ export function HomePage() {
               <div className="eyebrow">Curation d'avril · matériel truite rivière</div>
               <h2>Équipement du moment</h2>
             </div>
-            <a className="more">Tout le catalogue →</a>
+            <a className="more" onClick={openShop}>
+              Tout le catalogue →
+            </a>
           </div>
           <div className="products-grid">
             {featured.map((product) => (
@@ -266,7 +289,9 @@ export function HomePage() {
               <div className="eyebrow">Calendrier local</div>
               <h2>Concours à venir</h2>
             </div>
-            <a className="more">Tous les concours →</a>
+            <a className="more" onClick={openContests}>
+              Tous les concours →
+            </a>
           </div>
           <div className="concours-grid">
             {upcomingContests.map((contest) => {
@@ -310,7 +335,9 @@ export function HomePage() {
               <div className="eyebrow">Depuis le carnet</div>
               <h2>Cette semaine sur les rivières</h2>
             </div>
-            <a className="more">Votre carnet →</a>
+            <a className="more" onClick={openAccount}>
+              Votre carnet →
+            </a>
           </div>
           <div className="carnet-feed">
             {recentCatches.map((entry) => {
@@ -340,8 +367,6 @@ export function HomePage() {
           </div>
         </div>
       </section>
-
-      <SiteFooter />
     </div>
   );
 }

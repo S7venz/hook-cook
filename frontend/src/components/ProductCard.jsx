@@ -3,7 +3,7 @@ import { Button } from './ui/Button.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
 import { categories, species as speciesList } from '../data/catalog.js';
 import { formatPrice } from '../lib/format.js';
-import { useToast } from './ToastProvider.jsx';
+import { useToast } from '../lib/toast.js';
 
 export function ProductCard({ product, onSelect }) {
   const { push } = useToast();

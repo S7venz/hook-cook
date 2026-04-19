@@ -1,0 +1,27 @@
+const PATHS = {
+  search: 'M11 4a7 7 0 1 0 4.2 12.6l3.6 3.6 1.4-1.4-3.6-3.6A7 7 0 0 0 11 4zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z',
+  cart: 'M3 3h3l2 12h11l2-8H7M9 20a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z',
+  user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4 0-8 2-8 6v1h16v-1c0-4-4-6-8-6z',
+  close: 'M6 6l12 12M18 6L6 18',
+  filter: 'M4 5h16M7 12h10M10 19h4',
+  menu: 'M4 6h16M4 12h16M4 18h16',
+};
+
+export function Icon({ name, size = 20, className = '' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d={PATHS[name] ?? ''} />
+    </svg>
+  );
+}
