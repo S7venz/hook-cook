@@ -3,8 +3,6 @@ package backend
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import javax.crypto.SecretKey
 import java.nio.charset.StandardCharsets
@@ -12,7 +10,6 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class JwtService {
-    private static final Logger log = LoggerFactory.getLogger(JwtService)
 
     // Dev-only secret — override via env for prod deployments.
     private static final String DEV_SECRET =
