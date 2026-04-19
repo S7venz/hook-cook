@@ -3,12 +3,14 @@ import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
 import { categories, species as speciesList } from '../data/catalog.js';
+import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
 
 export function ProductCard({ product }) {
   const navigate = useNavigate();
   const { push } = useToast();
+  const { add } = useCart();
   const category = categories.find((c) => c.id === product.category);
   const tags = product.species
     .map((id) => speciesList.find((s) => s.id === id)?.name)
@@ -18,6 +20,7 @@ export function ProductCard({ product }) {
 
   const handleAdd = (event) => {
     event.stopPropagation();
+    add(product, 1);
     push(`Ajouté : ${product.name}`);
   };
 

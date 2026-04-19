@@ -7,6 +7,7 @@ import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { categories, findProduct, species as speciesList } from '../data/catalog.js';
+import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
 
@@ -82,6 +83,7 @@ export function ProductPage() {
   const { id } = useParams();
   const product = useMemo(() => findProduct(id), [id]);
   const { push } = useToast();
+  const { add } = useCart();
   const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState('specs');
   const [qty, setQty] = useState(1);
@@ -91,6 +93,7 @@ export function ProductPage() {
 
   const category = categories.find((c) => c.id === product.category);
   const addToCart = () => {
+    add(product, qty);
     push(
       qty === 1
         ? `Ajouté : ${product.name}`
