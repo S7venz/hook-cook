@@ -17,7 +17,10 @@ class UrlMappings {
         get "/api/techniques"(controller: 'reference', action: 'techniques')
         get "/api/species"(controller: 'reference', action: 'species')
         get "/api/contests"(controller: 'reference', action: 'contests')
+        post "/api/contests"(controller: 'reference', action: 'createContest')
         get "/api/contests/$id"(controller: 'reference', action: 'contest')
+        put "/api/contests/$id"(controller: 'reference', action: 'updateContest')
+        delete "/api/contests/$id"(controller: 'reference', action: 'deleteContest')
 
         get "/api/orders/me"(controller: 'order', action: 'myOrders')
         post "/api/orders"(controller: 'order', action: 'create')
