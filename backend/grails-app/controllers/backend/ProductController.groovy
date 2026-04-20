@@ -92,7 +92,7 @@ class ProductController {
     private void applyPayload(Product product, Map payload) {
         // Only assign id on creation
         if (!product.id && payload.id) product.id = payload.id
-        ['sku', 'name', 'category', 'technique', 'brand', 'water', 'img', 'description', 'story'].each { field ->
+        ['sku', 'name', 'category', 'technique', 'brand', 'water', 'img', 'imageUrl', 'description', 'story'].each { field ->
             if (payload.containsKey(field)) product[field] = payload[field]
         }
         if (payload.containsKey('price')) product.price = payload.price as BigDecimal

@@ -365,6 +365,7 @@ const EMPTY_PRODUCT = {
   reviews: '',
   water: '',
   img: '',
+  imageUrl: '',
   description: '',
   species: '',
 };
@@ -385,6 +386,7 @@ function toFormState(product) {
     reviews: product.reviews ?? '',
     water: product.water ?? '',
     img: product.img ?? '',
+    imageUrl: product.imageUrl ?? '',
     description: product.description ?? '',
     species: (product.species ?? []).join(', '),
   };
@@ -408,6 +410,7 @@ function buildPayload(form) {
     reviews: form.reviews === '' ? null : Number(form.reviews),
     water: form.water || null,
     img: form.img || null,
+    imageUrl: form.imageUrl.trim() || null,
     description: form.description || null,
     species,
   };
@@ -580,7 +583,39 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Description courte de l'image (placeholder)</label>
+          <label>URL de la photo (https://…)</label>
+          <input
+            className="input mono"
+            type="url"
+            value={form.imageUrl}
+            onChange={update('imageUrl')}
+            placeholder="https://images.unsplash.com/photo-..."
+          />
+          {form.imageUrl && (
+            <div
+              style={{
+                marginTop: 'var(--sp-3)',
+                border: '1px solid var(--hairline)',
+                borderRadius: 'var(--r-md)',
+                overflow: 'hidden',
+                width: 160,
+                height: 200,
+                background: 'var(--bg-sunk)',
+              }}
+            >
+              <img
+                src={form.imageUrl}
+                alt="Aperçu"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="field">
+          <label>Étiquette du placeholder (fallback texte si pas d'URL)</label>
           <input className="input" value={form.img} onChange={update('img')} />
         </div>
         <div className="field">
