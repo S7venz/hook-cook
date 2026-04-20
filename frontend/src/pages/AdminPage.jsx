@@ -731,7 +731,7 @@ function ProductsSection({
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, hydrating, logout } = useAuth();
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useOrders();
   const { permit, updateStatus: updatePermitStatus } = useSubmittedPermit();
@@ -748,6 +748,19 @@ export function AdminPage() {
       return new Set();
     }
   }, []);
+
+  if (hydrating) {
+    return (
+      <div className="page">
+        <div
+          className="page-container"
+          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
+        >
+          <p className="soft">Chargement…</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/connexion" state={{ from: '/admin' }} replace />;

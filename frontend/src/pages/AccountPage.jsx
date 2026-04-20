@@ -457,12 +457,25 @@ function AddressesTab() {
 
 export function AccountPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, hydrating, logout } = useAuth();
   const { orders } = useOrders();
   const { entries, addEntry, removeEntry } = useCarnet();
   const { permit } = useSubmittedPermit();
   const { isRegistered } = useContestRegistrations();
   const [tab, setTab] = useState('apercu');
+
+  if (hydrating) {
+    return (
+      <div className="page">
+        <div
+          className="page-container"
+          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
+        >
+          <p className="soft">Chargement de votre session…</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/connexion" state={{ from: '/compte' }} replace />;
