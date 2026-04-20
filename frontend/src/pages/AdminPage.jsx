@@ -3,10 +3,10 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { contests } from '../data/catalog.js';
+import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAuth } from '../lib/auth.js';
 import { formatPrice } from '../lib/format.js';
-import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
 import { useToast } from '../lib/toast.js';
 
@@ -768,7 +768,7 @@ export function AdminPage() {
   const navigate = useNavigate();
   const { user, hydrating, logout } = useAuth();
   const { push } = useToast();
-  const { orders, updateStatus: updateOrderStatus } = useOrders();
+  const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
   const { permit, updateStatus: updatePermitStatus } = useSubmittedPermit();
   const { products, createProduct, updateProduct, deleteProduct } = useAdminProducts();
   const [section, setSection] = useState('overview');

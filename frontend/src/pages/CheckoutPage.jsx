@@ -99,21 +99,34 @@ export function CheckoutPage() {
     );
   }
 
-  const pay = () => {
+  const pay = async () => {
     setProcessing(true);
-    setTimeout(() => {
-      const order = createOrder({
-        items,
-        subtotal,
-        shipping: shippingPrice,
-        total,
+    try {
+      const order = await createOrder({
+        items: items.map((it) => ({
+          product: {
+            id: it.product.id,
+            name: it.product.name,
+            sku: it.product.sku,
+            brand: it.product.brand,
+            imageUrl: it.product.imageUrl ?? null,
+            price: it.product.price,
+          },
+          qty: it.qty,
+        })),
         email,
-        address: { line: address, postal, city },
+        shipping: shippingPrice,
+        addressLine: address,
+        postalCode: postal,
+        city,
         shippingMode: shippingMode.title,
       });
       clear();
       navigate(`/confirmation/${order.id}`);
-    }, 1200);
+    } catch (err) {
+      setProcessing(false);
+      alert(err?.message ?? 'Erreur lors de la validation du paiement.');
+    }
   };
 
   return (

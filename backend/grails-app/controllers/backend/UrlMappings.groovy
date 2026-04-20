@@ -19,6 +19,12 @@ class UrlMappings {
         get "/api/contests"(controller: 'reference', action: 'contests')
         get "/api/contests/$id"(controller: 'reference', action: 'contest')
 
+        get "/api/orders/me"(controller: 'order', action: 'myOrders')
+        post "/api/orders"(controller: 'order', action: 'create')
+        get "/api/orders"(controller: 'order', action: 'listAll')
+        get "/api/orders/$reference"(controller: 'order', action: 'show')
+        patch "/api/orders/$reference"(controller: 'order', action: 'patchStatus')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

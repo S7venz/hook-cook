@@ -49,7 +49,7 @@ class AuthController {
             return
         }
         Map user_data = [
-                id: claims.subject as Long,
+                id: claims.getSubject() as Long,
                 email: claims.get('email'),
                 firstName: claims.get('firstName'),
                 lastName: claims.get('lastName'),

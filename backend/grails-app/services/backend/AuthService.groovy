@@ -64,7 +64,7 @@ class AuthService {
         if (!token) return null
         def claims = jwtService.parse(token)
         if (!claims) return null
-        String sub = claims.subject
+        String sub = claims.getSubject()
         if (!sub) return null
         User.get(sub as Long)
     }
@@ -75,7 +75,7 @@ class AuthService {
         String token = header.substring('Bearer '.length())
         def claims = jwtService.parse(token)
         if (!claims) return [error: 'auth_invalid']
-        String sub = claims.subject
+        String sub = claims.getSubject()
         if (!sub) return [error: 'auth_invalid']
         User user = User.get(sub as Long)
         if (!user) return [error: 'auth_invalid']
@@ -84,14 +84,7 @@ class AuthService {
 
     boolean isAdmin(request) {
         Map result = userFromRequest(request)
-        if (!result.user) {
-            log.warn('isAdmin: no user from request, error={}', result.error)
-            return false
-        }
-        boolean dbAdmin = result.user.role == 'ROLE_ADMIN'
-        boolean claimAdmin = result.role == 'ROLE_ADMIN'
-        log.info('isAdmin: user={} dbRole={} claimRole={}',
-                result.user.email, result.user.role, result.role)
-        dbAdmin || claimAdmin
+        if (!result.user) return false
+        result.user.role == 'ROLE_ADMIN' || result.role == 'ROLE_ADMIN'
     }
 }
