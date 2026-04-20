@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter
 @Transactional
 class PermitService {
 
+    MailService mailService
+
     static final Map<String, Map> TYPES = [
             annuel    : [title: 'Permis annuel', price: 92.0],
             semaine   : [title: 'Permis semaine', price: 28.0],
@@ -105,6 +107,7 @@ class PermitService {
         if (!permit.save(flush: true)) {
             return [error: 'Mise à jour impossible.']
         }
+        mailService?.permitDecision(permit)
         [permit: permit]
     }
 }

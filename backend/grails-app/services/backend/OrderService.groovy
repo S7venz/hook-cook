@@ -5,6 +5,8 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class OrderService {
 
+    MailService mailService
+
     static final Map<String, String> STATUS_LABELS = [
             paid     : 'Payée',
             shipped  : 'Expédiée',
@@ -61,6 +63,7 @@ class OrderService {
         if (!order.save(flush: true)) {
             return [error: 'Impossible de créer la commande.']
         }
+        mailService?.orderConfirmation(order)
         [order: order]
     }
 

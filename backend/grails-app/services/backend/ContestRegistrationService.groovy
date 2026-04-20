@@ -5,6 +5,8 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class ContestRegistrationService {
 
+    MailService mailService
+
     Map register(User user, String contestId, Map payload) {
         if (!user) return [error: 'Authentification requise.']
         Contest contest = Contest.get(contestId)
@@ -23,6 +25,7 @@ class ContestRegistrationService {
         }
         contest.inscrits = (contest.inscrits ?: 0) + 1
         contest.save(flush: true)
+        mailService?.contestRegistration(reg)
         [registration: reg]
     }
 
