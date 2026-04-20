@@ -7,7 +7,7 @@ import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAuth } from '../lib/auth.js';
 import { formatPrice } from '../lib/format.js';
-import { useSubmittedPermit } from '../lib/permitApplication.js';
+import { useAdminPermits } from '../lib/permitApplication.js';
 import { useToast } from '../lib/toast.js';
 
 const SECTIONS = [
@@ -36,7 +36,7 @@ function KpiCard({ label, value, delta, deltaTone }) {
   );
 }
 
-function OverviewSection({ orders, permit, contestCount, lowStock, onGo }) {
+function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo }) {
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
   const ordersToShip = orders.filter((o) => o.status === 'paid').length;
 
@@ -64,10 +64,7 @@ function OverviewSection({ orders, permit, contestCount, lowStock, onGo }) {
           delta={`${orders.length} au total`}
           deltaTone="soft"
         />
-        <KpiCard
-          label="Permis en attente"
-          value={permit && permit.status === 'pending' ? 1 : 0}
-        />
+        <KpiCard label="Permis en attente" value={pendingPermits ?? 0} />
         <KpiCard label="Inscriptions concours" value={contestCount} />
       </div>
 
@@ -222,7 +219,8 @@ function OrdersSection({ orders, onUpdateStatus }) {
   );
 }
 
-function PermisSection({ permit, onUpdate }) {
+function PermisSection({ permits, onUpdate }) {
+  const list = permits ?? [];
   return (
     <>
       <h1>Demandes de permis</h1>
@@ -240,51 +238,58 @@ function PermisSection({ permit, onUpdate }) {
             </tr>
           </thead>
           <tbody>
-            {!permit && (
+            {list.length === 0 && (
               <tr>
                 <td colSpan={7} className="soft" style={{ padding: 'var(--sp-4)' }}>
                   Aucune demande en cours.
                 </td>
               </tr>
             )}
-            {permit && (
-              <tr>
-                <td className="mono">{permit.id}</td>
+            {list.map((p) => (
+              <tr key={p.id}>
+                <td className="mono">{p.id}</td>
                 <td>
-                  {permit.firstName} {permit.lastName}
+                  {p.firstName} {p.lastName}
+                  {p.userEmail && (
+                    <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
+                      {p.userEmail}
+                    </div>
+                  )}
                 </td>
-                <td>{permit.typeTitle}</td>
+                <td>{p.typeTitle}</td>
                 <td className="soft">
-                  {new Intl.DateTimeFormat('fr-FR').format(new Date(permit.submittedAt))}
+                  {p.submittedAt
+                    ? new Intl.DateTimeFormat('fr-FR').format(new Date(p.submittedAt))
+                    : '—'}
                 </td>
-                <td className="mono">{formatPrice(permit.amount)}</td>
+                <td className="mono">{formatPrice(p.amount)}</td>
                 <td>
                   <Badge
                     status={
-                      permit.status === 'approved'
+                      p.status === 'approved'
                         ? 'approved'
-                        : permit.status === 'rejected'
+                        : p.status === 'rejected'
                           ? 'rejected'
                           : 'pending'
                     }
                   >
-                    {permit.statusLabel}
+                    {p.statusLabel}
                   </Badge>
                 </td>
                 <td>
-                  {permit.status === 'pending' && (
+                  {p.status === 'pending' && (
                     <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onUpdate('approved')}
+                        onClick={() => onUpdate(p.id, 'approved')}
                       >
                         Approuver
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onUpdate('rejected')}
+                        onClick={() => onUpdate(p.id, 'rejected')}
                       >
                         Rejeter
                       </Button>
@@ -292,7 +297,7 @@ function PermisSection({ permit, onUpdate }) {
                   )}
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
@@ -769,7 +774,7 @@ export function AdminPage() {
   const { user, hydrating, logout } = useAuth();
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
-  const { permit, updateStatus: updatePermitStatus } = useSubmittedPermit();
+  const { permits, updateStatus: updatePermitStatus } = useAdminPermits();
   const { products, createProduct, updateProduct, deleteProduct } = useAdminProducts();
   const [section, setSection] = useState('overview');
 
@@ -871,7 +876,7 @@ export function AdminPage() {
         {section === 'overview' && (
           <OverviewSection
             orders={orders}
-            permit={permit}
+            pendingPermits={permits.filter((p) => p.status === 'pending').length}
             contestCount={registeredIds.size}
             lowStock={lowStock}
             onGo={setSection}
@@ -881,7 +886,7 @@ export function AdminPage() {
           <OrdersSection orders={orders} onUpdateStatus={updateOrderStatus} />
         )}
         {section === 'permis' && (
-          <PermisSection permit={permit} onUpdate={updatePermitStatus} />
+          <PermisSection permits={permits} onUpdate={updatePermitStatus} />
         )}
         {section === 'concours' && <ConcoursSection registered={registeredIds} />}
         {section === 'products' && (

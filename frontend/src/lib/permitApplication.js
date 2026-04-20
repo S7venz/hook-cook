@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-
-const STORAGE_KEY = 'hc.permit.v1';
+import { api } from './api.js';
+import { useAuth } from './auth.js';
 
 export const PERMIT_TYPES = [
   {
@@ -26,7 +26,7 @@ export const PERMIT_TYPES = [
     label: '-12 ans',
     title: 'Découverte',
     price: 6,
-    items: ['Mineurs jusqu\'à 12 ans', "Toute l'année", 'Carte gratuite -2 ans'],
+    items: ["Mineurs jusqu'à 12 ans", "Toute l'année", 'Carte gratuite -2 ans'],
   },
 ];
 
@@ -41,106 +41,95 @@ export function findPermitType(id) {
   return PERMIT_TYPES.find((t) => t.id === id) ?? PERMIT_TYPES[0];
 }
 
-function loadInitial() {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-
-function buildHistory(submittedAt) {
-  const date = new Date(submittedAt);
-  const fmt = (d) =>
-    new Intl.DateTimeFormat('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(d);
-
-  const paid = new Date(date.getTime() + 3 * 60 * 1000);
-  const instructed = new Date(date.getTime() + 60 * 60 * 1000);
-  return [
-    { label: 'Demande envoyée', date: fmt(date), done: true },
-    { label: 'Paiement confirmé', date: fmt(paid), done: true },
-    { label: 'En instruction (fédération)', date: fmt(instructed), done: true, current: true },
-    { label: 'Décision', date: null, done: false },
-  ];
-}
-
-function generatePermitId() {
-  const rand = Math.floor(10000 + Math.random() * 89999);
-  return `FR-2026-${rand}`;
-}
-
 export function useSubmittedPermit() {
-  const [permit, setPermit] = useState(loadInitial);
+  const { token, user } = useAuth();
+  const [permit, setPermit] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [nonce, setNonce] = useState(0);
+
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
   useEffect(() => {
-    try {
-      if (permit) {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(permit));
-      } else {
-        window.localStorage.removeItem(STORAGE_KEY);
+    if (!token || !user) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.get('/api/permits/me', { token });
+        if (!cancelled) setPermit(data?.permit ?? null);
+      } catch {
+        if (!cancelled) setPermit(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch {
-      // ignore
-    }
-  }, [permit]);
-
-  const submit = useCallback((input) => {
-    const submittedAt = new Date().toISOString();
-    const type = findPermitType(input.typeId);
-    const record = {
-      id: generatePermitId(),
-      typeId: type.id,
-      typeTitle: type.title,
-      amount: type.price,
-      department: input.department,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      birthDate: input.birthDate,
-      submittedAt,
-      status: 'pending',
-      statusLabel: 'En instruction',
-      history: buildHistory(submittedAt),
+    })();
+    return () => {
+      cancelled = true;
     };
-    setPermit(record);
-    return record;
-  }, []);
+  }, [token, user, nonce]);
 
-  const reset = useCallback(() => setPermit(null), []);
+  const submit = useCallback(
+    async (input) => {
+      const created = await api.post('/api/permits', input, { token });
+      setPermit(created);
+      return created;
+    },
+    [token],
+  );
 
-  const updateStatus = useCallback((status) => {
-    const decisions = {
-      approved: { label: 'Approuvé', historyLabel: 'Approuvé par la fédération' },
-      rejected: { label: 'Rejeté', historyLabel: 'Rejet notifié' },
-    };
-    const decision = decisions[status];
-    if (!decision) return;
-    setPermit((current) => {
-      if (!current) return current;
-      const timestamp = new Date();
-      const fmt = new Intl.DateTimeFormat('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(timestamp);
-      const history = current.history.map((h) =>
-        h.label === 'Décision'
-          ? { ...h, done: true, date: fmt, label: decision.historyLabel, current: true }
-          : { ...h, current: false },
+  const updateStatus = useCallback(
+    async (status) => {
+      if (!permit) return null;
+      const updated = await api.patch(
+        `/api/permits/${encodeURIComponent(permit.id)}`,
+        { status },
+        { token },
       );
-      return { ...current, status, statusLabel: decision.label, history };
-    });
-  }, []);
+      setPermit(updated);
+      return updated;
+    },
+    [permit, token],
+  );
 
-  return { permit, submit, reset, updateStatus };
+  return { permit, loading, submit, updateStatus, refresh };
+}
+
+export function useAdminPermits() {
+  const { token, user } = useAuth();
+  const [permits, setPermits] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [nonce, setNonce] = useState(0);
+
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
+
+  useEffect(() => {
+    if (!token || user?.role !== 'ROLE_ADMIN') return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.get('/api/permits', { token });
+        if (!cancelled) setPermits(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setPermits([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, user, nonce]);
+
+  const updateStatus = useCallback(
+    async (reference, status) => {
+      await api.patch(
+        `/api/permits/${encodeURIComponent(reference)}`,
+        { status },
+        { token },
+      );
+      refresh();
+    },
+    [token, refresh],
+  );
+
+  return { permits, loading, updateStatus, refresh };
 }

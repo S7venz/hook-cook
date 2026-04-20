@@ -25,6 +25,11 @@ class UrlMappings {
         get "/api/orders/$reference"(controller: 'order', action: 'show')
         patch "/api/orders/$reference"(controller: 'order', action: 'patchStatus')
 
+        get "/api/permits/me"(controller: 'permit', action: 'current')
+        post "/api/permits"(controller: 'permit', action: 'create')
+        get "/api/permits"(controller: 'permit', action: 'listAll')
+        patch "/api/permits/$reference"(controller: 'permit', action: 'patchStatus')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

@@ -569,13 +569,17 @@ function LandingView({ onApply, onTrack, hasPermit }) {
 
 export function PermisPage() {
   const { permit, submit } = useSubmittedPermit();
-  const [view, setView] = useState(permit ? 'track' : 'landing');
+  const [view, setView] = useState('landing');
   const { push } = useToast();
 
-  const handleSubmit = (input) => {
-    submit(input);
-    push('Demande envoyée — en instruction');
-    setView('track');
+  const handleSubmit = async (input) => {
+    try {
+      await submit(input);
+      push('Demande envoyée — en instruction');
+      setView('track');
+    } catch (err) {
+      push(err?.message ?? 'Impossible de soumettre la demande.');
+    }
   };
 
   if (view === 'track' && permit) {
