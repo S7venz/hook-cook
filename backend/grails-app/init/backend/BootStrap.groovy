@@ -3,11 +3,26 @@ package backend
 class BootStrap {
 
     def init = { servletContext ->
+        seedAdmin()
         seedCategories()
         seedTechniques()
         seedSpecies()
         seedContests()
         seedProducts()
+    }
+
+    private void seedAdmin() {
+        String email = 'admin@hookcook.fr'
+        if (User.findByEmail(email)) return
+        def encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(12)
+        new User(
+                email: email,
+                passwordHash: encoder.encode('admin1234'),
+                firstName: 'Admin',
+                lastName: 'Hook & Cook',
+                role: 'ROLE_ADMIN',
+        ).save(failOnError: true, flush: true)
+        log.info('Seeded admin user: {} / admin1234', email)
     }
 
     def destroy = {

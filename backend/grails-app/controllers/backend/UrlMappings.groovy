@@ -8,7 +8,10 @@ class UrlMappings {
         get "/api/auth/me"(controller: 'auth', action: 'me')
 
         get "/api/products"(controller: 'product', action: 'list')
+        post "/api/products"(controller: 'product', action: 'save')
         get "/api/products/$id"(controller: 'product', action: 'show')
+        put "/api/products/$id"(controller: 'product', action: 'update')
+        delete "/api/products/$id"(controller: 'product', action: 'remove')
 
         get "/api/categories"(controller: 'reference', action: 'categories')
         get "/api/techniques"(controller: 'reference', action: 'techniques')

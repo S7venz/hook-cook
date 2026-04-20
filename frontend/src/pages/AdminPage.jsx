@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth.js';
 import { formatPrice } from '../lib/format.js';
 import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
+import { useToast } from '../lib/toast.js';
 
 const SECTIONS = [
   { id: 'overview', label: "Vue d'ensemble", group: 'Activité' },
@@ -341,23 +342,334 @@ function ConcoursSection({ registered }) {
   );
 }
 
-function ProductsSection({ products, onUpdateStock, onSetStock }) {
-  const [editingId, setEditingId] = useState(null);
-  const [draftValue, setDraftValue] = useState('');
+const PRODUCT_CATEGORIES = [
+  { id: 'cannes', label: 'Cannes' },
+  { id: 'moulinets', label: 'Moulinets' },
+  { id: 'leurres', label: 'Leurres & appâts' },
+  { id: 'soies-lignes', label: 'Soies & lignes' },
+  { id: 'vetements', label: 'Vêtements' },
+  { id: 'accessoires', label: 'Accessoires' },
+];
 
-  const startEdit = (product) => {
-    setEditingId(product.id);
-    setDraftValue(String(product.stock));
+const EMPTY_PRODUCT = {
+  id: '',
+  sku: '',
+  name: '',
+  category: 'cannes',
+  technique: '',
+  brand: '',
+  price: 0,
+  wasPrice: '',
+  stock: 0,
+  rating: '',
+  reviews: '',
+  water: '',
+  img: '',
+  description: '',
+  species: '',
+};
+
+function toFormState(product) {
+  if (!product) return { ...EMPTY_PRODUCT };
+  return {
+    id: product.id,
+    sku: product.sku ?? '',
+    name: product.name ?? '',
+    category: product.category ?? 'cannes',
+    technique: product.technique ?? '',
+    brand: product.brand ?? '',
+    price: product.price ?? 0,
+    wasPrice: product.wasPrice ?? '',
+    stock: product.stock ?? 0,
+    rating: product.rating ?? '',
+    reviews: product.reviews ?? '',
+    water: product.water ?? '',
+    img: product.img ?? '',
+    description: product.description ?? '',
+    species: (product.species ?? []).join(', '),
+  };
+}
+
+function buildPayload(form) {
+  const species = form.species
+    ? form.species.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  return {
+    id: form.id.trim(),
+    sku: form.sku.trim(),
+    name: form.name.trim(),
+    category: form.category,
+    technique: form.technique || null,
+    brand: form.brand || null,
+    price: Number(form.price) || 0,
+    wasPrice: form.wasPrice === '' ? null : Number(form.wasPrice),
+    stock: Number(form.stock) || 0,
+    rating: form.rating === '' ? null : Number(form.rating),
+    reviews: form.reviews === '' ? null : Number(form.reviews),
+    water: form.water || null,
+    img: form.img || null,
+    description: form.description || null,
+    species,
+  };
+}
+
+function ProductForm({ initial, onCancel, onSubmit }) {
+  const isCreate = !initial;
+  const [form, setForm] = useState(() => toFormState(initial));
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+    try {
+      await onSubmit(buildPayload(form));
+    } catch (err) {
+      setError(err?.message ?? 'Erreur inconnue.');
+      setSubmitting(false);
+      return;
+    }
+    setSubmitting(false);
   };
 
-  const saveEdit = (id) => {
-    onSetStock(id, draftValue);
-    setEditingId(null);
+  return (
+    <div className="panel" style={{ padding: 'var(--sp-5)', marginBottom: 'var(--sp-5)' }}>
+      <form onSubmit={submit} className="stack-md" noValidate>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <h3 style={{ margin: 0 }}>
+            {isCreate ? 'Nouveau produit' : `Éditer ${initial.name}`}
+          </h3>
+        </div>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}
+        >
+          <div className="field">
+            <label>Identifiant (slug)<span className="req">*</span></label>
+            <input
+              className="input mono"
+              value={form.id}
+              onChange={update('id')}
+              required
+              disabled={!isCreate}
+              placeholder="hc-nouvelle-canne"
+            />
+          </div>
+          <div className="field">
+            <label>SKU<span className="req">*</span></label>
+            <input
+              className="input mono"
+              value={form.sku}
+              onChange={update('sku')}
+              required
+            />
+          </div>
+        </div>
+        <div className="field">
+          <label>Nom<span className="req">*</span></label>
+          <input className="input" value={form.name} onChange={update('name')} required />
+        </div>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
+        >
+          <div className="field">
+            <label>Catégorie<span className="req">*</span></label>
+            <select
+              className="select"
+              value={form.category}
+              onChange={update('category')}
+            >
+              {PRODUCT_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label>Technique</label>
+            <input className="input" value={form.technique} onChange={update('technique')} />
+          </div>
+          <div className="field">
+            <label>Marque</label>
+            <input className="input" value={form.brand} onChange={update('brand')} />
+          </div>
+        </div>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
+        >
+          <div className="field">
+            <label>Prix (€)<span className="req">*</span></label>
+            <input
+              className="input mono"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.price}
+              onChange={update('price')}
+              required
+            />
+          </div>
+          <div className="field">
+            <label>Prix barré</label>
+            <input
+              className="input mono"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.wasPrice}
+              onChange={update('wasPrice')}
+            />
+          </div>
+          <div className="field">
+            <label>Stock<span className="req">*</span></label>
+            <input
+              className="input mono"
+              type="number"
+              min="0"
+              value={form.stock}
+              onChange={update('stock')}
+              required
+            />
+          </div>
+        </div>
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
+        >
+          <div className="field">
+            <label>Note (0-5)</label>
+            <input
+              className="input mono"
+              type="number"
+              step="0.1"
+              min="0"
+              max="5"
+              value={form.rating}
+              onChange={update('rating')}
+            />
+          </div>
+          <div className="field">
+            <label>Nombre d'avis</label>
+            <input
+              className="input mono"
+              type="number"
+              min="0"
+              value={form.reviews}
+              onChange={update('reviews')}
+            />
+          </div>
+          <div className="field">
+            <label>Type d'eau</label>
+            <input
+              className="input"
+              value={form.water}
+              onChange={update('water')}
+              placeholder="rivière, lac, mer…"
+            />
+          </div>
+        </div>
+        <div className="field">
+          <label>Espèces (séparées par des virgules)</label>
+          <input
+            className="input mono"
+            value={form.species}
+            onChange={update('species')}
+            placeholder="truite, ombre, perche"
+          />
+        </div>
+        <div className="field">
+          <label>Description courte de l'image (placeholder)</label>
+          <input className="input" value={form.img} onChange={update('img')} />
+        </div>
+        <div className="field">
+          <label>Description</label>
+          <textarea
+            className="textarea"
+            rows={3}
+            value={form.description}
+            onChange={update('description')}
+          />
+        </div>
+        {error && <div className="error">{error}</div>}
+        <div className="row">
+          <Button variant="ghost" onClick={onCancel} type="button" disabled={submitting}>
+            Annuler
+          </Button>
+          <Button variant="primary" type="submit" disabled={submitting}>
+            {submitting ? 'Enregistrement…' : isCreate ? 'Créer le produit' : 'Enregistrer les modifications'}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function ProductsSection({
+  products,
+  onCreate,
+  onUpdate,
+  onDelete,
+  notify,
+}) {
+  const [mode, setMode] = useState('list'); // 'list' | 'create' | number(id)
+  const editing = typeof mode === 'string' && mode.startsWith('edit:')
+    ? products.find((p) => p.id === mode.slice(5))
+    : null;
+
+  const handleCreate = async (payload) => {
+    await onCreate(payload);
+    notify(`Produit « ${payload.name} » créé.`);
+    setMode('list');
+  };
+
+  const handleUpdate = (id) => async (payload) => {
+    await onUpdate(id, payload);
+    notify(`Produit « ${payload.name} » mis à jour.`);
+    setMode('list');
+  };
+
+  const handleDelete = async (product) => {
+    if (!window.confirm(`Supprimer définitivement « ${product.name} » ?`)) return;
+    try {
+      await onDelete(product.id);
+      notify(`Produit « ${product.name} » supprimé.`);
+    } catch (err) {
+      notify(err?.message ?? 'Suppression impossible.');
+    }
   };
 
   return (
     <>
-      <h1>Produits</h1>
+      <div
+        className="row"
+        style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-4)' }}
+      >
+        <h1 style={{ margin: 0 }}>Produits</h1>
+        {mode === 'list' && (
+          <Button variant="primary" onClick={() => setMode('create')}>
+            + Ajouter un produit
+          </Button>
+        )}
+      </div>
+
+      {mode === 'create' && (
+        <ProductForm
+          initial={null}
+          onCancel={() => setMode('list')}
+          onSubmit={handleCreate}
+        />
+      )}
+
+      {editing && (
+        <ProductForm
+          initial={editing}
+          onCancel={() => setMode('list')}
+          onSubmit={handleUpdate(editing.id)}
+        />
+      )}
+
       <div className="panel">
         <table className="table">
           <thead>
@@ -367,67 +679,46 @@ function ProductsSection({ products, onUpdateStock, onSetStock }) {
               <th>Catégorie</th>
               <th>Prix</th>
               <th>Stock</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
+            {products.length === 0 && (
+              <tr>
+                <td colSpan={6} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                  Aucun produit. Ajoutez-en un pour démarrer.
+                </td>
+              </tr>
+            )}
             {products.map((p) => (
               <tr key={p.id}>
                 <td className="mono">{p.sku}</td>
-                <td>{p.name}</td>
+                <td>
+                  <div style={{ fontWeight: 500 }}>{p.name}</div>
+                  <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
+                    {p.id}
+                  </div>
+                </td>
                 <td className="soft">{p.category}</td>
                 <td className="mono">{formatPrice(p.price)}</td>
-                <td className="mono">
-                  {editingId === p.id ? (
-                    <input
-                      className="input mono"
-                      type="number"
-                      min="0"
-                      value={draftValue}
-                      onChange={(e) => setDraftValue(e.target.value)}
-                      style={{ width: 90, height: 32 }}
-                      autoFocus
-                    />
-                  ) : (
-                    p.stock
-                  )}
-                </td>
+                <td className="mono">{p.stock}</td>
                 <td>
-                  {editingId === p.id ? (
-                    <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => saveEdit(p.id)}
-                      >
-                        Enregistrer
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingId(null)}
-                      >
-                        Annuler
-                      </Button>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => startEdit(p)}
-                      >
-                        Éditer stock
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onUpdateStock(p.id, 10)}
-                      >
-                        +10
-                      </Button>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMode(`edit:${p.id}`)}
+                    >
+                      Éditer
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(p)}
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -441,10 +732,13 @@ function ProductsSection({ products, onUpdateStock, onSetStock }) {
 export function AdminPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useOrders();
   const { permit, updateStatus: updatePermitStatus } = useSubmittedPermit();
-  const { products, updateStock, setStock } = useAdminProducts();
+  const { products, createProduct, updateProduct, deleteProduct } = useAdminProducts();
   const [section, setSection] = useState('overview');
+
+  const isAdmin = user?.role === 'ROLE_ADMIN';
 
   const registeredIds = useMemo(() => {
     try {
@@ -457,6 +751,34 @@ export function AdminPage() {
 
   if (!user) {
     return <Navigate to="/connexion" state={{ from: '/admin' }} replace />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="page">
+        <div
+          className="page-container"
+          style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}
+        >
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-44)',
+              fontWeight: 400,
+              margin: '0 0 var(--sp-4)',
+            }}
+          >
+            Accès réservé aux administrateurs.
+          </h1>
+          <p className="soft" style={{ marginBottom: 'var(--sp-6)' }}>
+            Connectez-vous avec un compte admin pour accéder à cette section.
+          </p>
+          <Button variant="primary" onClick={() => navigate('/')}>
+            Retour à l'accueil
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const lowStock = products.filter((p) => p.stock < 15).slice(0, 4);
@@ -517,8 +839,10 @@ export function AdminPage() {
         {section === 'products' && (
           <ProductsSection
             products={products}
-            onUpdateStock={updateStock}
-            onSetStock={setStock}
+            onCreate={createProduct}
+            onUpdate={updateProduct}
+            onDelete={deleteProduct}
+            notify={push}
           />
         )}
       </main>

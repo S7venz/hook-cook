@@ -68,4 +68,22 @@ class AuthService {
         if (!sub) return null
         User.get(sub as Long)
     }
+
+    Map userFromRequest(request) {
+        String header = request.getHeader('Authorization')
+        if (!header || !header.startsWith('Bearer ')) return [error: 'auth_missing']
+        String token = header.substring('Bearer '.length())
+        def claims = jwtService.parse(token)
+        if (!claims) return [error: 'auth_invalid']
+        String sub = claims.subject
+        if (!sub) return [error: 'auth_invalid']
+        User user = User.get(sub as Long)
+        if (!user) return [error: 'auth_invalid']
+        [user: user, role: claims.get('role')]
+    }
+
+    boolean isAdmin(request) {
+        Map result = userFromRequest(request)
+        result.user && result.user.role == 'ROLE_ADMIN'
+    }
 }
