@@ -1,22 +1,51 @@
 package backend
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
+
 /**
  * Notifications transactionnelles.
  *
- * Pour l'instant : log des messages dans la console backend (les mails
- * réels nécessitent un SMTP — JavaMailSender peut être branché plus
- * tard via une variable d'environnement).
+ * Comportement :
+ *   - Si un SMTP est configuré (spring.mail.host défini), envoie un vrai mail via JavaMailSender.
+ *   - Sinon, écrit le contenu du mail dans les logs (mode développement).
  */
 class MailService {
 
+    @Autowired(required = false)
+    JavaMailSender javaMailSender
+
+    @Value('${spring.mail.host:}')
+    String mailHost
+
+    @Value('${hc.mail.from:noreply@hookcook.fr}')
+    String fromAddress
+
     boolean send(String to, String subject, String body) {
+        if (javaMailSender && mailHost) {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage()
+                message.from = fromAddress
+                message.to = to
+                message.subject = subject
+                message.text = body
+                javaMailSender.send(message)
+                log.info('Mail envoyé via SMTP à {} — {}', to, subject)
+                return true
+            } catch (Exception e) {
+                log.error('Erreur envoi SMTP ({}), fallback log', e.message)
+            }
+        }
+
         log.info '''
-=================== MAIL ===================
+=================== MAIL (LOG-ONLY) ===================
  To      : {}
  Subject : {}
  Body    :
 {}
-============================================''', to, subject, body
+=======================================================''', to, subject, body
         true
     }
 
