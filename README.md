@@ -200,6 +200,26 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | `HC_JWT_SECRET` | secret de dev (à changer en prod !) | Clé HMAC pour signer les JWT |
 | `VITE_API_URL` | `http://localhost:8080` | URL API côté frontend (build-time) |
 
+## Documentation
+
+- [docs/GUIDE-UTILISATEUR.md](docs/GUIDE-UTILISATEUR.md) — manuel client (compte, achat, permis, concours, carnet)
+- [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — manuel admin (produits, commandes, permis, concours, sécurité)
+
+## Tests
+
+Backend (Spock / Grails) :
+
+```bash
+cd backend
+./grailsw test-app
+# ou via Gradle directement :
+./gradlew test
+```
+
+Tests fournis dans `backend/src/test/groovy/backend/` :
+- `AuthServiceSpec` — register, login, BCrypt, validation
+- `JwtServiceSpec` — issue + parse roundtrip, signature invalide, token malformé
+
 ## Scripts utiles
 
 ```bash
