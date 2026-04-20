@@ -117,9 +117,20 @@ class ProductController {
     }
 
     private boolean requireAdmin() {
-        if (authService.isAdmin(request)) return true
+        Map check = authService.userFromRequest(request)
+        boolean ok = check.user && (check.user.role == 'ROLE_ADMIN' || check.role == 'ROLE_ADMIN')
+        if (ok) return true
+        Map debug = [
+                error      : 'Accès réservé aux administrateurs.',
+                tokenError : check.error,
+                userEmail  : check.user?.email,
+                dbRole     : check.user?.role,
+                claimRole  : check.role,
+                hasHeader  : request.getHeader('Authorization') != null,
+        ]
+        log.warn('requireAdmin REJECTED: {}', debug)
         response.status = 403
-        render([error: 'Accès réservé aux administrateurs.'] as JSON)
+        render(debug as JSON)
         false
     }
 
