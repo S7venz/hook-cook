@@ -30,6 +30,10 @@ spring:
                 - '**/*.gson'
                 - 'logback.groovy'
                 - '*.properties'
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 12MB
 environments:
     development:
         management:
