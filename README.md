@@ -199,6 +199,21 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | `DATASOURCE_PASSWORD` | `hookcook` | Password Postgres |
 | `HC_JWT_SECRET` | secret de dev (à changer en prod !) | Clé HMAC pour signer les JWT |
 | `VITE_API_URL` | `http://localhost:8080` | URL API côté frontend (build-time) |
+| `MAIL_HOST` | *(vide → logs seulement)* | Hôte SMTP (ex: `smtp.gmail.com`) |
+| `MAIL_PORT` | `587` | Port SMTP |
+| `MAIL_USER` | — | Nom d'utilisateur SMTP |
+| `MAIL_PASSWORD` | — | Mot de passe SMTP |
+| `MAIL_FROM` | `noreply@hookcook.fr` | Adresse expéditrice |
+
+Dès que `MAIL_HOST` est défini, `MailService` bascule automatiquement sur un vrai envoi via `JavaMailSender`. Sans SMTP configuré, les mails sont loggés dans la console Grails (utile pour le dev).
+
+## Sécurité (Spring Security)
+
+Le projet utilise **Spring Security** à deux endroits :
+1. **`spring-security-crypto`** pour le hashing BCrypt des mots de passe utilisateurs (12 rounds).
+2. **JWT manuel** (JJWT 0.12+) signé HS512 avec le secret serveur (`HC_JWT_SECRET`). Validation faite via un `AuthService` qui inspecte le header `Authorization: Bearer <token>` et vérifie le rôle (`ROLE_USER` / `ROLE_ADMIN`).
+
+Le filtre complet Spring Security (`SecurityFilterChain`) n'est pas en place — la protection des endpoints admin se fait via `authService.isAdmin(request)` appelé dans chaque action admin. Fonctionnellement équivalent pour un projet de cette taille, sans la courbe d'apprentissage de la config Spring Security.
 
 ## Documentation
 
