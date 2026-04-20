@@ -79,11 +79,19 @@ class AuthService {
         if (!sub) return [error: 'auth_invalid']
         User user = User.get(sub as Long)
         if (!user) return [error: 'auth_invalid']
-        [user: user, role: claims.get('role')]
+        [user: user, role: claims.get('role') as String]
     }
 
     boolean isAdmin(request) {
         Map result = userFromRequest(request)
-        result.user && result.user.role == 'ROLE_ADMIN'
+        if (!result.user) {
+            log.warn('isAdmin: no user from request, error={}', result.error)
+            return false
+        }
+        boolean dbAdmin = result.user.role == 'ROLE_ADMIN'
+        boolean claimAdmin = result.role == 'ROLE_ADMIN'
+        log.info('isAdmin: user={} dbRole={} claimRole={}',
+                result.user.email, result.user.role, result.role)
+        dbAdmin || claimAdmin
     }
 }
