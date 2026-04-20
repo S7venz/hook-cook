@@ -35,6 +35,8 @@ database/data/
 *.sqlite
 *.db
 
+backend/uploads/
+
 CLAUDE.md
 .claude/
 .claude-code/

@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { contests } from '../data/catalog.js';
+import { ImageUploadField } from '../components/ui/ImageUploadField.jsx';
 import { useAdminContests } from '../lib/adminContests.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
@@ -866,36 +867,11 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>URL de la photo (https://…)</label>
-          <input
-            className="input mono"
-            type="url"
+          <label>Photo du produit</label>
+          <ImageUploadField
             value={form.imageUrl}
-            onChange={update('imageUrl')}
-            placeholder="https://images.unsplash.com/photo-..."
+            onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
           />
-          {form.imageUrl && (
-            <div
-              style={{
-                marginTop: 'var(--sp-3)',
-                border: '1px solid var(--hairline)',
-                borderRadius: 'var(--r-md)',
-                overflow: 'hidden',
-                width: 160,
-                height: 200,
-                background: 'var(--bg-sunk)',
-              }}
-            >
-              <img
-                src={form.imageUrl}
-                alt="Aperçu"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
         </div>
         <div className="field">
           <label>Étiquette du placeholder (fallback texte si pas d'URL)</label>

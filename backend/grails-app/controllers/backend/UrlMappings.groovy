@@ -50,6 +50,9 @@ class UrlMappings {
         post "/api/carnet"(controller: 'carnet', action: 'create')
         delete "/api/carnet/$id"(controller: 'carnet', action: 'remove')
 
+        post "/api/uploads"(controller: 'upload', action: 'upload')
+        get "/api/uploads/$filename"(controller: 'upload', action: 'serve')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
