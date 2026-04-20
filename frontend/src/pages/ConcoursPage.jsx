@@ -178,11 +178,15 @@ export function ConcoursPage() {
     };
   }, [showModal]);
 
-  const handleConfirm = ({ contestId, category }) => {
+  const handleConfirm = async ({ contestId, category, permit }) => {
     const label = CATEGORIES.find((c) => c.id === category)?.label ?? '';
-    register(contestId);
-    push(`Inscrit à ${selected.title} · ${label}`);
-    setShowModal(false);
+    try {
+      await register(contestId, { category, permitNumber: permit });
+      push(`Inscrit à ${selected.title} · ${label}`);
+      setShowModal(false);
+    } catch (err) {
+      push(err?.message ?? 'Inscription impossible.');
+    }
   };
 
   const [day, month] = selected.dateDisplay.split(' ');

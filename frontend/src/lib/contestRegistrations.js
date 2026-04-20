@@ -1,40 +1,52 @@
 import { useCallback, useEffect, useState } from 'react';
-
-const STORAGE_KEY = 'hc.contests.v1';
-
-function loadInitial() {
-  if (typeof window === 'undefined') return new Set();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    return new Set(Array.isArray(parsed) ? parsed : []);
-  } catch {
-    return new Set();
-  }
-}
+import { api } from './api.js';
+import { useAuth } from './auth.js';
 
 export function useContestRegistrations() {
-  const [ids, setIds] = useState(loadInitial);
+  const { token, user } = useAuth();
+  const [registrations, setRegistrations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [nonce, setNonce] = useState(0);
+
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
-    } catch {
-      // ignore
-    }
-  }, [ids]);
+    if (!token || !user) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.get('/api/contests-registrations/me', { token });
+        if (!cancelled) setRegistrations(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setRegistrations([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, user, nonce]);
 
-  const register = useCallback((id) => {
-    setIds((current) => {
-      if (current.has(id)) return current;
-      const next = new Set(current);
-      next.add(id);
-      return next;
-    });
-  }, []);
+  const register = useCallback(
+    async (contestId, { category, permitNumber }) => {
+      const created = await api.post(
+        `/api/contests/${encodeURIComponent(contestId)}/register`,
+        { category, permitNumber },
+        { token },
+      );
+      setRegistrations((current) => [created, ...current]);
+      return created;
+    },
+    [token],
+  );
 
-  const isRegistered = useCallback((id) => ids.has(id), [ids]);
+  const isRegistered = useCallback(
+    (contestId) => registrations.some((r) => r.contestId === contestId),
+    [registrations],
+  );
 
-  return { register, isRegistered, count: ids.size };
+  const count = registrations.length;
+
+  return { registrations, loading, register, isRegistered, count, refresh };
 }

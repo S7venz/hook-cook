@@ -30,6 +30,14 @@ class UrlMappings {
         get "/api/permits"(controller: 'permit', action: 'listAll')
         patch "/api/permits/$reference"(controller: 'permit', action: 'patchStatus')
 
+        post "/api/contests/$id/register"(controller: 'contestRegistration', action: 'register')
+        get "/api/contests-registrations/me"(controller: 'contestRegistration', action: 'myList')
+        get "/api/contests-registrations"(controller: 'contestRegistration', action: 'listAll')
+
+        get "/api/carnet"(controller: 'carnet', action: 'list')
+        post "/api/carnet"(controller: 'carnet', action: 'create')
+        delete "/api/carnet/$id"(controller: 'carnet', action: 'remove')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

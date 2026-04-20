@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
@@ -305,7 +305,7 @@ function PermisSection({ permits, onUpdate }) {
   );
 }
 
-function ConcoursSection({ registered }) {
+function ConcoursSection() {
   return (
     <>
       <h1>Concours</h1>
@@ -316,21 +316,20 @@ function ConcoursSection({ registered }) {
               <th>Titre</th>
               <th>Date</th>
               <th>Lieu</th>
-              <th>Inscrits (site)</th>
+              <th>Inscrits</th>
               <th>Statut</th>
             </tr>
           </thead>
           <tbody>
             {contests.map((c) => {
-              const siteCount = registered.has(c.id) ? c.inscrits + 1 : c.inscrits;
-              const full = siteCount >= c.max;
+              const full = c.inscrits >= c.max;
               return (
                 <tr key={c.id}>
                   <td>{c.title}</td>
                   <td className="mono">{c.dateDisplay}</td>
                   <td className="soft">{c.lieu}</td>
                   <td className="mono">
-                    {siteCount}/{c.max}
+                    {c.inscrits}/{c.max}
                   </td>
                   <td>
                     <Badge status={full ? 'rejected' : 'approved'}>
@@ -780,14 +779,7 @@ export function AdminPage() {
 
   const isAdmin = user?.role === 'ROLE_ADMIN';
 
-  const registeredIds = useMemo(() => {
-    try {
-      const raw = window.localStorage.getItem('hc.contests.v1');
-      return new Set(raw ? JSON.parse(raw) : []);
-    } catch {
-      return new Set();
-    }
-  }, []);
+  const totalRegistrations = contests.reduce((s, c) => s + c.inscrits, 0);
 
   if (hydrating) {
     return (
@@ -877,7 +869,7 @@ export function AdminPage() {
           <OverviewSection
             orders={orders}
             pendingPermits={permits.filter((p) => p.status === 'pending').length}
-            contestCount={registeredIds.size}
+            contestCount={totalRegistrations}
             lowStock={lowStock}
             onGo={setSection}
           />
@@ -888,7 +880,7 @@ export function AdminPage() {
         {section === 'permis' && (
           <PermisSection permits={permits} onUpdate={updatePermitStatus} />
         )}
-        {section === 'concours' && <ConcoursSection registered={registeredIds} />}
+        {section === 'concours' && <ConcoursSection />}
         {section === 'products' && (
           <ProductsSection
             products={products}
