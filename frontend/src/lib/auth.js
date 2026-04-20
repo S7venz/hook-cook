@@ -7,6 +7,7 @@ export const AuthContext = createContext({
   login: async () => ({ ok: false, error: '' }),
   register: async () => ({ ok: false, error: '' }),
   logout: () => {},
+  updateProfile: async () => ({ ok: false, error: '' }),
 });
 
 export function useAuth() {

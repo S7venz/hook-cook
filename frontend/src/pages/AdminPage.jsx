@@ -7,6 +7,7 @@ import { ImageUploadField } from '../components/ui/ImageUploadField.jsx';
 import { useAdminContests } from '../lib/adminContests.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
+import { useAdminStats } from '../lib/adminStats.js';
 import { useAuth } from '../lib/auth.js';
 import { formatPrice } from '../lib/format.js';
 import { useAdminPermits } from '../lib/permitApplication.js';
@@ -14,6 +15,7 @@ import { useToast } from '../lib/toast.js';
 
 const SECTIONS = [
   { id: 'overview', label: "Vue d'ensemble", group: 'Activité' },
+  { id: 'stats', label: 'Statistiques', group: 'Activité' },
   { id: 'orders', label: 'Commandes', group: 'Activité' },
   { id: 'permis', label: 'Permis', group: 'Pêche' },
   { id: 'concours', label: 'Concours', group: 'Pêche' },
@@ -38,7 +40,232 @@ function KpiCard({ label, value, delta, deltaTone }) {
   );
 }
 
-function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo }) {
+function RevenueBarChart({ data }) {
+  if (!data || data.length === 0) return null;
+  const amounts = data.map((d) => Number(d.total ?? 0));
+  const max = Math.max(...amounts, 1);
+  const width = 600;
+  const height = 180;
+  const padding = 28;
+  const barWidth = (width - padding * 2) / data.length;
+  return (
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="CA par mois"
+      style={{ width: '100%', maxWidth: width }}
+    >
+      {data.map((d, i) => {
+        const val = Number(d.total ?? 0);
+        const h = ((val / max) * (height - padding * 2)) || 0;
+        const x = padding + i * barWidth + barWidth * 0.15;
+        const y = height - padding - h;
+        const bw = barWidth * 0.7;
+        return (
+          <g key={d.key}>
+            <rect
+              x={x}
+              y={y}
+              width={bw}
+              height={h}
+              fill="var(--accent)"
+              opacity={val > 0 ? 0.85 : 0.2}
+              rx={2}
+            />
+            <text
+              x={x + bw / 2}
+              y={height - padding + 14}
+              textAnchor="middle"
+              fontFamily="var(--font-mono)"
+              fontSize="10"
+              fill="var(--ink-mute)"
+            >
+              {d.label}
+            </text>
+            {val > 0 && (
+              <text
+                x={x + bw / 2}
+                y={y - 4}
+                textAnchor="middle"
+                fontFamily="var(--font-mono)"
+                fontSize="10"
+                fill="var(--ink-soft)"
+              >
+                {Math.round(val)} €
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function StatusBreakdown({ title, breakdown, labels }) {
+  const entries = Object.entries(breakdown ?? {});
+  if (entries.length === 0) {
+    return (
+      <div className="card" style={{ padding: 'var(--sp-5)' }}>
+        <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+          {title}
+        </div>
+        <p className="soft">Aucune donnée.</p>
+      </div>
+    );
+  }
+  const total = entries.reduce((s, [, v]) => s + (Number(v) || 0), 0);
+  return (
+    <div className="card" style={{ padding: 'var(--sp-5)' }}>
+      <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+        {title}
+      </div>
+      <div className="stack-sm">
+        {entries.map(([key, value]) => {
+          const pct = total > 0 ? (value / total) * 100 : 0;
+          return (
+            <div key={key}>
+              <div
+                className="row"
+                style={{ justifyContent: 'space-between', fontSize: 'var(--fs-13)' }}
+              >
+                <span>{labels?.[key] ?? key}</span>
+                <span className="mono">
+                  {value} · {pct.toFixed(0)} %
+                </span>
+              </div>
+              <div
+                style={{
+                  height: 6,
+                  background: 'var(--bg-sunk)',
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                  marginTop: 4,
+                }}
+              >
+                <div
+                  style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    background: 'var(--accent)',
+                    opacity: 0.75,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StatsSection({ stats, loading }) {
+  if (loading || !stats) {
+    return (
+      <>
+        <h1>Statistiques</h1>
+        <p className="soft">Chargement…</p>
+      </>
+    );
+  }
+  return (
+    <>
+      <h1>Statistiques</h1>
+      <div className="kpi-row">
+        <div className="kpi">
+          <div className="lbl">CA total</div>
+          <div className="val">{formatPrice(Number(stats.totalRevenue ?? 0))}</div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Commandes</div>
+          <div className="val">{stats.totalOrders ?? 0}</div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Permis émis</div>
+          <div className="val">{stats.totalPermits ?? 0}</div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Inscriptions concours</div>
+          <div className="val">{stats.totalRegistrations ?? 0}</div>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
+        <div className="panel-header">
+          <h3>CA par mois (6 derniers)</h3>
+        </div>
+        <div className="panel-body" style={{ padding: 'var(--sp-5)' }}>
+          <RevenueBarChart data={stats.revenueByMonth ?? []} />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 'var(--sp-4)',
+          marginTop: 'var(--sp-5)',
+        }}
+      >
+        <StatusBreakdown
+          title="Commandes par statut"
+          breakdown={stats.ordersByStatus}
+          labels={{
+            paid: 'Payées',
+            shipped: 'Expédiées',
+            delivered: 'Livrées',
+            cancelled: 'Annulées',
+          }}
+        />
+        <StatusBreakdown
+          title="Permis par statut"
+          breakdown={stats.permitsByStatus}
+          labels={{
+            pending: 'En instruction',
+            approved: 'Approuvés',
+            rejected: 'Rejetés',
+          }}
+        />
+      </div>
+
+      <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
+        <div className="panel-header">
+          <h3>Top 5 produits vendus</h3>
+        </div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>SKU</th>
+              <th>Quantité</th>
+              <th>CA généré</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(stats.topProducts ?? []).length === 0 ? (
+              <tr>
+                <td colSpan={4} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                  Aucune vente enregistrée pour l'instant.
+                </td>
+              </tr>
+            ) : (
+              stats.topProducts.map((p) => (
+                <tr key={p.productId}>
+                  <td>{p.name}</td>
+                  <td className="mono">{p.sku}</td>
+                  <td className="mono">{p.qty}</td>
+                  <td className="mono">{formatPrice(Number(p.revenue ?? 0))}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo, onReplenish }) {
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
   const ordersToShip = orders.filter((o) => o.status === 'paid').length;
 
@@ -135,9 +362,14 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo 
                   <td>{p.name}</td>
                   <td className="mono">{p.stock}</td>
                   <td>
-                    <Button variant="ghost" size="sm" onClick={() => onGo('products')}>
-                      Réapprovisionner
-                    </Button>
+                    <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+                      <Button variant="ghost" size="sm" onClick={() => onReplenish?.(p)}>
+                        + stock
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => onGo('products')}>
+                        Ouvrir
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -905,6 +1137,7 @@ function ProductsSection({
   onCreate,
   onUpdate,
   onDelete,
+  onReplenish,
   notify,
 }) {
   const [mode, setMode] = useState('list'); // 'list' | 'create' | number(id)
@@ -995,15 +1228,34 @@ function ProductsSection({
                 </td>
                 <td className="soft">{p.category}</td>
                 <td className="mono">{formatPrice(p.price)}</td>
-                <td className="mono">{p.stock}</td>
+                <td className="mono">
+                  <span
+                    style={{
+                      color:
+                        p.stock < (p.lowStockThreshold ?? 15)
+                          ? 'var(--warn)'
+                          : 'var(--ink)',
+                      fontWeight: p.stock < (p.lowStockThreshold ?? 15) ? 600 : 400,
+                    }}
+                  >
+                    {p.stock}
+                  </span>
+                </td>
                 <td>
-                  <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+                  <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setMode(`edit:${p.id}`)}
                     >
                       Éditer
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onReplenish?.(p)}
+                    >
+                      Réapprovisionner
                     </Button>
                     <Button
                       variant="ghost"
@@ -1029,13 +1281,14 @@ export function AdminPage() {
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
   const { permits, updateStatus: updatePermitStatus } = useAdminPermits();
-  const { products, createProduct, updateProduct, deleteProduct } = useAdminProducts();
+  const { products, createProduct, updateProduct, deleteProduct, replenish } = useAdminProducts();
   const {
     contests: remoteContests,
     createContest,
     updateContest,
     deleteContest,
   } = useAdminContests();
+  const { stats, loading: statsLoading } = useAdminStats();
   const [section, setSection] = useState('overview');
 
   const isAdmin = user?.role === 'ROLE_ADMIN';
@@ -1088,7 +1341,28 @@ export function AdminPage() {
     );
   }
 
-  const lowStock = products.filter((p) => p.stock < 15).slice(0, 4);
+  const lowStock = products
+    .filter((p) => p.stock < (p.lowStockThreshold ?? 15))
+    .slice(0, 4);
+
+  const handleReplenish = async (product) => {
+    const raw = window.prompt(
+      `Combien d'unités ajouter à « ${product.name} » ? (stock actuel : ${product.stock})`,
+      '10',
+    );
+    if (!raw) return;
+    const qty = Number.parseInt(raw, 10);
+    if (!Number.isFinite(qty) || qty <= 0) {
+      push('Quantité invalide.');
+      return;
+    }
+    try {
+      await replenish(product.id, qty);
+      push(`+${qty} unités sur « ${product.name} ».`);
+    } catch (err) {
+      push(err?.message ?? 'Réapprovisionnement impossible.');
+    }
+  };
 
   return (
     <div className="admin-layout">
@@ -1134,8 +1408,10 @@ export function AdminPage() {
             contestCount={totalRegistrations}
             lowStock={lowStock}
             onGo={setSection}
+            onReplenish={handleReplenish}
           />
         )}
+        {section === 'stats' && <StatsSection stats={stats} loading={statsLoading} />}
         {section === 'orders' && (
           <OrdersSection orders={orders} onUpdateStatus={updateOrderStatus} />
         )}
@@ -1157,6 +1433,7 @@ export function AdminPage() {
             onCreate={createProduct}
             onUpdate={updateProduct}
             onDelete={deleteProduct}
+            onReplenish={handleReplenish}
             notify={push}
           />
         )}

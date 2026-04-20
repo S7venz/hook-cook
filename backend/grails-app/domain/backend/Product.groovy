@@ -21,6 +21,7 @@ class Product {
     String imageUrl
     String description
     String story
+    Integer lowStockThreshold = 15
 
     String speciesCsv        // "truite,ombre"
     String monthsCsv         // "3,4,5,6,7,8,9"
@@ -51,6 +52,7 @@ class Product {
         monthsCsv nullable: true, maxSize: 60
         variantsJson nullable: true, maxSize: 4000
         specsJson nullable: true, maxSize: 4000
+        lowStockThreshold nullable: true, min: 0
     }
 
     static mapping = {
@@ -111,9 +113,10 @@ class Product {
                 reviews    : reviews,
                 brand      : brand,
                 water      : water,
-                img        : img,
-                imageUrl   : imageUrl,
-                description: description,
+                img              : img,
+                imageUrl         : imageUrl,
+                description      : description,
+                lowStockThreshold: lowStockThreshold,
                 story      : story,
                 species    : getSpecies(),
                 months     : getMonths(),

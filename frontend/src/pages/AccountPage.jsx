@@ -414,23 +414,199 @@ function CarnetTab({ entries, onAdd, onRemove }) {
   );
 }
 
-function SettingsTab({ user, onLogout }) {
+function ProfileForm({ user, onSubmit }) {
+  const [firstName, setFirstName] = useState(user.firstName ?? '');
+  const [lastName, setLastName] = useState(user.lastName ?? '');
+  const [phone, setPhone] = useState(user.phone ?? '');
+  const [addressLine, setAddressLine] = useState(user.addressLine ?? '');
+  const [postalCode, setPostalCode] = useState(user.postalCode ?? '');
+  const [city, setCity] = useState(user.city ?? '');
+  const [country, setCountry] = useState(user.country ?? 'France');
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState({ kind: null, message: '' });
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setFeedback({ kind: null, message: '' });
+    const result = await onSubmit({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phone: phone.trim() || null,
+      addressLine: addressLine.trim() || null,
+      postalCode: postalCode.trim() || null,
+      city: city.trim() || null,
+      country: country.trim() || null,
+    });
+    setSaving(false);
+    if (result.ok) {
+      setFeedback({ kind: 'ok', message: 'Profil mis à jour.' });
+    } else {
+      setFeedback({ kind: 'error', message: result.error ?? 'Échec de la mise à jour.' });
+    }
+  };
+
   return (
-    <div className="card" style={{ padding: 'var(--sp-5)' }}>
-      <div className="stack-md">
+    <form onSubmit={submit} className="card stack-md" style={{ padding: 'var(--sp-5)' }} noValidate>
+      <div className="eyebrow">Mes informations</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
         <div className="field">
-          <label>Nom</label>
+          <label>Prénom<span className="req">*</span></label>
+          <input
+            className="input"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="field">
+          <label>Nom<span className="req">*</span></label>
+          <input
+            className="input"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+        </div>
+      </div>
+      <div className="field">
+        <label>Email</label>
+        <input className="input mono" value={user.email} disabled />
+        <div className="hint">L'email de connexion ne peut pas être modifié depuis cette page.</div>
+      </div>
+      <div className="field">
+        <label>Téléphone</label>
+        <input
+          className="input"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="06 12 34 56 78"
+        />
+      </div>
+      <div className="eyebrow" style={{ marginTop: 'var(--sp-3)' }}>
+        Adresse de livraison par défaut
+      </div>
+      <div className="field">
+        <label>Adresse</label>
+        <input
+          className="input"
+          value={addressLine}
+          onChange={(e) => setAddressLine(e.target.value)}
+          placeholder="14 rue des Arènes"
+        />
+      </div>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 'var(--sp-3)' }}
+      >
+        <div className="field">
+          <label>Code postal</label>
+          <input
+            className="input"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label>Ville</label>
+          <input
+            className="input"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label>Pays</label>
+          <input
+            className="input"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+          />
+        </div>
+      </div>
+      {feedback.kind === 'ok' && (
+        <div style={{ color: 'var(--ok)', fontSize: 'var(--fs-14)' }}>{feedback.message}</div>
+      )}
+      {feedback.kind === 'error' && <div className="error">{feedback.message}</div>}
+      <div>
+        <Button variant="primary" type="submit" disabled={saving}>
+          {saving ? 'Enregistrement…' : 'Enregistrer'}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function SettingsTab({ user, onLogout, onSubmit }) {
+  return (
+    <div className="stack-lg">
+      <ProfileForm user={user} onSubmit={onSubmit} />
+      <div className="card" style={{ padding: 'var(--sp-5)' }}>
+        <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+          Session
+        </div>
+        <Button variant="ghost" onClick={onLogout}>
+          Se déconnecter
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AddressesTab({ user, onGoSettings }) {
+  const hasAddress = user.addressLine && user.city;
+  if (!hasAddress) {
+    return (
+      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
+        <div
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--fs-24)',
+            marginBottom: 'var(--sp-3)',
+          }}
+        >
+          Aucune adresse enregistrée.
+        </div>
+        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
+          Ajoutez votre adresse de livraison depuis la section Paramètres pour gagner du temps
+          au checkout.
+        </p>
+        <Button variant="primary" onClick={onGoSettings}>
+          Renseigner mon adresse
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className="stack-md">
+      <div className="card" style={{ padding: 'var(--sp-5)' }}>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            {user.firstName} {user.lastName}
+            <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
+              Adresse de livraison
+            </div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-20)', fontWeight: 500 }}>
+              {user.firstName} {user.lastName}
+            </div>
+            <div className="mono soft" style={{ marginTop: 'var(--sp-2)' }}>
+              {user.addressLine}
+              <br />
+              {user.postalCode} {user.city}
+              {user.country && (
+                <>
+                  <br />
+                  {user.country}
+                </>
+              )}
+            </div>
+            {user.phone && (
+              <div className="mono soft" style={{ marginTop: 'var(--sp-2)' }}>
+                Tel : {user.phone}
+              </div>
+            )}
           </div>
-        </div>
-        <div className="field">
-          <label>Email</label>
-          <div className="mono">{user.email}</div>
-        </div>
-        <div>
-          <Button variant="ghost" onClick={onLogout}>
-            Se déconnecter
+          <Button variant="ghost" onClick={onGoSettings}>
+            Modifier
           </Button>
         </div>
       </div>
@@ -438,26 +614,9 @@ function SettingsTab({ user, onLogout }) {
   );
 }
 
-function AddressesTab() {
-  return (
-    <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-      <div
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--fs-24)',
-          marginBottom: 'var(--sp-3)',
-        }}
-      >
-        Aucune adresse enregistrée.
-      </div>
-      <p className="soft">Les adresses seront gérées avec le backend utilisateur.</p>
-    </div>
-  );
-}
-
 export function AccountPage() {
   const navigate = useNavigate();
-  const { user, hydrating, logout } = useAuth();
+  const { user, hydrating, logout, updateProfile } = useAuth();
   const { orders } = useOrders();
   const { entries, addEntry, removeEntry } = useCarnet();
   const { permit } = useSubmittedPermit();
@@ -542,9 +701,15 @@ export function AccountPage() {
             {tab === 'carnet' && (
               <CarnetTab entries={entries} onAdd={addEntry} onRemove={removeEntry} />
             )}
-            {tab === 'adresses' && <AddressesTab />}
+            {tab === 'adresses' && (
+              <AddressesTab user={user} onGoSettings={() => setTab('parametres')} />
+            )}
             {tab === 'parametres' && (
-              <SettingsTab user={user} onLogout={handleLogout} />
+              <SettingsTab
+                user={user}
+                onLogout={handleLogout}
+                onSubmit={updateProfile}
+              />
             )}
           </div>
         </div>

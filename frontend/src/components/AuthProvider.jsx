@@ -94,9 +94,25 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateProfile = useCallback(
+    async (payload) => {
+      try {
+        const data = await api.patch('/api/auth/me', payload, { token });
+        setUser(data.user);
+        return { ok: true };
+      } catch (err) {
+        if (err instanceof ApiError) {
+          return { ok: false, error: err.message };
+        }
+        return { ok: false, error: 'Erreur inconnue.' };
+      }
+    },
+    [token],
+  );
+
   const value = useMemo(
-    () => ({ user, token, hydrating, login, register, logout }),
-    [user, token, hydrating, login, register, logout],
+    () => ({ user, token, hydrating, login, register, logout, updateProfile }),
+    [user, token, hydrating, login, register, logout, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -6,12 +6,14 @@ class UrlMappings {
         post "/api/auth/register"(controller: 'auth', action: 'register')
         post "/api/auth/login"(controller: 'auth', action: 'login')
         get "/api/auth/me"(controller: 'auth', action: 'me')
+        patch "/api/auth/me"(controller: 'auth', action: 'updateMe')
 
         get "/api/products"(controller: 'product', action: 'list')
         post "/api/products"(controller: 'product', action: 'save')
         get "/api/products/$id"(controller: 'product', action: 'show')
         put "/api/products/$id"(controller: 'product', action: 'update')
         delete "/api/products/$id"(controller: 'product', action: 'remove')
+        post "/api/products/$id/replenish"(controller: 'product', action: 'replenish')
 
         get "/api/categories"(controller: 'reference', action: 'categories')
         post "/api/categories"(controller: 'reference', action: 'createCategory')
@@ -52,6 +54,8 @@ class UrlMappings {
 
         post "/api/uploads"(controller: 'upload', action: 'upload')
         get "/api/uploads/$filename"(controller: 'upload', action: 'serve')
+
+        get "/api/admin/stats"(controller: 'stats', action: 'overview')
 
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")

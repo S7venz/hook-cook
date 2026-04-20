@@ -35,5 +35,17 @@ export function useAdminProducts() {
     [token, refresh],
   );
 
-  return { products, loading, createProduct, updateProduct, deleteProduct };
+  const replenish = useCallback(
+    async (id, qty) => {
+      await api.post(
+        `/api/products/${encodeURIComponent(id)}/replenish`,
+        { qty: Number(qty) },
+        { token },
+      );
+      await refresh();
+    },
+    [token, refresh],
+  );
+
+  return { products, loading, createProduct, updateProduct, deleteProduct, replenish };
 }

@@ -7,11 +7,12 @@ class ProductController {
 
     static responseFormats = ['json']
     static allowedMethods = [
-            list  : 'GET',
-            show  : 'GET',
-            save  : 'POST',
-            update: 'PUT',
-            remove: 'DELETE',
+            list     : 'GET',
+            show     : 'GET',
+            save     : 'POST',
+            update   : 'PUT',
+            remove   : 'DELETE',
+            replenish: 'POST',
     ]
 
     AuthService authService
@@ -89,11 +90,40 @@ class ProductController {
         render('')
     }
 
+    @Transactional
+    def replenish() {
+        if (!requireAdmin()) return
+        Product product = Product.get(params.id)
+        if (!product) {
+            response.status = 404
+            render([error: 'Produit introuvable.'] as JSON)
+            return
+        }
+        Map payload = request.JSON as Map
+        Integer qty = (payload?.qty ?: 0) as Integer
+        if (qty <= 0) {
+            response.status = 400
+            render([error: 'Quantité invalide (doit être > 0).'] as JSON)
+            return
+        }
+        product.stock = (product.stock ?: 0) + qty
+        if (!product.save(flush: true)) {
+            response.status = 400
+            render([error: 'Mise à jour impossible.'] as JSON)
+            return
+        }
+        render(product.toApiMap() as JSON)
+    }
+
     private void applyPayload(Product product, Map payload) {
         // Only assign id on creation
         if (!product.id && payload.id) product.id = payload.id
         ['sku', 'name', 'category', 'technique', 'brand', 'water', 'img', 'imageUrl', 'description', 'story'].each { field ->
             if (payload.containsKey(field)) product[field] = payload[field]
+        }
+        if (payload.containsKey('lowStockThreshold')) {
+            product.lowStockThreshold = payload.lowStockThreshold != null ?
+                    (payload.lowStockThreshold as Integer) : null
         }
         if (payload.containsKey('price')) product.price = payload.price as BigDecimal
         if (payload.containsKey('wasPrice')) {

@@ -1,11 +1,12 @@
 package backend
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 
 class AuthController {
 
     static responseFormats = ['json']
-    static allowedMethods = [register: 'POST', login: 'POST', me: 'GET']
+    static allowedMethods = [register: 'POST', login: 'POST', me: 'GET', updateMe: 'PATCH']
 
     AuthService authService
 
@@ -33,39 +34,40 @@ class AuthController {
     }
 
     def me() {
-        String header = request.getHeader('Authorization')
-        log.info('/api/auth/me — Authorization header present: {}', header != null)
-        if (!header || !header.startsWith('Bearer ')) {
-            response.status = 401
-            render([error: 'Token requis.'] as JSON)
+        User user = currentUserFromRequest()
+        if (!user) return
+        render([user: user.toApiMap()] as JSON)
+    }
+
+    @Transactional
+    def updateMe() {
+        User user = currentUserFromRequest()
+        if (!user) return
+        Map payload = request.JSON as Map
+        ['firstName', 'lastName', 'phone', 'addressLine', 'postalCode', 'city', 'country'].each { field ->
+            if (payload.containsKey(field)) user[field] = payload[field]
+        }
+        if (!user.save(flush: true)) {
+            def error = user.errors.allErrors[0]
+            response.status = 400
+            render([error: error ? "Validation : ${error.field ?: error.code}" : 'Données invalides.'] as JSON)
             return
         }
-        String token = header.substring('Bearer '.length())
-        def claims = authService.jwtService.parse(token)
-        if (!claims) {
-            log.warn('/api/auth/me — JWT invalide')
+        render([user: user.toApiMap()] as JSON)
+    }
+
+    private User currentUserFromRequest() {
+        Map check = authService.userFromRequest(request)
+        if (!check.user) {
             response.status = 401
-            render([error: 'Token invalide ou expiré.'] as JSON)
-            return
+            render([error: check.error ?: 'Authentification requise.'] as JSON)
+            return null
         }
-        Map user_data = [
-                id: claims.getSubject() as Long,
-                email: claims.get('email'),
-                firstName: claims.get('firstName'),
-                lastName: claims.get('lastName'),
-                role: claims.get('role'),
-        ]
-        render([user: user_data] as JSON)
+        check.user
     }
 
     private Map userPayload(User user, String token) {
-        Map user_data = [
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role,
-        ]
+        Map user_data = user.toApiMap()
         if (token) {
             return [user: user_data, token: token]
         }
