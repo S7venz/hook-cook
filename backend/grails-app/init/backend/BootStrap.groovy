@@ -67,16 +67,16 @@ class BootStrap {
     private void seedSpecies() {
         if (Species.count() > 0) return
         [
-                [id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9]],
-                [id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1]],
-                [id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1]],
-                [id: 'carpe', name: 'Carpe', latin: 'Cyprinus carpio', water: 'étang/lac', months: [4, 5, 6, 7, 8, 9, 10, 11]],
-                [id: 'bar', name: 'Bar', latin: 'Dicentrarchus labrax', water: 'mer', months: [3, 4, 5, 6, 7, 8, 9, 10, 11]],
-                [id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11]],
-                [id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10]],
-                [id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12]],
+                [id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9], imageUrl: 'https://loremflickr.com/900/600/brown-trout,fish/all?lock=101'],
+                [id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/northern-pike,fish/all?lock=102'],
+                [id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/zander,fish/all?lock=103'],
+                [id: 'carpe', name: 'Carpe', latin: 'Cyprinus carpio', water: 'étang/lac', months: [4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/common-carp,fish/all?lock=104'],
+                [id: 'bar', name: 'Bar', latin: 'Dicentrarchus labrax', water: 'mer', months: [3, 4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/sea-bass,fish/all?lock=105'],
+                [id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/european-perch,fish/all?lock=106'],
+                [id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10], imageUrl: 'https://loremflickr.com/900/600/catfish,river/all?lock=107'],
+                [id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12], imageUrl: 'https://loremflickr.com/900/600/grayling,fish/all?lock=108'],
         ].each { Map data ->
-            Species s = new Species(name: data.name, latin: data.latin, water: data.water)
+            Species s = new Species(name: data.name, latin: data.latin, water: data.water, imageUrl: data.imageUrl)
             s.id = data.id
             s.months = data.months
             s.save(failOnError: true)
@@ -183,6 +183,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9],
                         brand      : 'Hook & Cook',
                         img        : 'Canne mouche Sauvage 9ft — vue complète',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fly-fishing-rod,fishing/all?lock=201',
                         description: 'Soie WF5F adaptée aux petites rivières et ruisseaux de montagne. Blank en carbone à fort module, dessiné pour charger le bas de canne en lancers courts — idéale pour pêcher sous branches.',
                         story      : "Fabriquée à Saint-Jean-Pied-de-Port par l'atelier Peyre, cette canne reprend le profil des cannes que Jean-Marc monte depuis trente-deux ans pour les guides du Pays basque. Chaque blank est scellé à la main, les anneaux alignés au fil, le porte-moulinet tourné dans un morceau de noyer local.\n\nElle est taillée pour la truite farios en eau vive — ce que Jean-Marc appelle \"le geste court et la remontée lente\". Vous n'achetez pas une canne de série.",
                         variants   : [longueur: ['8 ft', '9 ft', '10 ft'], action: ['Moyenne', 'Moyenne-rapide', 'Rapide']],
@@ -211,6 +212,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9, 10],
                         brand      : 'Cordier Roubinet',
                         img        : 'Soie WF6F — bobine + détail tresse',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fly-fishing-line,spool/all?lock=202',
                         description: "Profil à avant lourd pour charger rapidement le bas de canne. Cœur tressé 16 brins, gaine lissée à la cire d'abeille. Lancers doux sur 25 mètres.",
                         story      : "Cordier Roubinet est l'un des derniers cordiers français à tresser ses soies manuellement. Le cœur est monté sur un métier vieux d'un siècle, la gaine lissée avec une cire préparée par le fils du fondateur.",
                         variants   : [grammage: ['WF4', 'WF5', 'WF6', 'WF7'], couleur: ['Ivoire', 'Vert mousse']],
@@ -238,6 +240,7 @@ class BootStrap {
                         months     : [5, 6, 7, 8, 9, 10, 11, 12, 1],
                         brand      : 'Hook & Cook',
                         img        : 'Canne carnassiers Strike — vue complète',
+                        imageUrl   : 'https://loremflickr.com/800/1000/baitcasting-rod,fishing-rod/all?lock=203',
                         description: 'Blank rigide pour lancer des swimbaits lourds en toute précision. Talon renforcé pour le combat avec les gros poissons.',
                         variants   : [longueur: ['2.10 m', '2.40 m', '2.70 m'], puissance: ['20-60 g', '40-100 g', '80-160 g']],
                         specs      : [Longueur: '2.40 m', Puissance: '40-100 g', Action: 'Rapide', Poids: '184 g', Brins: '2'],
@@ -257,6 +260,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9, 10, 11],
                         brand      : 'Hook & Cook',
                         img        : 'Leurres souples — pack ouvert',
+                        imageUrl   : 'https://loremflickr.com/800/1000/soft-plastic-lure,fishing-lure/all?lock=204',
                         description: 'Imitation de vairon. Queue vibrante, odeur attractant. Idéal en finesse sur perches actives.',
                         variants   : [couleur: ['Naturel', 'Perch', 'Motor Oil', 'Chartreuse']],
                 ],
@@ -275,6 +279,7 @@ class BootStrap {
                         months     : [4, 5, 6, 7, 8, 9, 10, 11],
                         brand      : 'Hook & Cook',
                         img        : 'Moulinet Carp 8000 — profil',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fishing-reel,carp/all?lock=205',
                         description: 'Grande bobine long-cast, 5 roulements étanches. Frein arrière 12 kg, idéal pour la carpe de nuit.',
                         variants   : [taille: ['6000', '8000', '10000']],
                         specs      : [Capacité: '420 m / 0.35 mm', Ratio: '4.6:1', Roulements: '5 + 1', Poids: '618 g', Frein: '12 kg'],
@@ -294,6 +299,7 @@ class BootStrap {
                         months     : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                         brand      : 'Hook & Cook',
                         img        : 'Veste Estuaire — silhouette 3/4',
+                        imageUrl   : 'https://loremflickr.com/800/1000/rain-jacket,outdoor/all?lock=206',
                         description: 'Membrane 3 couches 20k/20k. Capuche ajustable, poches waders, ourlet bas pour pêcher en cuissardes.',
                         variants   : [taille: ['S', 'M', 'L', 'XL', 'XXL'], couleur: ['Algue', 'Grès', 'Ardoise']],
                 ],
@@ -312,6 +318,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9],
                         brand      : 'Hook & Cook',
                         img        : 'Boîte à mouches 24 — ouverte',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fly-box,fly-fishing/all?lock=207',
                         description: 'Boîte alu compartimentée, fermeture magnétique. 24 emplacements mousse anti-rouille.',
                         variants   : [couleur: ['Laiton', 'Noir mat']],
                 ],
@@ -330,6 +337,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9],
                         brand      : 'Tournon',
                         img        : 'Hameçons truite — boîte ouverte',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fishing-hooks,fly-tying/all?lock=208',
                         description: 'Hameçons anglais nº14, fil fin, ardillon écrasable. Finition noir mat.',
                         variants   : [taille: ['12', '14', '16', '18']],
                 ],
@@ -348,6 +356,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9, 10],
                         brand      : 'Atelier Peyre',
                         img        : 'Épuisette noyer — repliée',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fishing-net,wood/all?lock=209',
                         description: 'Manche en noyer tourné main, filet caoutchouc sans nœuds. Pliable sur gilet.',
                         variants   : [longueur: ['50 cm', '60 cm', '80 cm']],
                 ],
@@ -366,6 +375,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9],
                         brand      : 'Tournon',
                         img        : 'Bas de ligne fluorocarbone — bobine',
+                        imageUrl   : 'https://loremflickr.com/800/1000/fishing-line,tippet/all?lock=210',
                         description: "Fluorocarbone japonais haute résistance. Invisible sous l'eau.",
                         variants   : [diametre: ['0.12', '0.14', '0.16', '0.18', '0.20']],
                 ],
@@ -384,6 +394,7 @@ class BootStrap {
                         months     : [3, 4, 5, 6, 7, 8, 9, 10, 11],
                         brand      : 'Hook & Cook',
                         img        : 'Cuissardes Source — silhouette',
+                        imageUrl   : 'https://loremflickr.com/800/1000/waders,fly-fishing/all?lock=211',
                         description: 'Membrane 4 couches au genou, chaussons néoprène 4 mm, ceinture renforcée.',
                         variants   : [taille: ['S', 'M', 'L', 'XL']],
                 ],
@@ -402,6 +413,7 @@ class BootStrap {
                         months     : [5, 6, 7, 8, 9, 10, 11, 12, 1],
                         brand      : 'Hook & Cook',
                         img        : 'Swimbait brochet 18cm',
+                        imageUrl   : 'https://loremflickr.com/800/1000/swimbait,fishing-lure/all?lock=212',
                         description: 'Swimbait 3 sections, nage en S. Hameçons triples VMC. Pour prospection lente.',
                         variants   : [couleur: ['Gardon', 'Perch', 'Firetiger', 'Black']],
                 ],
@@ -415,5 +427,9 @@ class BootStrap {
             p.save(failOnError: true)
         }
         log.info('Seeded {} products.', Product.count())
+    }
+
+    private void ensureAdminProductOverride() {
+        // placeholder hook for future updates
     }
 }

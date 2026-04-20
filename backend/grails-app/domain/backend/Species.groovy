@@ -6,6 +6,7 @@ class Species {
     String name
     String latin
     String water
+    String imageUrl
     String monthsCsv         // "3,4,5,6,7,8,9"
 
     static constraints = {
@@ -13,6 +14,7 @@ class Species {
         name blank: false, maxSize: 80
         latin nullable: true, maxSize: 120
         water nullable: true, maxSize: 40
+        imageUrl nullable: true, maxSize: 500
         monthsCsv nullable: true, maxSize: 60
     }
 
@@ -32,6 +34,6 @@ class Species {
     }
 
     Map toApiMap() {
-        [id: id, name: name, latin: latin, water: water, months: getMonths()]
+        [id: id, name: name, latin: latin, water: water, imageUrl: imageUrl, months: getMonths()]
     }
 }

@@ -18,6 +18,7 @@ class Product {
     String brand
     String water
     String img
+    String imageUrl
     String description
     String story
 
@@ -43,6 +44,7 @@ class Product {
         brand nullable: true, maxSize: 120
         water nullable: true, maxSize: 40
         img nullable: true, maxSize: 255
+        imageUrl nullable: true, maxSize: 500
         description nullable: true, maxSize: 4000
         story nullable: true, maxSize: 8000
         speciesCsv nullable: true, maxSize: 255
@@ -110,6 +112,7 @@ class Product {
                 brand      : brand,
                 water      : water,
                 img        : img,
+                imageUrl   : imageUrl,
                 description: description,
                 story      : story,
                 species    : getSpecies(),

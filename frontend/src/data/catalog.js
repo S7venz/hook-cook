@@ -1,12 +1,12 @@
 export const species = [
-  { id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9] },
-  { id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1] },
-  { id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1] },
-  { id: 'carpe', name: 'Carpe', latin: 'Cyprinus carpio', water: 'étang/lac', months: [4, 5, 6, 7, 8, 9, 10, 11] },
-  { id: 'bar', name: 'Bar', latin: 'Dicentrarchus labrax', water: 'mer', months: [3, 4, 5, 6, 7, 8, 9, 10, 11] },
-  { id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11] },
-  { id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10] },
-  { id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12] },
+  { id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9], imageUrl: 'https://loremflickr.com/900/600/brown-trout,fish/all?lock=101' },
+  { id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/northern-pike,fish/all?lock=102' },
+  { id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/zander,fish/all?lock=103' },
+  { id: 'carpe', name: 'Carpe', latin: 'Cyprinus carpio', water: 'étang/lac', months: [4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/common-carp,fish/all?lock=104' },
+  { id: 'bar', name: 'Bar', latin: 'Dicentrarchus labrax', water: 'mer', months: [3, 4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/sea-bass,fish/all?lock=105' },
+  { id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/european-perch,fish/all?lock=106' },
+  { id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10], imageUrl: 'https://loremflickr.com/900/600/catfish,river/all?lock=107' },
+  { id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12], imageUrl: 'https://loremflickr.com/900/600/grayling,fish/all?lock=108' },
 ];
 
 export const categories = [

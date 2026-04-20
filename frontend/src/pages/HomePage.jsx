@@ -231,7 +231,7 @@ export function HomePage() {
                 }}
               >
                 <div className="media">
-                  <SpeciesIllus species={sp.id} />
+                  <SpeciesIllus species={sp.id} imageUrl={sp.imageUrl} alt={sp.name} />
                 </div>
                 <div className="meta">{sp.water}</div>
                 <div className="name">{sp.name}</div>

@@ -40,7 +40,7 @@ export function ProductCard({ product }) {
       onKeyDown={handleKey}
     >
       <div className="card-media">
-        <Placeholder label={product.img} />
+        <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
         <div className="tag-row">
           {product.wasPrice && <Badge accent>Promo</Badge>}
           {product.stock < 10 && <Badge status="pending">Stock {product.stock}</Badge>}

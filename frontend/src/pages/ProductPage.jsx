@@ -157,7 +157,7 @@ export function ProductPage() {
         <div className="pd-layout">
           <div className="pd-gallery">
             <div className="pd-main-img">
-              <Placeholder label={product.img} />
+              <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
             </div>
             <div className="pd-thumbs">
               {[0, 1, 2, 3].map((i) => (

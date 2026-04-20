@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const HUE_BY_SPECIES = {
   truite: 30,
   brochet: 210,
@@ -9,8 +11,22 @@ const HUE_BY_SPECIES = {
   ombre: 150,
 };
 
-export function SpeciesIllus({ species }) {
+export function SpeciesIllus({ species, imageUrl, alt }) {
+  const [errored, setErrored] = useState(false);
   const hue = HUE_BY_SPECIES[species] ?? 30;
+
+  if (imageUrl && !errored) {
+    return (
+      <img
+        src={imageUrl}
+        alt={alt ?? species}
+        loading="lazy"
+        onError={() => setErrored(true)}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
+    );
+  }
+
   return (
     <div className="species-illus" style={{ background: `oklch(0.88 0.02 ${hue})` }}>
       <svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
