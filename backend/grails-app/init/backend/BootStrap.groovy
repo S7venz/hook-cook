@@ -31,42 +31,47 @@ class BootStrap {
     }
 
     private void seedCategories() {
-        if (Category.count() > 0) return
-        [
-                [id: 'cannes', name: 'Cannes', count: 47],
-                [id: 'moulinets', name: 'Moulinets', count: 38],
-                [id: 'leurres', name: 'Leurres & appâts', count: 124],
-                [id: 'soies-lignes', name: 'Soies & lignes', count: 29],
-                [id: 'vetements', name: 'Vêtements', count: 56],
-                [id: 'accessoires', name: 'Accessoires', count: 81],
-        ].each { data ->
-            Category c = new Category(name: data.name, displayCount: data.count)
-            c.id = data.id
-            c.save(failOnError: true)
+        Category.withTransaction {
+            if (Category.count() > 0) return
+            [
+                    [id: 'cannes', name: 'Cannes', count: 47],
+                    [id: 'moulinets', name: 'Moulinets', count: 38],
+                    [id: 'leurres', name: 'Leurres & appâts', count: 124],
+                    [id: 'soies-lignes', name: 'Soies & lignes', count: 29],
+                    [id: 'vetements', name: 'Vêtements', count: 56],
+                    [id: 'accessoires', name: 'Accessoires', count: 81],
+            ].each { data ->
+                Category c = new Category(name: data.name, displayCount: data.count)
+                c.id = data.id
+                c.save(failOnError: true, flush: true)
+            }
+            log.info('Seeded {} categories.', Category.count())
         }
-        log.info('Seeded {} categories.', Category.count())
     }
 
     private void seedTechniques() {
-        if (Technique.count() > 0) return
-        [
-                [id: 'mouche', name: 'Mouche'],
-                [id: 'carnassiers', name: 'Carnassiers'],
-                [id: 'peche-fond', name: 'Pêche au fond'],
-                [id: 'anglaise', name: 'Anglaise'],
-                [id: 'surfcasting', name: 'Surfcasting'],
-                [id: 'streetfishing', name: 'Street-fishing'],
-        ].each { data ->
-            Technique t = new Technique(name: data.name)
-            t.id = data.id
-            t.save(failOnError: true)
+        Technique.withTransaction {
+            if (Technique.count() > 0) return
+            [
+                    [id: 'mouche', name: 'Mouche'],
+                    [id: 'carnassiers', name: 'Carnassiers'],
+                    [id: 'peche-fond', name: 'Pêche au fond'],
+                    [id: 'anglaise', name: 'Anglaise'],
+                    [id: 'surfcasting', name: 'Surfcasting'],
+                    [id: 'streetfishing', name: 'Street-fishing'],
+            ].each { data ->
+                Technique t = new Technique(name: data.name)
+                t.id = data.id
+                t.save(failOnError: true, flush: true)
+            }
+            log.info('Seeded {} techniques.', Technique.count())
         }
-        log.info('Seeded {} techniques.', Technique.count())
     }
 
     private void seedSpecies() {
-        if (Species.count() > 0) return
-        [
+        Species.withTransaction {
+            if (Species.count() > 0) return
+            [
                 [id: 'truite', name: 'Truite', latin: 'Salmo trutta', water: 'rivière', months: [3, 4, 5, 6, 7, 8, 9], imageUrl: 'https://loremflickr.com/900/600/brown-trout,fish/all?lock=101'],
                 [id: 'brochet', name: 'Brochet', latin: 'Esox lucius', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/northern-pike,fish/all?lock=102'],
                 [id: 'sandre', name: 'Sandre', latin: 'Sander lucioperca', water: 'lac/rivière', months: [5, 6, 7, 8, 9, 10, 11, 12, 1], imageUrl: 'https://loremflickr.com/900/600/zander,fish/all?lock=103'],
@@ -75,18 +80,20 @@ class BootStrap {
                 [id: 'perche', name: 'Perche', latin: 'Perca fluviatilis', water: 'lac/rivière', months: [3, 4, 5, 6, 7, 8, 9, 10, 11], imageUrl: 'https://loremflickr.com/900/600/european-perch,fish/all?lock=106'],
                 [id: 'silure', name: 'Silure', latin: 'Silurus glanis', water: 'rivière', months: [5, 6, 7, 8, 9, 10], imageUrl: 'https://loremflickr.com/900/600/catfish,river/all?lock=107'],
                 [id: 'ombre', name: 'Ombre', latin: 'Thymallus thymallus', water: 'rivière', months: [5, 6, 7, 8, 9, 10, 11, 12], imageUrl: 'https://loremflickr.com/900/600/grayling,fish/all?lock=108'],
-        ].each { Map data ->
-            Species s = new Species(name: data.name, latin: data.latin, water: data.water, imageUrl: data.imageUrl)
-            s.id = data.id
-            s.months = data.months
-            s.save(failOnError: true)
+            ].each { Map data ->
+                Species s = new Species(name: data.name, latin: data.latin, water: data.water, imageUrl: data.imageUrl)
+                s.id = data.id
+                s.months = data.months
+                s.save(failOnError: true, flush: true)
+            }
+            log.info('Seeded {} species.', Species.count())
         }
-        log.info('Seeded {} species.', Species.count())
     }
 
     private void seedContests() {
-        if (Contest.count() > 0) return
-        [
+        Contest.withTransaction {
+            if (Contest.count() > 0) return
+            [
                 [
                         id         : 'vesoul-2026-05',
                         title      : 'Open de Vesoul — Truite fario',
@@ -143,30 +150,32 @@ class BootStrap {
                         max        : 40,
                         reglement  : 'Nocturne de 20h à 6h. Une canne par pêcheur. Classement combiné poids / nombre.',
                 ],
-        ].each { Map data ->
-            Contest c = new Contest(
-                    title      : data.title,
-                    date       : data.date,
-                    dateDisplay: data.dateDisplay,
-                    lieu       : data.lieu,
-                    distance   : data.distance,
-                    format     : data.format,
-                    price      : data.price as BigDecimal,
-                    inscrits   : data.inscrits,
-                    max        : data.max,
-                    reglement  : data.reglement,
-            )
-            c.id = data.id
-            c.species = data.species
-            c.save(failOnError: true)
+            ].each { Map data ->
+                Contest c = new Contest(
+                        title      : data.title,
+                        date       : data.date,
+                        dateDisplay: data.dateDisplay,
+                        lieu       : data.lieu,
+                        distance   : data.distance,
+                        format     : data.format,
+                        price      : data.price as BigDecimal,
+                        inscrits   : data.inscrits,
+                        max        : data.max,
+                        reglement  : data.reglement,
+                )
+                c.id = data.id
+                c.species = data.species
+                c.save(failOnError: true, flush: true)
+            }
+            log.info('Seeded {} contests.', Contest.count())
         }
-        log.info('Seeded {} contests.', Contest.count())
     }
 
     private void seedProducts() {
-        if (Product.count() > 0) return
+        Product.withTransaction {
+            if (Product.count() > 0) return
 
-        List<Map> seed = [
+            List<Map> seed = [
                 [
                         id         : 'hc-sauvage-9-5',
                         sku        : 'HC-2186-WF5F',
@@ -419,17 +428,14 @@ class BootStrap {
                 ],
         ]
 
-        seed.each { Map data ->
-            Product p = new Product()
-            data.each { key, value ->
-                if (value != null) p[key] = value
+            seed.each { Map data ->
+                Product p = new Product()
+                data.each { key, value ->
+                    if (value != null) p[key] = value
+                }
+                p.save(failOnError: true, flush: true)
             }
-            p.save(failOnError: true)
+            log.info('Seeded {} products.', Product.count())
         }
-        log.info('Seeded {} products.', Product.count())
-    }
-
-    private void ensureAdminProductOverride() {
-        // placeholder hook for future updates
     }
 }
