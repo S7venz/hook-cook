@@ -8,7 +8,7 @@ import { ScrollToTop } from './components/ScrollToTop.jsx';
 import { TopNav } from './components/TopNav.jsx';
 import { SiteFooter } from './components/SiteFooter.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
-import { ThemeProvider } from './lib/theme.js';
+import { ThemeProvider } from './components/ThemeProvider.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
