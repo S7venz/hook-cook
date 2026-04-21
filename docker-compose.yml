@@ -32,6 +32,8 @@ services:
       SMTP_FROM: ${SMTP_FROM}
     ports:
       - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,3 +50,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:
