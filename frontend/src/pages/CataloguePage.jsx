@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Fuse from 'fuse.js';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
@@ -127,8 +128,28 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
   );
 }
 
-function filterProducts(items, filters, sort) {
+/**
+ * Config Fuse.js — tolérance aux fautes de frappe, pondération par champ.
+ * threshold 0.4 laisse passer 1-2 typos par mot de 6-8 chars.
+ */
+const FUSE_OPTIONS = {
+  keys: [
+    { name: 'name', weight: 0.5 },
+    { name: 'brand', weight: 0.2 },
+    { name: 'description', weight: 0.15 },
+    { name: 'sku', weight: 0.1 },
+    { name: 'species', weight: 0.05 },
+  ],
+  threshold: 0.4,
+  ignoreLocation: true,
+  includeScore: true,
+  minMatchCharLength: 2,
+};
+
+function filterProducts(items, filters, sort, fuse) {
   let list = [...items];
+  let usedFuzzy = false;
+
   if (filters.species.length) {
     list = list.filter((p) => p.species.some((s) => filters.species.includes(s)));
   }
@@ -141,20 +162,24 @@ function filterProducts(items, filters, sort) {
   if (filters.inStock) {
     list = list.filter((p) => p.stock > 0);
   }
+
   if (filters.query) {
-    const q = filters.query.trim().toLowerCase();
-    if (q) {
-      list = list.filter((p) => {
-        const haystack = [p.name, p.brand, p.sku, p.description ?? '']
-          .join(' ')
-          .toLowerCase();
-        return haystack.includes(q);
-      });
+    const q = filters.query.trim();
+    if (q.length >= 2 && fuse) {
+      const ids = new Set(list.map((p) => p.id));
+      const results = fuse.search(q).filter((r) => ids.has(r.item.id));
+      list = results.map((r) => r.item);
+      usedFuzzy = true;
     }
   }
-  if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
-  if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
-  if (sort === 'rating') list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+
+  // Si on a trié par pertinence via Fuse, on garde l'ordre des scores.
+  // Sinon on trie par la clé demandée.
+  if (!usedFuzzy || sort !== 'pertinence') {
+    if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
+    if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
+    if (sort === 'rating') list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  }
   return list;
 }
 
@@ -165,9 +190,13 @@ export function CataloguePage() {
   const [sort, setSort] = useState('pertinence');
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const fuse = useMemo(
+    () => (products.length ? new Fuse(products, FUSE_OPTIONS) : null),
+    [products],
+  );
   const visible = useMemo(
-    () => filterProducts(products, filters, sort),
-    [products, filters, sort],
+    () => filterProducts(products, filters, sort, fuse),
+    [products, filters, sort, fuse],
   );
   const activeCount = filters.species.length + filters.categories.length + filters.techniques.length;
 
