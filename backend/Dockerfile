@@ -21,9 +21,13 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/build/libs/*.war /app/app.war
 
-ENV DATASOURCE_URL=jdbc:postgresql://postgres:5432/hookcook
-ENV DATASOURCE_USERNAME=hookcook
-ENV DATASOURCE_PASSWORD=hookcook
+# Les variables suivantes sont attendues au runtime.
+# Elles sont fournies par docker-compose.yml (qui les lit depuis .env) :
+#   DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD
+#   HC_JWT_SECRET
+#   ADMIN_EMAIL, ADMIN_PASSWORD
+#   SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM
+# Si tu lances ce conteneur sans compose, tu dois les passer via -e VAR=valeur.
 ENV SPRING_PROFILES_ACTIVE=production
 
 EXPOSE 8080
