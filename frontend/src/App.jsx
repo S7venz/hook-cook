@@ -12,8 +12,10 @@ import { ToastProvider } from './components/ToastProvider.jsx';
 import { ThemeProvider } from './components/ThemeProvider.jsx';
 import { WishlistProvider } from './components/WishlistProvider.jsx';
 import { AboutPage } from './pages/AboutPage.jsx';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { HelpPage } from './pages/HelpPage.jsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
 import { CartPage } from './pages/CartPage.jsx';
@@ -62,6 +64,8 @@ export default function App() {
                             {/* ── Pages d'auth (publiques, redirect si déjà connecté n'est pas imposé) ── */}
                             <Route path="/connexion" element={<LoginPage />} />
                             <Route path="/inscription" element={<RegisterPage />} />
+                            <Route path="/mot-de-passe-oublie" element={<ForgotPasswordPage />} />
+                            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
                             {/* ── Routes utilisateur (auth requise) ──── */}
                             <Route
