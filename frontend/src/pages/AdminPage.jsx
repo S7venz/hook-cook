@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
-import { contests } from '../data/catalog.js';
 import { ImageUploadField } from '../components/ui/ImageUploadField.jsx';
 import { useAdminContests } from '../lib/adminContests.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
@@ -1293,8 +1292,7 @@ export function AdminPage() {
 
   const isAdmin = user?.role === 'ROLE_ADMIN';
 
-  const contestsForStats = remoteContests.length > 0 ? remoteContests : contests;
-  const totalRegistrations = contestsForStats.reduce((s, c) => s + (c.inscrits ?? 0), 0);
+  const totalRegistrations = remoteContests.reduce((s, c) => s + (c.inscrits ?? 0), 0);
 
   if (hydrating) {
     return (
@@ -1420,7 +1418,7 @@ export function AdminPage() {
         )}
         {section === 'concours' && (
           <ConcoursSection
-            contests={remoteContests.length > 0 ? remoteContests : contests}
+            contests={remoteContests}
             onCreate={createContest}
             onUpdate={updateContest}
             onDelete={deleteContest}

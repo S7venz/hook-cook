@@ -2,15 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
-import { categories, species as speciesList } from '../data/catalog.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
+import { useReferenceData } from '../lib/referenceData.js';
 import { useToast } from '../lib/toast.js';
 
 export function ProductCard({ product }) {
   const navigate = useNavigate();
   const { push } = useToast();
   const { add } = useCart();
+  const { categories, species: speciesList } = useReferenceData();
   const category = categories.find((c) => c.id === product.category);
   const tags = product.species
     .map((id) => speciesList.find((s) => s.id === id)?.name)

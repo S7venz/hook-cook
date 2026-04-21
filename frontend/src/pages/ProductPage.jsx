@@ -6,10 +6,10 @@ import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
-import { categories, species as speciesList } from '../data/catalog.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useProduct, useProducts } from '../lib/products.js';
+import { useReferenceData } from '../lib/referenceData.js';
 import { useToast } from '../lib/toast.js';
 
 const TABS = [
@@ -84,6 +84,7 @@ export function ProductPage() {
   const { id } = useParams();
   const product = useProduct(id);
   const { loading } = useProducts();
+  const { categories, species: speciesList } = useReferenceData();
   const { push } = useToast();
   const { add } = useCart();
   const [thumb, setThumb] = useState(0);

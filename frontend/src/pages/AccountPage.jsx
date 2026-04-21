@@ -4,13 +4,13 @@ import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
-import { contests, species as speciesList } from '../data/catalog.js';
 import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { formatPrice } from '../lib/format.js';
 import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
+import { useReferenceData } from '../lib/referenceData.js';
 
 const TABS = [
   { id: 'apercu', label: 'Aperçu' },
@@ -228,6 +228,7 @@ function ConcoursTab({ inscribed, onExplore }) {
 }
 
 function CarnetForm({ onSubmit, onCancel }) {
+  const { species: speciesList } = useReferenceData();
   const [species, setSpecies] = useState('truite');
   const [taille, setTaille] = useState('');
   const [poids, setPoids] = useState('');
@@ -333,6 +334,7 @@ function CarnetForm({ onSubmit, onCancel }) {
 }
 
 function CarnetTab({ entries, onAdd, onRemove }) {
+  const { species: speciesList } = useReferenceData();
   const [showForm, setShowForm] = useState(false);
 
   const submit = (entry) => {
@@ -617,6 +619,7 @@ function AddressesTab({ user, onGoSettings }) {
 export function AccountPage() {
   const navigate = useNavigate();
   const { user, hydrating, logout, updateProfile } = useAuth();
+  const { contests: remoteContests } = useReferenceData();
   const { orders } = useOrders();
   const { entries, addEntry, removeEntry } = useCarnet();
   const { permit } = useSubmittedPermit();
@@ -640,7 +643,7 @@ export function AccountPage() {
     return <Navigate to="/connexion" state={{ from: '/compte' }} replace />;
   }
 
-  const inscribed = contests.filter((c) => isRegistered(c.id));
+  const inscribed = remoteContests.filter((c) => isRegistered(c.id));
 
   const handleLogout = () => {
     logout();

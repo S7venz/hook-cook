@@ -3,6 +3,7 @@ import { AuthProvider } from './components/AuthProvider.jsx';
 import { CartProvider } from './components/CartProvider.jsx';
 import { OrdersProvider } from './components/OrdersProvider.jsx';
 import { ProductsProvider } from './components/ProductsProvider.jsx';
+import { ReferenceDataProvider } from './components/ReferenceDataProvider.jsx';
 import { ScrollToTop } from './components/ScrollToTop.jsx';
 import { TopNav } from './components/TopNav.jsx';
 import { SiteFooter } from './components/SiteFooter.jsx';
@@ -26,10 +27,11 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-        <ProductsProvider>
-          <OrdersProvider>
-            <CartProvider>
-              <ToastProvider>
+        <ReferenceDataProvider>
+          <ProductsProvider>
+            <OrdersProvider>
+              <CartProvider>
+                <ToastProvider>
           <div className="app-shell">
             <TopNav />
             <main>
@@ -50,10 +52,11 @@ export default function App() {
             </main>
             <SiteFooter />
           </div>
-              </ToastProvider>
-            </CartProvider>
-          </OrdersProvider>
-        </ProductsProvider>
+                </ToastProvider>
+              </CartProvider>
+            </OrdersProvider>
+          </ProductsProvider>
+        </ReferenceDataProvider>
       </AuthProvider>
     </BrowserRouter>
   );

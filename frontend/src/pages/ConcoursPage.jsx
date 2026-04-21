@@ -3,8 +3,8 @@ import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
-import { contests } from '../data/catalog.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
+import { useReferenceData } from '../lib/referenceData.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
 
@@ -157,8 +157,9 @@ function RegistrationModal({ contest, onClose, onConfirm }) {
 }
 
 export function ConcoursPage() {
+  const { contests, loading } = useReferenceData();
   const [filter, setFilter] = useState('all');
-  const [selectedId, setSelectedId] = useState(contests[0].id);
+  const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const { push } = useToast();
   const { register, isRegistered } = useContestRegistrations();
@@ -166,10 +167,10 @@ export function ConcoursPage() {
   const activeFilter = FILTERS.find((f) => f.id === filter);
   const visibleContests = useMemo(
     () => contests.filter((c) => (activeFilter ? activeFilter.match(c) : true)),
-    [activeFilter],
+    [activeFilter, contests],
   );
   const selected =
-    visibleContests.find((c) => c.id === selectedId) ?? visibleContests[0] ?? contests[0];
+    visibleContests.find((c) => c.id === selectedId) ?? visibleContests[0] ?? null;
 
   useEffect(() => {
     document.body.style.overflow = showModal ? 'hidden' : '';
@@ -188,6 +189,42 @@ export function ConcoursPage() {
       push(err?.message ?? 'Inscription impossible.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div
+          className="page-container"
+          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
+        >
+          <p className="soft">Chargement des concours…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selected) {
+    return (
+      <div className="page">
+        <div
+          className="page-container"
+          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
+        >
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-44)',
+              fontWeight: 400,
+              margin: '0 0 var(--sp-4)',
+            }}
+          >
+            Aucun concours pour l'instant.
+          </h1>
+          <p className="soft">Les prochains concours seront annoncés ici.</p>
+        </div>
+      </div>
+    );
+  }
 
   const [day, month] = selected.dateDisplay.split(' ');
   const alreadyIn = isRegistered(selected.id);

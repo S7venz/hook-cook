@@ -5,9 +5,11 @@ import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
-import { carnet, contests, species } from '../data/catalog.js';
+import { useAuth } from '../lib/auth.js';
+import { useCarnet } from '../lib/carnet.js';
 import { formatPrice } from '../lib/format.js';
 import { useProducts } from '../lib/products.js';
+import { useReferenceData } from '../lib/referenceData.js';
 
 const CURRENT_MONTH = 4;
 
@@ -143,9 +145,12 @@ function contestLabel(contest) {
 export function HomePage() {
   const navigate = useNavigate();
   const { products } = useProducts();
+  const { contests, species } = useReferenceData();
+  const { user } = useAuth();
+  const { entries: carnetEntries } = useCarnet();
   const featured = products.slice(0, 4);
   const upcomingContests = contests.slice(0, 3);
-  const recentCatches = carnet.slice(0, 3);
+  const recentCatches = user ? carnetEntries.slice(0, 3) : [];
 
   const openShop = () => navigate('/boutique');
   const openShopForSpecies = (id) => navigate(`/boutique?species=${id}`);
@@ -330,45 +335,47 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="page-container">
-          <div className="section-header">
-            <div>
-              <div className="eyebrow">Depuis le carnet</div>
-              <h2>Cette semaine sur les rivières</h2>
+      {user && recentCatches.length > 0 && (
+        <section className="section">
+          <div className="page-container">
+            <div className="section-header">
+              <div>
+                <div className="eyebrow">Votre carnet</div>
+                <h2>Vos dernières prises</h2>
+              </div>
+              <a className="more" onClick={openAccount}>
+                Voir tout →
+              </a>
             </div>
-            <a className="more" onClick={openAccount}>
-              Votre carnet →
-            </a>
+            <div className="carnet-feed">
+              {recentCatches.map((entry) => {
+                const sp = species.find((s) => s.id === entry.species);
+                return (
+                  <article className="carnet-entry" key={entry.id}>
+                    <div className="media">
+                      <Placeholder label={entry.photo} />
+                    </div>
+                    <div className="body">
+                      <div className="eyebrow">
+                        {sp?.name} · {entry.spot}
+                      </div>
+                      <div className="big-num">
+                        {entry.taille}
+                        <small>cm</small>
+                      </div>
+                      <div className="entry-meta">
+                        <span>{new Date(entry.date).toLocaleDateString('fr-FR')}</span>
+                        <span>·</span>
+                        <span>{entry.bait}</span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
-          <div className="carnet-feed">
-            {recentCatches.map((entry) => {
-              const sp = species.find((s) => s.id === entry.species);
-              return (
-                <article className="carnet-entry" key={entry.id}>
-                  <div className="media">
-                    <Placeholder label={entry.photo} />
-                  </div>
-                  <div className="body">
-                    <div className="eyebrow">
-                      {sp?.name} · {entry.spot}
-                    </div>
-                    <div className="big-num">
-                      {entry.taille}
-                      <small>cm</small>
-                    </div>
-                    <div className="entry-meta">
-                      <span>{new Date(entry.date).toLocaleDateString('fr-FR')}</span>
-                      <span>·</span>
-                      <span>{entry.bait}</span>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

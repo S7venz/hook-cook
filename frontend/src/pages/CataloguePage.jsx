@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
-import { categories, species, techniques } from '../data/catalog.js';
 import { useProducts } from '../lib/products.js';
+import { useReferenceData } from '../lib/referenceData.js';
 
 const SORT_OPTIONS = [
   { value: 'pertinence', label: 'Tri : pertinence' },
@@ -64,7 +64,7 @@ function useCatalogFilters() {
   };
 }
 
-function FiltersPanel({ filters, onToggle, onToggleStock }) {
+function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, techniques }) {
   return (
     <>
       <div>
@@ -160,6 +160,7 @@ function filterProducts(items, filters, sort) {
 export function CataloguePage() {
   const { filters, toggle, toggleInStock, setQuery, reset } = useCatalogFilters();
   const { products, loading } = useProducts();
+  const { categories, species, techniques } = useReferenceData();
   const [sort, setSort] = useState('pertinence');
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -196,7 +197,14 @@ export function CataloguePage() {
       <div className="page-container">
         <div className="catalog-layout">
           <aside className="filters-sidebar" aria-label="Filtres">
-            <FiltersPanel filters={filters} onToggle={toggle} onToggleStock={toggleInStock} />
+            <FiltersPanel
+              filters={filters}
+              onToggle={toggle}
+              onToggleStock={toggleInStock}
+              categories={categories}
+              species={species}
+              techniques={techniques}
+            />
           </aside>
 
           <main className="catalog-main">
@@ -333,6 +341,9 @@ export function CataloguePage() {
                 filters={filters}
                 onToggle={toggle}
                 onToggleStock={toggleInStock}
+                categories={categories}
+                species={species}
+                techniques={techniques}
               />
             </div>
             <div className="drawer-footer">
