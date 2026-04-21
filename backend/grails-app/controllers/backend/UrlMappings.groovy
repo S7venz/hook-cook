@@ -72,6 +72,10 @@ class UrlMappings {
         get "/api/stock-alerts"(controller: 'stockAlert', action: 'list')
         post "/api/products/$productId/stock-alerts"(controller: 'stockAlert', action: 'subscribe')
 
+        get "/api/admin/exports/orders.csv"(controller: 'export', action: 'orders')
+        get "/api/admin/exports/permits.csv"(controller: 'export', action: 'permits')
+        get "/api/admin/exports/contest-registrations.csv"(controller: 'export', action: 'contestRegistrations')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

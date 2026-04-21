@@ -8,6 +8,7 @@ import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAdminStats } from '../lib/adminStats.js';
 import { useAuth } from '../lib/auth.js';
+import { downloadExport } from '../lib/exports.js';
 import { formatPrice } from '../lib/format.js';
 import { useAdminPermits } from '../lib/permitApplication.js';
 import { useToast } from '../lib/toast.js';
@@ -380,10 +381,35 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
   );
 }
 
+function ExportButton({ kind, label }) {
+  const { token } = useAuth();
+  const { push } = useToast();
+  const [busy, setBusy] = useState(false);
+  const handle = async () => {
+    setBusy(true);
+    try {
+      await downloadExport(kind, token);
+    } catch (err) {
+      push(err?.message ?? 'Export impossible.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Button variant="ghost" size="sm" onClick={handle} disabled={busy}>
+      <Icon name="download" size={14} />
+      {busy ? 'Export…' : label}
+    </Button>
+  );
+}
+
 function OrdersSection({ orders, onUpdateStatus }) {
   return (
     <>
-      <h1>Commandes</h1>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ margin: 0 }}>Commandes</h1>
+        <ExportButton kind="orders" label="Exporter en CSV" />
+      </div>
       <div className="panel">
         <table className="table">
           <thead>
@@ -456,7 +482,10 @@ function PermisSection({ permits, onUpdate }) {
   const list = permits ?? [];
   return (
     <>
-      <h1>Demandes de permis</h1>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ margin: 0 }}>Demandes de permis</h1>
+        <ExportButton kind="permits" label="Exporter en CSV" />
+      </div>
       <div className="panel">
         <table className="table">
           <thead>
@@ -791,9 +820,12 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
       >
         <h1 style={{ margin: 0 }}>Concours</h1>
         {mode === 'list' && (
-          <Button variant="primary" onClick={() => setMode('create')}>
-            + Ajouter un concours
-          </Button>
+          <div className="row" style={{ gap: 'var(--sp-2)' }}>
+            <ExportButton kind="contestRegistrations" label="Exporter inscriptions CSV" />
+            <Button variant="primary" onClick={() => setMode('create')}>
+              + Ajouter un concours
+            </Button>
+          </div>
         )}
       </div>
 
