@@ -90,6 +90,18 @@ export function LoginPage() {
                 autoComplete="current-password"
                 required
               />
+              <div style={{ textAlign: 'right' }}>
+                <Link
+                  to="/mot-de-passe-oublie"
+                  style={{
+                    fontSize: 'var(--fs-12)',
+                    color: 'var(--ink-mute)',
+                    borderBottom: '1px dotted currentColor',
+                  }}
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
             </div>
             {error && <div className="error">{error}</div>}
             <Button variant="primary" size="lg" full type="submit" disabled={submitting}>
