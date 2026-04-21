@@ -133,7 +133,10 @@ environments:
             password: ''
     production:
         dataSource:
-            dbCreate: none
+            # "update" = Hibernate crée les tables manquantes et ajoute les nouvelles
+            # colonnes au boot. Suffisant pour ce projet ; pour une vraie prod,
+            # utiliser un outil de migration (Flyway/Liquibase) et passer à "validate".
+            dbCreate: update
             url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/hookcook}
             username: ${DATASOURCE_USERNAME:hookcook}
             password: ${DATASOURCE_PASSWORD:hookcook}
