@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
+import { useAuth } from '../lib/auth.js';
 import {
-  DEPARTMENTS,
-  PERMIT_TYPES,
-  findPermitType,
+  useDepartments,
+  usePermitTypes,
   useSubmittedPermit,
 } from '../lib/permitApplication.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
+
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 const STEP_LABELS = ['Type', 'Identité', 'Pièces', 'Récap', 'Paiement'];
 
@@ -30,58 +32,90 @@ function Stepper({ current }) {
   );
 }
 
-function UploadZone({ uploaded, onUpload, onRemove, label, fileName, fileSize, initials }) {
+function formatSize(bytes) {
+  if (!bytes || bytes <= 0) return '';
+  const mo = bytes / (1024 * 1024);
+  if (mo >= 1) return `${mo.toFixed(1)} Mo`;
+  const ko = bytes / 1024;
+  return `${Math.round(ko)} Ko`;
+}
+
+function UploadZone({ file, onUpload, onRemove, label, initials, uploading, error }) {
+  const inputRef = useRef(null);
+  const openPicker = () => inputRef.current?.click();
+  const handleChange = (event) => {
+    const f = event.target.files?.[0];
+    if (f) onUpload(f);
+    if (inputRef.current) inputRef.current.value = '';
+  };
+
   return (
-    <div
-      className={`upload-zone ${uploaded ? 'has-file' : ''}`}
-      onClick={uploaded ? undefined : onUpload}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && !uploaded) {
-          e.preventDefault();
-          onUpload();
-        }
-      }}
-    >
-      {uploaded ? (
-        <>
-          <div className="upload-preview">
-            {initials[0]}
-            <br />
-            {initials[1]}
-          </div>
+    <>
+      <div
+        className={`upload-zone ${file ? 'has-file' : ''}`}
+        onClick={file || uploading ? undefined : openPicker}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && !file && !uploading) {
+            e.preventDefault();
+            openPicker();
+          }
+        }}
+      >
+        {file ? (
+          <>
+            <div className="upload-preview">
+              {initials[0]}
+              <br />
+              {initials[1]}
+            </div>
+            <div>
+              <div style={{ fontWeight: 500 }}>{file.name}</div>
+              <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
+                {formatSize(file.size)} · uploadé
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              style={{ marginLeft: 'auto' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+            >
+              Remplacer
+            </button>
+          </>
+        ) : (
           <div>
-            <div style={{ fontWeight: 500 }}>{fileName}</div>
-            <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
-              {fileSize} · uploadé
+            <Icon name="upload" size={24} />
+            <div style={{ marginTop: 'var(--sp-2)' }}>
+              {uploading ? 'Envoi en cours…' : label}
+            </div>
+            <div
+              className="mono soft"
+              style={{ fontSize: 'var(--fs-12)', marginTop: 4 }}
+            >
+              ou cliquez pour parcourir · JPG / PNG / WebP · max 8 Mo
             </div>
           </div>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            style={{ marginLeft: 'auto' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-          >
-            Remplacer
-          </button>
-        </>
-      ) : (
-        <div>
-          <Icon name="upload" size={24} />
-          <div style={{ marginTop: 'var(--sp-2)' }}>{label}</div>
-          <div
-            className="mono soft"
-            style={{ fontSize: 'var(--fs-12)', marginTop: 4 }}
-          >
-            ou cliquez pour parcourir · JPG / PDF · max 8 Mo
-          </div>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleChange}
+        />
+      </div>
+      {error && (
+        <div className="error" style={{ marginTop: 'var(--sp-2)' }}>
+          {error}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -104,7 +138,7 @@ function TrackingView({ permit, onBack }) {
           Permis {permit.id}
         </h1>
         <div className="row" style={{ marginBottom: 'var(--sp-6)' }}>
-          <Badge status="pending">{permit.statusLabel}</Badge>
+          <Badge status={permit.status}>{permit.statusLabel}</Badge>
           <span className="mono soft">
             {permit.typeTitle} · {permit.department} · {formatPrice(permit.amount)}
           </span>
@@ -129,15 +163,35 @@ function TrackingView({ permit, onBack }) {
           </div>
         </div>
 
-        <div className="card" style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-5)' }}>
-          <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-            Messagerie · Fédération des Pyrénées-Orientales
+        {(permit.idDocUrl || permit.photoDocUrl) && (
+          <div className="card" style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-5)' }}>
+            <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+              Pièces déposées
+            </div>
+            <div className="row" style={{ gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
+              {permit.idDocUrl && (
+                <a
+                  href={permit.idDocUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-ghost btn-sm"
+                >
+                  Pièce d'identité ↗
+                </a>
+              )}
+              {permit.photoDocUrl && (
+                <a
+                  href={permit.photoDocUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-ghost btn-sm"
+                >
+                  Photo d'identité ↗
+                </a>
+              )}
+            </div>
           </div>
-          <p className="soft" style={{ fontSize: 'var(--fs-14)' }}>
-            Bonjour. Votre dossier est en cours d'instruction. Délai moyen : 2 jours
-            ouvrés. Aucune action requise de votre part pour l'instant.
-          </p>
-        </div>
+        )}
 
         <div style={{ marginTop: 'var(--sp-6)' }}>
           <Button variant="ghost" onClick={onBack}>
@@ -149,23 +203,94 @@ function TrackingView({ permit, onBack }) {
   );
 }
 
-function ApplyView({ onSubmit, onBack }) {
+function ApplyView({ onSubmit, onBack, types, departments }) {
+  const { token } = useAuth();
   const [step, setStep] = useState(1);
-  const [typeId, setTypeId] = useState('annuel');
-  const [firstName, setFirstName] = useState('Claude');
-  const [lastName, setLastName] = useState('Desprez');
-  const [birthDate, setBirthDate] = useState('1992-06-14');
-  const [department, setDepartment] = useState(DEPARTMENTS[0].name);
-  const [idDoc, setIdDoc] = useState(false);
-  const [photoDoc, setPhotoDoc] = useState(false);
+  const [typeId, setTypeId] = useState(types[0]?.id ?? '');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [department, setDepartment] = useState(departments[0]?.name ?? '');
+  const [idDocFile, setIdDocFile] = useState(null);
+  const [idDocUrl, setIdDocUrl] = useState('');
+  const [idDocError, setIdDocError] = useState('');
+  const [idDocUploading, setIdDocUploading] = useState(false);
+  const [photoDocFile, setPhotoDocFile] = useState(null);
+  const [photoDocUrl, setPhotoDocUrl] = useState('');
+  const [photoDocError, setPhotoDocError] = useState('');
+  const [photoDocUploading, setPhotoDocUploading] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
+  const [cardNumber, setCardNumber] = useState('');
 
-  const type = findPermitType(typeId);
+  const type = types.find((t) => t.id === typeId) ?? types[0];
+
+  const uploadDoc = async (file, slot) => {
+    const setFile = slot === 'id' ? setIdDocFile : setPhotoDocFile;
+    const setUrl = slot === 'id' ? setIdDocUrl : setPhotoDocUrl;
+    const setError = slot === 'id' ? setIdDocError : setPhotoDocError;
+    const setUploading = slot === 'id' ? setIdDocUploading : setPhotoDocUploading;
+
+    setError('');
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const response = await fetch(`${BASE_URL}/api/uploads`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error ?? `Erreur ${response.status}`);
+      }
+      const data = await response.json();
+      setFile(file);
+      setUrl(data.url);
+    } catch (err) {
+      setError(err.message ?? 'Upload impossible.');
+      setFile(null);
+      setUrl('');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeDoc = (slot) => {
+    if (slot === 'id') {
+      setIdDocFile(null);
+      setIdDocUrl('');
+      setIdDocError('');
+    } else {
+      setPhotoDocFile(null);
+      setPhotoDocUrl('');
+      setPhotoDocError('');
+    }
+  };
+
+  const uploadedCount = [idDocUrl, photoDocUrl].filter(Boolean).length;
 
   const pay = () => {
-    onSubmit({ typeId, firstName, lastName, birthDate, department });
+    onSubmit({
+      typeId,
+      firstName,
+      lastName,
+      birthDate,
+      department,
+      idDocUrl,
+      photoDocUrl,
+    });
   };
+
+  if (!type) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <p>Chargement des tarifs…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -186,7 +311,7 @@ function ApplyView({ onSubmit, onBack }) {
               Quel type de permis ?
             </h2>
             <div className="permis-types">
-              {PERMIT_TYPES.map((t) => (
+              {types.map((t) => (
                 <div
                   key={t.id}
                   className={`permis-type-card ${typeId === t.id ? 'selected' : ''}`}
@@ -200,10 +325,10 @@ function ApplyView({ onSubmit, onBack }) {
                     }
                   }}
                 >
-                  <div className="lbl">{t.label}</div>
+                  {t.label && <div className="lbl">{t.label}</div>}
                   <div className="t">{t.title}</div>
                   <ul>
-                    {t.items.map((item) => (
+                    {(t.items ?? []).map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
@@ -275,6 +400,8 @@ function ApplyView({ onSubmit, onBack }) {
                   className="input"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Prénom"
+                  autoComplete="given-name"
                 />
               </div>
               <div className="field">
@@ -285,6 +412,8 @@ function ApplyView({ onSubmit, onBack }) {
                   className="input"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Nom"
+                  autoComplete="family-name"
                 />
               </div>
             </div>
@@ -300,6 +429,7 @@ function ApplyView({ onSubmit, onBack }) {
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
+                  autoComplete="bday"
                 />
               </div>
               <div className="field">
@@ -311,7 +441,7 @@ function ApplyView({ onSubmit, onBack }) {
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                 >
-                  {DEPARTMENTS.map((d) => (
+                  {departments.map((d) => (
                     <option key={d.code} value={d.name}>
                       {d.name}
                     </option>
@@ -348,20 +478,20 @@ function ApplyView({ onSubmit, onBack }) {
             >
               Pièces justificatives
             </h2>
-            <p className="soft">JPG ou PDF · max 8 Mo par fichier.</p>
+            <p className="soft">JPG, PNG ou WebP · max 8 Mo par fichier.</p>
 
             <div className="field">
               <label>
                 Pièce d'identité<span className="req">*</span>
               </label>
               <UploadZone
-                uploaded={idDoc}
-                onUpload={() => setIdDoc(true)}
-                onRemove={() => setIdDoc(false)}
+                file={idDocFile}
+                onUpload={(f) => uploadDoc(f, 'id')}
+                onRemove={() => removeDoc('id')}
                 label="Déposez votre pièce d'identité ici"
-                fileName="carte-identite-recto.jpg"
-                fileSize="2.4 Mo"
                 initials={['ID', 'RECTO']}
+                uploading={idDocUploading}
+                error={idDocError}
               />
             </div>
 
@@ -370,13 +500,13 @@ function ApplyView({ onSubmit, onBack }) {
                 Photo d'identité<span className="req">*</span>
               </label>
               <UploadZone
-                uploaded={photoDoc}
-                onUpload={() => setPhotoDoc(true)}
-                onRemove={() => setPhotoDoc(false)}
+                file={photoDocFile}
+                onUpload={(f) => uploadDoc(f, 'photo')}
+                onRemove={() => removeDoc('photo')}
                 label="Déposez une photo d'identité"
-                fileName="photo-identite.jpg"
-                fileSize="1.1 Mo"
                 initials={['PH', 'OTO']}
+                uploading={photoDocUploading}
+                error={photoDocError}
               />
             </div>
 
@@ -388,7 +518,7 @@ function ApplyView({ onSubmit, onBack }) {
                 variant="primary"
                 size="lg"
                 onClick={() => setStep(4)}
-                disabled={!idDoc || !photoDoc}
+                disabled={!idDocUrl || !photoDocUrl}
               >
                 Continuer →
               </Button>
@@ -420,7 +550,9 @@ function ApplyView({ onSubmit, onBack }) {
               </div>
               <div className="summary-row">
                 <span>Pièces</span>
-                <span className="val">2 fichiers</span>
+                <span className="val">
+                  {uploadedCount} fichier{uploadedCount > 1 ? 's' : ''}
+                </span>
               </div>
               <div className="summary-row total">
                 <span>Total TTC</span>
@@ -480,6 +612,9 @@ function ApplyView({ onSubmit, onBack }) {
                   className="input mono"
                   value={cardNumber}
                   onChange={(e) => setCardNumber(e.target.value)}
+                  placeholder="1234 5678 9012 3456"
+                  autoComplete="cc-number"
+                  inputMode="numeric"
                 />
               </div>
             </div>
@@ -493,7 +628,7 @@ function ApplyView({ onSubmit, onBack }) {
   );
 }
 
-function LandingView({ onApply, onTrack, hasPermit }) {
+function LandingView({ onApply, onTrack, hasPermit, types }) {
   return (
     <div className="page" style={{ padding: 0 }}>
       <section className="permis-hero">
@@ -546,12 +681,12 @@ function LandingView({ onApply, onTrack, hasPermit }) {
             </div>
           </div>
           <div className="permis-types">
-            {PERMIT_TYPES.map((t) => (
+            {types.map((t) => (
               <div key={t.id} className="permis-type-card">
-                <div className="lbl">{t.label}</div>
+                {t.label && <div className="lbl">{t.label}</div>}
                 <div className="t">{t.title}</div>
                 <ul>
-                  {t.items.map((item) => (
+                  {(t.items ?? []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -569,6 +704,8 @@ function LandingView({ onApply, onTrack, hasPermit }) {
 
 export function PermisPage() {
   const { permit, submit } = useSubmittedPermit();
+  const { types, loading: typesLoading } = usePermitTypes();
+  const { departments, loading: depLoading } = useDepartments();
   const [view, setView] = useState('landing');
   const { push } = useToast();
 
@@ -582,12 +719,29 @@ export function PermisPage() {
     }
   };
 
+  if (typesLoading || depLoading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <p>Chargement…</p>
+        </div>
+      </div>
+    );
+  }
+
   if (view === 'track' && permit) {
     return <TrackingView permit={permit} onBack={() => setView('landing')} />;
   }
 
   if (view === 'apply') {
-    return <ApplyView onSubmit={handleSubmit} onBack={() => setView('landing')} />;
+    return (
+      <ApplyView
+        onSubmit={handleSubmit}
+        onBack={() => setView('landing')}
+        types={types}
+        departments={departments}
+      />
+    );
   }
 
   return (
@@ -595,6 +749,7 @@ export function PermisPage() {
       onApply={() => setView('apply')}
       onTrack={() => setView('track')}
       hasPermit={Boolean(permit)}
+      types={types}
     />
   );
 }

@@ -2,43 +2,52 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from './api.js';
 import { useAuth } from './auth.js';
 
-export const PERMIT_TYPES = [
-  {
-    id: 'annuel',
-    label: 'Le plus choisi',
-    title: 'Permis annuel',
-    price: 92,
-    items: [
-      'Valide du 1er janv. au 31 déc.',
-      'Toutes eaux 1re et 2e catégorie',
-      'CPMA incluse',
-    ],
-  },
-  {
-    id: 'semaine',
-    label: 'Vacances',
-    title: 'Permis semaine',
-    price: 28,
-    items: ['7 jours consécutifs', 'Carte interfédérale', 'Idéal séjour'],
-  },
-  {
-    id: 'decouverte',
-    label: '-12 ans',
-    title: 'Découverte',
-    price: 6,
-    items: ["Mineurs jusqu'à 12 ans", "Toute l'année", 'Carte gratuite -2 ans'],
-  },
-];
+export function usePermitTypes() {
+  const [types, setTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export const DEPARTMENTS = [
-  { code: '66', name: '66 — Pyrénées-Orientales' },
-  { code: '11', name: '11 — Aude' },
-  { code: '09', name: '09 — Ariège' },
-  { code: '34', name: '34 — Hérault' },
-];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.get('/api/permit-types');
+        if (!cancelled) setTypes(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setTypes([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-export function findPermitType(id) {
-  return PERMIT_TYPES.find((t) => t.id === id) ?? PERMIT_TYPES[0];
+  return { types, loading };
+}
+
+export function useDepartments() {
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.get('/api/departments');
+        if (!cancelled) setDepartments(Array.isArray(data) ? data : []);
+      } catch {
+        if (!cancelled) setDepartments([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { departments, loading };
 }
 
 export function useSubmittedPermit() {
