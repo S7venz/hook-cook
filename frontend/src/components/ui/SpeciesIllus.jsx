@@ -17,13 +17,30 @@ export function SpeciesIllus({ species, imageUrl, alt }) {
 
   if (imageUrl && !errored) {
     return (
-      <img
-        src={imageUrl}
-        alt={alt ?? species}
-        loading="lazy"
-        onError={() => setErrored(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-      />
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: `oklch(0.96 0.006 ${hue})`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'var(--sp-3)',
+        }}
+      >
+        <img
+          src={imageUrl}
+          alt={alt ?? species}
+          loading="lazy"
+          onError={() => setErrored(true)}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
+      </div>
     );
   }
 

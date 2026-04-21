@@ -93,7 +93,7 @@ function ConditionsCard() {
   return (
     <div className="card" style={cardStyle}>
       <div className="eyebrow">Conditions du moment</div>
-      <h3 style={cardTitleStyle}>Loue — Montgesoye</h3>
+      <h3 style={cardTitleStyle}>La Têt — Olette</h3>
       <div
         style={{
           display: 'grid',
@@ -185,7 +185,11 @@ export function HomePage() {
               </div>
             </div>
             <div className="hero-illus">
-              <Placeholder label="Matin sur le Doubs — brume, pêcheur au loin" />
+              <Placeholder
+                src="http://localhost:8080/api/uploads/hero-home.png"
+                label="Matin sur la Têt — brume, pêcheur au loin"
+                alt="Pêcheur à la mouche au lever du jour sur une rivière embrumée"
+              />
             </div>
           </div>
         </div>
@@ -199,7 +203,7 @@ export function HomePage() {
           </div>
           <div className="saison-item">
             <span className="lbl">Prochain concours</span>
-            <span className="val">Open de Vesoul · 04 mai</span>
+            <span className="val">Open de la Têt · 04 mai</span>
           </div>
           <div className="saison-item">
             <span className="lbl">Ouverture à venir</span>
