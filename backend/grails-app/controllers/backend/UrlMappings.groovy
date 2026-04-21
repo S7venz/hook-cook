@@ -43,6 +43,8 @@ class UrlMappings {
         post "/api/permits"(controller: 'permit', action: 'create')
         get "/api/permits"(controller: 'permit', action: 'listAll')
         patch "/api/permits/$reference"(controller: 'permit', action: 'patchStatus')
+        get "/api/permit-types"(controller: 'reference', action: 'permitTypes')
+        get "/api/departments"(controller: 'reference', action: 'departments')
 
         post "/api/contests/$id/register"(controller: 'contestRegistration', action: 'register')
         get "/api/contests-registrations/me"(controller: 'contestRegistration', action: 'myList')

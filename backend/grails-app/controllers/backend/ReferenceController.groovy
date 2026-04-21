@@ -12,6 +12,8 @@ class ReferenceController {
             species         : 'GET',
             contests        : 'GET',
             contest         : 'GET',
+            permitTypes     : 'GET',
+            departments     : 'GET',
             createContest   : 'POST',
             updateContest   : 'PUT',
             deleteContest   : 'DELETE',
@@ -42,6 +44,14 @@ class ReferenceController {
 
     def contests() {
         render(Contest.list(sort: 'date').collect { it.toApiMap() } as JSON)
+    }
+
+    def permitTypes() {
+        render(PermitType.list(sort: 'price').collect { it.toApiMap() } as JSON)
+    }
+
+    def departments() {
+        render(Department.list(sort: 'id').collect { it.toApiMap() } as JSON)
     }
 
     def contest() {
