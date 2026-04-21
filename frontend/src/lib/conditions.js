@@ -25,7 +25,7 @@ const METEO_URL =
 
 const HUBEAU_URL =
   'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr' +
-  `?code_entite=${HUBEAU_STATION}&grandeur_hydro=Q&size=1&sort=desc`;
+  `?code_entite=${HUBEAU_STATION}&grandeur_hydro=Q&size=24&sort=desc`;
 
 function moonPhase(date = new Date()) {
   // Réf: nouvelle lune du 6 janvier 2000 à 18:14 UTC
@@ -71,6 +71,7 @@ export function useLiveConditions() {
     temp: null,
     pressure: null,
     flow: null,
+    flowHistory: [],
     moon: moonPhase(),
     loading: true,
     error: false,
@@ -91,14 +92,20 @@ export function useLiveConditions() {
         const temp = meteoRes?.current?.temperature_2m ?? null;
         const pressure =
           meteoRes?.current?.pressure_msl ?? meteoRes?.current?.surface_pressure ?? null;
-        const flow = hubeauRes?.data?.[0]?.resultat_obs
-          ? Number(hubeauRes.data[0].resultat_obs) / 1000 // L/s → m³/s
-          : null;
+        // Hubeau renvoie "desc" (plus récent en premier). Inverse pour
+        // que le sparkline se lise de gauche (ancien) à droite (récent).
+        const obs = Array.isArray(hubeauRes?.data) ? hubeauRes.data : [];
+        const flowHistory = obs
+          .map((o) => (o?.resultat_obs != null ? Number(o.resultat_obs) / 1000 : null))
+          .filter((v) => Number.isFinite(v))
+          .reverse();
+        const flow = flowHistory.length > 0 ? flowHistory[flowHistory.length - 1] : null;
 
         setData({
           temp,
           pressure,
           flow,
+          flowHistory,
           moon: moonPhase(),
           loading: false,
           error: temp === null && flow === null,

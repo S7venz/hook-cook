@@ -93,8 +93,96 @@ function pressureTrend(hpa) {
   return 'Anticyclone marqué — conditions techniques.';
 }
 
+// Petit pictogramme météo déduit de la pression + température.
+// Principe : basse pression → probable couvert/pluie ; haute pression →
+// ciel dégagé. C'est une heuristique d'indication, pas une prévision.
+function MeteoIcon({ pressure, temp }) {
+  if (pressure == null) return null;
+  let kind;
+  if (pressure < 1005) kind = 'rain';
+  else if (pressure < 1013) kind = 'cloud';
+  else if (pressure < 1022) kind = temp != null && temp < 8 ? 'cloud' : 'sun';
+  else kind = 'sun';
+
+  return (
+    <div className="conditions-meteo" aria-hidden="true" title={`Pression ${Math.round(pressure)} hPa`}>
+      {kind === 'sun' && (
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="6" stroke="currentColor" strokeWidth="2" />
+          <path
+            d="M20 4v4M20 32v4M4 20h4M32 20h4M8 8l3 3M29 29l3 3M32 8l-3 3M11 29l-3 3"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+      {kind === 'cloud' && (
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 26a6 6 0 0 1 1-11.9 8 8 0 0 1 15.4 2A5 5 0 0 1 28 26H12z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
+      {kind === 'rain' && (
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 22a6 6 0 0 1 1-11.9 8 8 0 0 1 15.4 2A5 5 0 0 1 28 22H12z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M15 28l-2 4M22 28l-2 4M29 28l-2 4"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+    </div>
+  );
+}
+
+// Sparkline minimaliste : courbe + remplissage tendance sur les
+// dernières heures de débit Hubeau. Vide si moins de 4 points.
+function FlowSparkline({ series }) {
+  if (!Array.isArray(series) || series.length < 4) return null;
+  const W = 320;
+  const H = 48;
+  const PAD = 2;
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const range = max - min || 1;
+  const step = (W - PAD * 2) / (series.length - 1);
+
+  const points = series.map((v, i) => {
+    const x = PAD + i * step;
+    const y = PAD + (H - PAD * 2) * (1 - (v - min) / range);
+    return [x, y];
+  });
+
+  const stroke = points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const fill = `${stroke} L ${W - PAD} ${H - PAD} L ${PAD} ${H - PAD} Z`;
+
+  return (
+    <svg
+      className="conditions-sparkline"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      aria-label={`Tendance débit ${series.length} dernières heures`}
+    >
+      <path d={fill} className="fill" />
+      <path d={stroke} className="stroke" />
+    </svg>
+  );
+}
+
 function ConditionsCard() {
-  const { temp, pressure, flow, moon, loading, error } = useLiveConditions();
+  const { temp, pressure, flow, flowHistory, moon, loading, error } = useLiveConditions();
 
   const tempDisplay = temp != null ? `${Math.round(temp)}°` : '—';
   const pressureDisplay = pressure != null ? Math.round(pressure) : '—';
@@ -114,7 +202,8 @@ function ConditionsCard() {
       ];
 
   return (
-    <div className="card" style={cardStyle}>
+    <div className="card" style={{ ...cardStyle, position: 'relative' }}>
+      <MeteoIcon pressure={pressure} temp={temp} />
       <div className="eyebrow">
         Conditions en direct {loading && ' · màj…'}
         {error && ' · données partielles'}
@@ -144,6 +233,7 @@ function ConditionsCard() {
           </div>
         ))}
       </div>
+      <FlowSparkline series={flowHistory} />
       <div
         style={{
           marginTop: 'var(--sp-3)',
@@ -198,6 +288,53 @@ export function HomePage() {
     <div className="page">
       <section className="hero">
         <div className="hero-bg" aria-hidden="true" />
+        <svg
+          className="hero-deco"
+          viewBox="0 0 800 600"
+          preserveAspectRatio="xMaxYMid slice"
+          aria-hidden="true"
+        >
+          {/* Lignes de pêche — courbes décoratives évoquant un lancer */}
+          <path
+            d="M 800 120 Q 600 180 400 240 T 0 360"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+          />
+          <path
+            d="M 800 180 Q 550 260 350 320 T 0 440"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity="0.6"
+          />
+          <path
+            d="M 800 60 Q 650 120 500 170 T 200 260"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity="0.4"
+          />
+          {/* Petites mouches / hameçons ponctuant les lignes */}
+          <circle cx="400" cy="240" r="3" fill="currentColor" opacity="0.8" />
+          <circle cx="350" cy="320" r="2.5" fill="currentColor" opacity="0.6" />
+          <circle cx="500" cy="170" r="2" fill="currentColor" opacity="0.5" />
+          {/* Ondulations / rides d'eau en bas à droite */}
+          <path
+            d="M 500 500 Q 560 490 620 500 T 740 500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity="0.5"
+          />
+          <path
+            d="M 520 530 Q 580 520 640 530 T 760 530"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity="0.3"
+          />
+        </svg>
         <div className="page-container">
           <div className="hero-grid">
             <div>
