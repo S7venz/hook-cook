@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Icon } from './ui/Icon.jsx';
 import { useAuth } from '../lib/auth.js';
 import { cartTotals, useCart } from '../lib/cart.js';
+import { useTheme } from '../lib/theme.js';
 
 const LINKS = [
   { to: '/boutique', label: 'Boutique' },
@@ -14,6 +15,7 @@ export function TopNav() {
   const { items } = useCart();
   const { count } = cartTotals(items);
   const { user } = useAuth();
+  const { theme, toggle } = useTheme();
 
   return (
     <header className="topnav">
@@ -36,6 +38,15 @@ export function TopNav() {
         </nav>
 
         <div className="topnav-actions">
+          <button
+            className="icon-btn"
+            aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+            title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+            type="button"
+            onClick={toggle}
+          >
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
+          </button>
           <button
             className="icon-btn"
             aria-label="Rechercher dans la boutique"

@@ -6,6 +6,7 @@ import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
+import { Skeleton, SkeletonLine } from '../components/ui/Skeleton.jsx';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useProduct, useProducts } from '../lib/products.js';
@@ -95,8 +96,25 @@ export function ProductPage() {
   if (loading) {
     return (
       <div className="page">
-        <div className="page-container" style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}>
-          <p className="soft">Chargement du produit…</p>
+        <div className="page-container">
+          <div className="pd-layout" aria-busy="true">
+            <div className="pd-gallery">
+              <div className="pd-main-img">
+                <Skeleton width="100%" height="100%" radius={0} />
+              </div>
+            </div>
+            <div className="pd-details">
+              <Skeleton width="40%" height={12} style={{ marginBottom: 12 }} />
+              <Skeleton width="80%" height={32} style={{ marginBottom: 16 }} />
+              <SkeletonLine lines={3} />
+              <div style={{ marginTop: 24 }}>
+                <Skeleton width="30%" height={24} />
+              </div>
+              <div style={{ marginTop: 24 }}>
+                <Skeleton width="50%" height={44} radius={8} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

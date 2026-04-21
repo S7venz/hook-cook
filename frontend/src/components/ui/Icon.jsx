@@ -14,6 +14,10 @@ const PATHS = {
   trash:
     'M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3',
   plus: 'M12 5v14M5 12h14',
+  sun: 'M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+  moon: 'M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z',
+  download:
+    'M12 3v12m0 0l-4-4m4 4l4-4M5 21h14',
 };
 
 export function Icon({ name, size = 20, className = '' }) {

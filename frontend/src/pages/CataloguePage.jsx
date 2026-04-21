@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
+import { ProductCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
 
@@ -279,8 +280,10 @@ export function CataloguePage() {
             )}
 
             {loading ? (
-              <div style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}>
-                <p className="soft">Chargement du catalogue…</p>
+              <div className="catalog-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
               </div>
             ) : visible.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}>

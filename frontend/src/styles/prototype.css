@@ -327,6 +327,25 @@ body { overflow-x: hidden; }
 }
 .product-card.sold-out .card-media { opacity: 0.55; filter: grayscale(0.35); }
 .product-card.sold-out .info .name { color: var(--ink-mute); }
+
+/* Skeleton loaders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-sunk) 0%,
+    color-mix(in oklch, var(--bg-sunk) 60%, var(--hairline)) 50%,
+    var(--bg-sunk) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
 .product-card .info {
   padding: var(--sp-3) 0;
   display: flex; flex-direction: column; gap: var(--sp-1);
