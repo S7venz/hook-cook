@@ -1,18 +1,30 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { emailValid, useAuth } from '../lib/auth.js';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { login, user, hydrating } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const redirectTo = location.state?.from ?? '/compte';
+  // Priorité : state.from (posé par RouteGuards) > ?next= > /compte.
+  // Sanitize anti-open-redirect : on refuse tout ce qui n'est pas un
+  // chemin interne commençant par / et différent de //.
+  const rawRedirect = location.state?.from ?? searchParams.get('next') ?? '/compte';
+  const redirectTo = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+    ? rawRedirect
+    : '/compte';
+
+  // Déjà connecté ? On saute direct à la destination.
+  if (!hydrating && user) {
+    return <Navigate to={redirectTo} replace />;
+  }
 
   const submit = async (e) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -1328,7 +1328,7 @@ function ProductsSection({
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const { user, hydrating, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
   const { permits, updateStatus: updatePermitStatus } = useAdminPermits();
@@ -1342,54 +1342,10 @@ export function AdminPage() {
   const { stats, loading: statsLoading } = useAdminStats();
   const [section, setSection] = useState('overview');
 
-  const isAdmin = user?.role === 'ROLE_ADMIN';
-
+  // L'auth + rôle admin sont déjà garantis par <RequireAdmin> dans
+  // App.jsx : quand ce composant rend, user existe, hydrating est
+  // terminé et user.role === 'ROLE_ADMIN'. Plus besoin de double check.
   const totalRegistrations = remoteContests.reduce((s, c) => s + (c.inscrits ?? 0), 0);
-
-  if (hydrating) {
-    return (
-      <div className="page">
-        <div
-          className="page-container"
-          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
-        >
-          <p className="soft">Chargement…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/connexion" state={{ from: '/admin' }} replace />;
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="page">
-        <div
-          className="page-container"
-          style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}
-        >
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-44)',
-              fontWeight: 400,
-              margin: '0 0 var(--sp-4)',
-            }}
-          >
-            Accès réservé aux administrateurs.
-          </h1>
-          <p className="soft" style={{ marginBottom: 'var(--sp-6)' }}>
-            Connectez-vous avec un compte admin pour accéder à cette section.
-          </p>
-          <Button variant="primary" onClick={() => navigate('/')}>
-            Retour à l'accueil
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const lowStock = products
     .filter((p) => p.stock < (p.lowStockThreshold ?? 15))

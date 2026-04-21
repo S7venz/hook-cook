@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -689,31 +689,17 @@ function AddressesTab({ user, onGoSettings }) {
 }
 
 export function AccountPage() {
+  // L'auth est déjà garantie par <RequireAuth> dans App.jsx :
+  // quand ce composant rend, user est forcément non-null et
+  // hydrating est terminé. On évite donc le double check.
   const navigate = useNavigate();
-  const { user, hydrating, logout, updateProfile } = useAuth();
+  const { user, logout, updateProfile } = useAuth();
   const { contests: remoteContests } = useReferenceData();
   const { orders } = useOrders();
   const { entries, addEntry, removeEntry } = useCarnet();
   const { permit } = useSubmittedPermit();
   const { isRegistered } = useContestRegistrations();
   const [tab, setTab] = useState('apercu');
-
-  if (hydrating) {
-    return (
-      <div className="page">
-        <div
-          className="page-container"
-          style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
-        >
-          <p className="soft">Chargement de votre session…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/connexion" state={{ from: '/compte' }} replace />;
-  }
 
   const inscribed = remoteContests.filter((c) => isRegistered(c.id));
 
