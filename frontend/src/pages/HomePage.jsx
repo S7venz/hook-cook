@@ -7,6 +7,7 @@ import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
 import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
+import { useLiveConditions } from '../lib/conditions.js';
 import { formatPrice } from '../lib/format.js';
 import { useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
@@ -84,15 +85,40 @@ function SeasonsCard() {
   );
 }
 
+function pressureTrend(hpa) {
+  if (hpa == null) return 'Données météo indisponibles.';
+  if (hpa < 1005) return 'Basses pressions — idéal pour la sèche matinale.';
+  if (hpa < 1015) return 'Pressions stables — journée classique de pêche.';
+  if (hpa < 1025) return 'Hautes pressions — privilégier le début / fin de journée.';
+  return 'Anticyclone marqué — conditions techniques.';
+}
+
 function ConditionsCard() {
-  const metrics = [
-    { value: '12°', label: 'eau' },
-    { value: '1013', label: 'hPa' },
-    { value: 'L+2', label: 'lune' },
-  ];
+  const { temp, pressure, flow, moon, loading, error } = useLiveConditions();
+
+  const tempDisplay = temp != null ? `${Math.round(temp)}°` : '—';
+  const pressureDisplay = pressure != null ? Math.round(pressure) : '—';
+  const flowDisplay = flow != null ? flow.toFixed(1) : null;
+  const moonDisplay = moon.short;
+
+  const metrics = flowDisplay
+    ? [
+        { value: `${flowDisplay}`, label: 'm³/s débit' },
+        { value: tempDisplay, label: 'air' },
+        { value: moonDisplay, label: 'lune' },
+      ]
+    : [
+        { value: tempDisplay, label: 'air' },
+        { value: pressureDisplay, label: 'hPa' },
+        { value: moonDisplay, label: 'lune' },
+      ];
+
   return (
     <div className="card" style={cardStyle}>
-      <div className="eyebrow">Conditions du moment</div>
+      <div className="eyebrow">
+        Conditions en direct {loading && ' · màj…'}
+        {error && ' · données partielles'}
+      </div>
       <h3 style={cardTitleStyle}>La Têt — Olette</h3>
       <div
         style={{
@@ -125,7 +151,17 @@ function ConditionsCard() {
           color: 'var(--ink-soft)',
         }}
       >
-        Couvert, basses pressions. Conditions idéales pour la sèche matinale.
+        {pressureTrend(pressure)} {moon.label} · J{moon.daysSinceNew}.
+      </div>
+      <div
+        style={{
+          marginTop: 'var(--sp-2)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'var(--fs-12)',
+          color: 'var(--ink-mute)',
+        }}
+      >
+        Sources : Open-Meteo · Hubeau (Eaufrance)
       </div>
     </div>
   );
