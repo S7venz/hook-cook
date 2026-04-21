@@ -328,6 +328,37 @@ body { overflow-x: hidden; }
 .product-card.sold-out .card-media { opacity: 0.55; filter: grayscale(0.35); }
 .product-card.sold-out .info .name { color: var(--ink-mute); }
 
+/* Dark mode : les sections "spotlight" (strip saison, hero permis,
+   hero home) utilisent var(--ink) comme fond, qui devient clair en
+   sombre. On force un fond volontairement sombre pour préserver le
+   contraste inversé par rapport au reste de la page. */
+[data-theme="dark"] .saison-strip,
+[data-theme="dark"] .permis-hero {
+  background: oklch(0.12 0.018 250);
+  color: oklch(0.95 0.012 85);
+}
+[data-theme="dark"] .saison-item .lbl {
+  color: oklch(0.62 0.015 85);
+}
+[data-theme="dark"] .permis-hero p {
+  color: oklch(0.78 0.015 85);
+}
+
+/* Dark mode : placeholder map moins "trou noir" */
+[data-theme="dark"] .map-placeholder {
+  background: oklch(0.22 0.020 250);
+}
+[data-theme="dark"] .map-placeholder .placeholder-img {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      oklch(0.24 0.020 250),
+      oklch(0.24 0.020 250) 10px,
+      oklch(0.22 0.020 250) 10px,
+      oklch(0.22 0.020 250) 20px
+    );
+}
+
 /* Skeleton loaders */
 .skeleton {
   background: linear-gradient(
@@ -1048,6 +1079,51 @@ body { overflow-x: hidden; }
   overflow: hidden;
 }
 @media (max-width: 900px) { .map-placeholder { height: 320px; position: static; } }
+
+/* Carte Leaflet des concours */
+.contests-map {
+  position: relative;
+  width: 100%; height: 100%;
+}
+.contests-map .leaflet-container {
+  width: 100%; height: 100%;
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+}
+.contests-map-caption {
+  position: absolute;
+  bottom: var(--sp-2);
+  left: var(--sp-2);
+  right: var(--sp-2);
+  z-index: 500;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--ink-soft);
+  background: color-mix(in oklch, var(--bg-elev) 85%, transparent);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+.contests-map .leaflet-popup-content {
+  font-family: var(--font-body);
+  font-size: var(--fs-13);
+  line-height: 1.4;
+  margin: 10px 12px;
+}
+.contests-map .leaflet-popup-content-wrapper {
+  background: var(--bg-elev);
+  color: var(--ink);
+  border-radius: var(--r-md);
+}
+.contests-map .leaflet-popup-tip {
+  background: var(--bg-elev);
+}
+[data-theme="dark"] .contests-map .leaflet-popup-content-wrapper,
+[data-theme="dark"] .contests-map .leaflet-popup-tip {
+  background: oklch(0.22 0.020 250);
+  color: oklch(0.95 0.012 85);
+}
 
 /* ============ COMPTE / CARNET ============ */
 .account-layout {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
-import { Placeholder } from '../components/ui/Placeholder.jsx';
+import { ContestsMap } from '../components/ui/ContestsMap.jsx';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { formatPrice } from '../lib/format.js';
@@ -311,7 +311,7 @@ export function ConcoursPage() {
           </div>
 
           <aside className="map-placeholder">
-            <Placeholder label="Carte des concours — région Occitanie · 4 épingles" />
+            <ContestsMap contests={visibleContests} />
           </aside>
         </div>
 
