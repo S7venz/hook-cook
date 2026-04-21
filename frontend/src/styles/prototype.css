@@ -1888,3 +1888,136 @@ html { scroll-behavior: smooth; }
 .kpi .val {
   font-variant-numeric: tabular-nums;
 }
+
+/* ── 19. Section icons — micro-animations SVG subtiles ──────────── */
+/*
+ * Le composant <SectionIcon> affiche un petit pictogramme en face
+ * d'un eyebrow ou d'un titre. Chaque icône a sa propre animation
+ * d'ambiance (poisson qui nage, ligne qui oscille, vague qui ondule).
+ * Le tout désactivé si prefers-reduced-motion.
+ */
+.hc-sicon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  vertical-align: -0.15em;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.eyebrow .hc-sicon {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.55em;
+  vertical-align: -0.2em;
+}
+.hc-sicon svg { width: 100%; height: 100%; overflow: visible; }
+
+/* Poisson : la queue s'agite + le corps ondule doucement */
+@keyframes hc-fish-tail { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+@keyframes hc-fish-bob  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
+.hc-sicon--fish .tail { transform-origin: 18px 12px; animation: hc-fish-tail 1.4s ease-in-out infinite; }
+.hc-sicon--fish .body { animation: hc-fish-bob 3.2s ease-in-out infinite; }
+
+/* Vagues : onde qui se déplace de gauche à droite */
+@keyframes hc-wave-drift {
+  0%   { transform: translateX(0); opacity: 0.9; }
+  50%  { transform: translateX(2px); opacity: 0.6; }
+  100% { transform: translateX(0); opacity: 0.9; }
+}
+.hc-sicon--wave .w1 { animation: hc-wave-drift 2.6s ease-in-out infinite; }
+.hc-sicon--wave .w2 { animation: hc-wave-drift 2.6s ease-in-out infinite 0.6s; opacity: 0.75; }
+.hc-sicon--wave .w3 { animation: hc-wave-drift 2.6s ease-in-out infinite 1.2s; opacity: 0.5; }
+
+/* Canne à pêche : légère oscillation (comme un lancer qui retombe) */
+@keyframes hc-rod-sway {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50%      { transform: rotate(2deg); }
+}
+.hc-sicon--rod .rod { transform-origin: 4px 20px; animation: hc-rod-sway 3.6s ease-in-out infinite; }
+
+/* Hameçon : pendule doux */
+@keyframes hc-hook-swing {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+.hc-sicon--hook .hook { transform-origin: 12px 2px; animation: hc-hook-swing 2.8s ease-in-out infinite; }
+
+/* Mouche : flotte doucement comme posée sur l'eau */
+@keyframes hc-fly-hover {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-0.8px) rotate(2deg); }
+}
+.hc-sicon--fly .fly { transform-origin: center; animation: hc-fly-hover 2.4s ease-in-out infinite; }
+
+/* Trophée : reflet qui balaie */
+@keyframes hc-shine {
+  0%   { opacity: 0; transform: translateX(-6px); }
+  40%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translateX(6px); }
+}
+.hc-sicon--trophy .shine { animation: hc-shine 3.6s ease-in-out infinite; }
+
+/* Boussole : aiguille qui tourne très lentement */
+@keyframes hc-compass-spin {
+  0%   { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+.hc-sicon--compass .needle { transform-origin: 12px 12px; animation: hc-compass-spin 12s linear infinite; }
+
+/* Permis : tampon qui pulse subtilement */
+@keyframes hc-stamp-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+.hc-sicon--permit .stamp { transform-origin: 17px 7px; animation: hc-stamp-pulse 2.6s ease-in-out infinite; }
+
+/* Calendrier : point de marqueur qui clignote */
+@keyframes hc-cal-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+.hc-sicon--calendar .dot { animation: hc-cal-pulse 2s ease-in-out infinite; }
+
+/* Carnet : trait d'écriture qui apparaît */
+@keyframes hc-ink-dash {
+  0%   { stroke-dashoffset: 18; }
+  60%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.hc-sicon--carnet .ink {
+  stroke-dasharray: 18;
+  animation: hc-ink-dash 3.6s ease-in-out infinite alternate;
+}
+
+/* Panier : roues qui roulent légèrement */
+@keyframes hc-cart-roll {
+  0%, 100% { transform: rotate(0); }
+  50%      { transform: rotate(20deg); }
+}
+.hc-sicon--cart .wheel1 { transform-origin: 8px 18px; animation: hc-cart-roll 2.8s ease-in-out infinite; }
+.hc-sicon--cart .wheel2 { transform-origin: 16px 18px; animation: hc-cart-roll 2.8s ease-in-out infinite 0.2s; }
+
+/* Feuille : légère oscillation comme dans le vent */
+@keyframes hc-leaf-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+.hc-sicon--leaf .leaf { transform-origin: 12px 20px; animation: hc-leaf-sway 3s ease-in-out infinite; }
+
+/* Goutte : chute douce + disparition */
+@keyframes hc-drop-fall {
+  0%   { transform: translateY(-3px); opacity: 0; }
+  40%  { opacity: 1; }
+  90%  { transform: translateY(2px); opacity: 0; }
+  100% { transform: translateY(2px); opacity: 0; }
+}
+.hc-sicon--drop .drop { animation: hc-drop-fall 2.4s ease-in-out infinite; }
+
+/* Respecte prefers-reduced-motion : pas d'animation du tout */
+@media (prefers-reduced-motion: reduce) {
+  .hc-sicon *,
+  .hc-sicon { animation: none !important; }
+}
