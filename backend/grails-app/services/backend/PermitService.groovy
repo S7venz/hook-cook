@@ -13,8 +13,10 @@ class PermitService {
     MailService mailService
 
     private static String generateReference() {
-        int rand = (int) (10000 + Math.random() * 89999)
-        "FR-2026-${rand}"
+        // UUID tronqué plutôt que Math.random() — sur 5 chiffres on avait
+        // seulement 90k valeurs et un PRNG prédictible.
+        String suffix = UUID.randomUUID().toString().replace('-', '').take(10).toUpperCase()
+        "FR-2026-${suffix}"
     }
 
     private static DateTimeFormatter FMT = DateTimeFormatter

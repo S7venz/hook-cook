@@ -15,8 +15,11 @@ class OrderService {
     ]
 
     private static String generateReference() {
-        int rand = (int) (1000 + Math.random() * 8999)
-        "HC-2186-${rand}"
+        // UUID tronqué (8 hex chars → ~4B valeurs) + SecureRandom plutôt
+        // que Math.random() (PRNG non-crypto prédictible). Évite les
+        // collisions à partir de la 105ᵉ commande et la devinabilité.
+        String suffix = UUID.randomUUID().toString().replace('-', '').take(8).toUpperCase()
+        "HC-2186-${suffix}"
     }
 
     Map createFromCart(User user, Map payload) {

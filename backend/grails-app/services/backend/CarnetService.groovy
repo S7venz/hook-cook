@@ -33,9 +33,11 @@ class CarnetService {
 
     Map remove(User user, Long id) {
         CatchEntry entry = CatchEntry.get(id)
-        if (!entry) return [error: 'Prise introuvable.']
-        if (entry.user.id != user.id && user.role != 'ROLE_ADMIN') {
-            return [error: 'Suppression non autorisée.']
+        // Message uniforme entre "inexistant" et "pas à moi" — évite
+        // qu'un attaquant puisse énumérer les IDs valides d'autres users
+        // en comparant les messages d'erreur (IDOR enumeration).
+        if (!entry || (entry.user.id != user.id && user.role != 'ROLE_ADMIN')) {
+            return [error: 'Prise introuvable.']
         }
         entry.delete(flush: true)
         [ok: true]
