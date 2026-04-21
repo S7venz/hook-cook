@@ -9,9 +9,23 @@ class AuthController {
     static allowedMethods = [register: 'POST', login: 'POST', me: 'GET', updateMe: 'PATCH']
 
     AuthService authService
+    RateLimitService rateLimitService
+
+    // 5 tentatives / 10 minutes / (IP + email) sur /login
+    // 3 créations de comptes / heure / IP sur /register
+    private static final int LOGIN_MAX = 5
+    private static final long LOGIN_WINDOW_MS = 10L * 60 * 1000
+    private static final int REGISTER_MAX = 3
+    private static final long REGISTER_WINDOW_MS = 60L * 60 * 1000
 
     def register() {
         Map payload = request.JSON as Map
+        String ip = clientIp()
+        if (!rateLimitService.allow("register:${ip}", REGISTER_MAX, REGISTER_WINDOW_MS)) {
+            response.status = 429
+            render([error: 'Trop de créations de comptes. Réessayez dans 1h.'] as JSON)
+            return
+        }
         Map result = authService.register(payload ?: [:])
         if (result.error) {
             response.status = 400
@@ -24,6 +38,14 @@ class AuthController {
 
     def login() {
         Map payload = request.JSON as Map
+        String ip = clientIp()
+        String email = (payload?.email ?: '').toString().toLowerCase()
+        String key = "login:${ip}:${email}"
+        if (!rateLimitService.allow(key, LOGIN_MAX, LOGIN_WINDOW_MS)) {
+            response.status = 429
+            render([error: 'Trop de tentatives. Réessayez dans 10 minutes.'] as JSON)
+            return
+        }
         Map result = authService.login(payload ?: [:])
         if (result.error) {
             response.status = 401
@@ -31,6 +53,12 @@ class AuthController {
             return
         }
         render(userPayload(result.user, result.token) as JSON)
+    }
+
+    private String clientIp() {
+        String xff = request.getHeader('X-Forwarded-For')
+        if (xff) return xff.split(',')[0].trim()
+        return request.remoteAddr ?: 'unknown'
     }
 
     def me() {
