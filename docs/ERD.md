@@ -13,6 +13,9 @@ erDiagram
     users ||--o{ contest_registrations : "inscrit"
     users ||--o{ catch_entries : "consigne"
     users ||--o{ product_reviews : "rédige"
+    users ||--o{ wishlist_items : "favori"
+    users ||--o{ stock_alerts : "attend"
+    users ||--o{ password_reset_tokens : "reset"
 
     orders ||--|{ order_items : "contient"
     order_items }o--|| products : "snapshot"
@@ -27,6 +30,8 @@ erDiagram
     catch_entries }o--|| species : "espèce"
 
     product_reviews }o--|| products : "note"
+    wishlist_items }o--|| products : "cible"
+    stock_alerts }o--|| products : "surveille"
     permits }o--|| permit_types : "type"
     permits }o--o| departments : "département"
 
@@ -197,6 +202,32 @@ erDiagram
         boolean verified_purchase
         timestamp date_created
     }
+
+    wishlist_items {
+        bigint id PK
+        bigint user_id FK
+        string product_id FK
+        timestamp date_created
+    }
+
+    stock_alerts {
+        bigint id PK
+        bigint user_id FK
+        string product_id FK
+        boolean notified
+        timestamp notified_at
+        timestamp date_created
+    }
+
+    password_reset_tokens {
+        bigint id PK
+        bigint user_id FK
+        string token UK "UUID 128 bits"
+        timestamp expires_at "TTL 1h"
+        boolean used
+        timestamp used_at
+        timestamp date_created
+    }
 ```
 
 ## Relations clés
@@ -210,6 +241,9 @@ erDiagram
 | `contests` → `contest_registrations` | 1..N | compteur `inscrits` dénormalisé sur `contests` |
 | `users` → `catch_entries` | 1..N | le carnet de prises est privé par défaut |
 | `users` → `product_reviews` | 1..N | contrainte applicative : un seul avis par couple (user, product) |
+| `users` → `wishlist_items` | 1..N | un seul item par couple (user, product) — idempotence côté service |
+| `users` → `stock_alerts` | 1..N | alertes actives filtrables via `notified = false` |
+| `users` → `password_reset_tokens` | 1..N | anciens tokens invalidés à chaque nouvelle demande |
 | `products` ↔ `species` | N..N | stocké en CSV dans `species_csv` (pas de table de jointure) |
 | `products` ↔ `months` | N..N | idem, CSV dans `months_csv` |
 
@@ -237,6 +271,12 @@ Tous déclarés via `static mapping { }` dans les domains :
 | `catch_entries` | `catch_entries_user_idx` | `user_id` |
 | `product_reviews` | `product_reviews_product_idx` | `product_id` |
 | `product_reviews` | `product_reviews_user_idx` | `user_id` |
+| `wishlist_items` | `wishlist_user_idx` | `user_id` |
+| `wishlist_items` | `wishlist_product_idx` | `product_id` |
+| `stock_alerts` | `stock_alerts_user_idx` | `user_id` |
+| `stock_alerts` | `stock_alerts_product_idx` | `product_id` |
+| `password_reset_tokens` | `pwd_reset_token_idx` (unique) | `token` |
+| `password_reset_tokens` | `pwd_reset_user_idx` | `user_id` |
 
 ## Génération et évolution du schéma
 

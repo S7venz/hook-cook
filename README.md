@@ -169,6 +169,18 @@ hook-cook/
 | GET | `/api/admin/exports/permits.csv` | Toutes les demandes de permis |
 | GET | `/api/admin/exports/contest-registrations.csv` | Toutes les inscriptions concours |
 
+### Password reset (public)
+| Méthode | Path | Description |
+|---|---|---|
+| POST | `/api/auth/password-reset/request` | Demande de lien (toujours 200, anti-énumération) |
+| POST | `/api/auth/password-reset/confirm` | Valide le token + pose le nouveau mot de passe |
+
+### RGPD (user authentifié)
+| Méthode | Path | Description |
+|---|---|---|
+| GET | `/api/users/me/export` | Export JSON complet de toutes ses données |
+| DELETE | `/api/users/me` | Suppression / anonymisation irréversible |
+
 ### Concours (user)
 | Méthode | Path | Description |
 |---|---|---|
@@ -240,7 +252,12 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | **Export CSV admin** | Commandes, permis, inscriptions — format Excel FR compatible |
 | **Mode sombre** | Toggle avec respect du `prefers-color-scheme` système |
 | **Skeleton loaders** | Transitions fluides pendant les chargements |
-| **Pages légales** | Mentions, CGV, confidentialité RGPD, cookies |
+| **Pages légales + FAQ** | Mentions, CGV, confidentialité RGPD, cookies, /a-propos, /aide |
+| **Password reset par email** | Token UUID one-shot 1h, anti-énumération, rate limit 3/h/email |
+| **RGPD : export + suppression** | Export JSON complet, anonymisation irréversible (art. 15/17/20) |
+| **Stats admin enrichies** | Panier moyen, conversion, stocks critiques, jamais vendus, CA par catégorie |
+| **Seed démo** | 10 users + 18 commandes + 6 permis + 10 inscriptions + 8 avis (activé par `HC_SEED_DEMO=true`) |
+| **Routing complet** | Guards centralisés, 404/403 dédiés, alias URL, anti-open-redirect |
 
 ## Sécurité
 
@@ -270,10 +287,24 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | `SMTP_USERNAME` | — | Nom d'utilisateur SMTP |
 | `SMTP_PASSWORD` | — | Mot de passe SMTP |
 | `SMTP_FROM` | `no-reply@hookcook.fr` | Adresse expéditrice |
-| `ADMIN_EMAIL` | `admin@hookcook.fr` | Email de l'admin seedé au boot |
-| `ADMIN_PASSWORD` | `admin1234` | Mot de passe de l'admin seedé (à changer en prod !) |
+| `ADMIN_EMAIL` | `admin@hookcook.fr` | Email de l'admin seedé au boot (obligatoire en prod) |
+| `ADMIN_PASSWORD` | — | Mot de passe admin ≥ 10 chars en prod, sinon boot refusé |
+| `HC_SEED_DEMO` | `` (vide) | Si `true`, injecte 10 users + historiques au premier boot |
 
 Dès que `SMTP_HOST` est défini, `MailService` bascule automatiquement sur un vrai envoi via `JavaMailSender`. Sans SMTP configuré, les mails sont loggés dans la console Grails (utile pour le dev).
+
+### Seed de démo (`HC_SEED_DEMO=true`)
+
+Au premier boot avec ce flag activé, `DemoSeedData` injecte dans la BDD :
+
+- 10 utilisateurs français avec adresses 66/Occitanie (tous mot de passe `demo1234`)
+- 18 commandes étalées sur 6 mois (statuts mixtes)
+- 6 permis (4 approved / 1 pending / 1 rejected)
+- 10 inscriptions concours, 8 avis clients vérifiés, 6 entrées carnet, 7 favoris
+
+Idempotent : si `marie.dupont@demo.hookcook.fr` existe déjà, le seed est ignoré. Voir `backend/grails-app/init/backend/DemoSeedData.groovy` pour le détail.
+
+Ne jamais activer en production.
 
 ## Premier démarrage
 
@@ -298,9 +329,10 @@ Le filtre complet Spring Security (`SecurityFilterChain`) n'est pas en place —
 
 ## Documentation
 
-- [docs/API.md](docs/API.md) — documentation API exhaustive (tous endpoints + payloads + codes d'erreur)
-- [docs/GUIDE-UTILISATEUR.md](docs/GUIDE-UTILISATEUR.md) — manuel client (compte, achat, permis, concours, carnet)
-- [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — manuel admin (produits, commandes, permis, concours, sécurité)
+- [docs/API.md](docs/API.md) — documentation API exhaustive (16 sections, tous endpoints + payloads + codes d'erreur)
+- [docs/ERD.md](docs/ERD.md) — diagramme entité-relation (Mermaid rendu par GitHub)
+- [docs/GUIDE-UTILISATEUR.md](docs/GUIDE-UTILISATEUR.md) — manuel client (compte, achat, permis, concours, carnet, RGPD, reset mdp)
+- [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — manuel admin (produits, stats, exports CSV, permis, concours, seed démo, sécurité)
 - [docs/cahier-des-charges.md](docs/cahier-des-charges.md) — spécifications fonctionnelles du projet
 
 ## Tests

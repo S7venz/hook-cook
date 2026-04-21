@@ -16,6 +16,13 @@ API REST du backend Grails, consommée par le frontend React et par le tableau d
 - [Carnet de prises](#7-carnet-de-prises)
 - [Uploads de fichiers](#8-uploads-de-fichiers)
 - [Statistiques admin](#9-statistiques-admin)
+- [Avis produits](#10-avis-produits)
+- [Favoris (wishlist)](#11-favoris-wishlist)
+- [Alertes retour en stock](#12-alertes-retour-en-stock)
+- [Leaderboard mensuel](#13-leaderboard-mensuel)
+- [Exports CSV admin](#14-exports-csv-admin)
+- [RGPD (export et suppression)](#15-rgpd)
+- [Password reset](#16-password-reset)
 - [Modèle de données](#modèle-de-données)
 - [Codes de statut HTTP](#codes-de-statut-http)
 
@@ -791,17 +798,316 @@ GET /api/admin/stats
     { "key": "2025-11", "label": "nov. 2025", "total": 2480.50, "count": 9 },
     { "key": "2025-12", "label": "déc. 2025", "total": 3120.00, "count": 12 }
   ],
+  "newUsersByMonth": [
+    { "key": "2026-04", "label": "avr. 2026", "count": 3 }
+  ],
   "topProducts": [
     { "productId": "hc-sauvage-9-5", "name": "Canne...", "sku": "HC-C-095-6#4", "qty": 14, "revenue": 6846.0 }
   ],
   "ordersByStatus": { "paid": 18, "shipped": 6, "delivered": 22, "cancelled": 1 },
   "permitsByStatus": { "pending": 4, "approved": 32, "rejected": 2 },
+  "categoryRevenue": [
+    { "category": "cannes", "revenue": 4500.00 },
+    { "category": "leurres", "revenue": 320.00 }
+  ],
+  "lowStock": [
+    { "id": "hc-x", "name": "Canne X", "stock": 2, "threshold": 15, "category": "cannes" }
+  ],
+  "neverSold": [
+    { "id": "hc-y", "name": "Accessoire Y", "stock": 30, "price": 12.50, "category": "accessoires" }
+  ],
   "totalRevenue": 18540.50,
   "totalOrders": 47,
   "totalPermits": 38,
-  "totalRegistrations": 24
+  "totalRegistrations": 24,
+  "totalUsers": 45,
+  "totalBuyers": 32,
+  "avgBasket": 175.25,
+  "conversionRate": 71.1
 }
 ```
+
+Champs :
+- **`avgBasket`** : CA total / nombre de commandes payées+ (panier moyen).
+- **`conversionRate`** : % d'utilisateurs ayant acheté au moins une fois (proxy simple).
+- **`lowStock`** : 8 produits avec stock ≤ seuil, triés par stock asc.
+- **`neverSold`** : 6 produits jamais apparus dans un `order_item`, triés par stock dormant desc.
+- **`categoryRevenue`** : CA agrégé par catégorie, trié desc.
+
+---
+
+## 10. Avis produits
+
+### 10.1 — Lister les avis d'un produit
+
+```
+GET /api/products/{id}/reviews
+```
+
+**Public.** Trié par date décroissante.
+
+**Réponse `200` :**
+```json
+[
+  {
+    "id": 42,
+    "productId": "hc-sauvage-9-5",
+    "rating": 5,
+    "title": "Parfaite en rivière",
+    "comment": "Action moyenne-rapide, lancers doux...",
+    "verifiedPurchase": true,
+    "author": { "firstName": "Marie", "lastName": "D." },
+    "createdAt": "2026-04-15T10:12:00Z"
+  }
+]
+```
+
+### 10.2 — Vérifier l'éligibilité
+
+```
+GET /api/products/{id}/reviews/eligibility
+```
+
+**Authentifié.** Indique si le user peut laisser un avis.
+
+**Réponse `200` :**
+```json
+{ "eligible": true }
+```
+
+ou :
+```json
+{ "eligible": false, "reason": "not_purchased" }
+```
+
+Raisons possibles : `not_logged_in`, `not_purchased`, `already_reviewed`.
+
+### 10.3 — Publier un avis
+
+```
+POST /api/products/{id}/reviews
+```
+
+**Authentifié.** L'utilisateur doit avoir acheté le produit (commande en statut `paid`, `shipped` ou `delivered`) et ne pas avoir déjà laissé un avis.
+
+**Requête :**
+```json
+{ "rating": 5, "title": "Optionnel", "comment": "Minimum 10 caractères" }
+```
+
+**Erreurs :**
+- `400` — note hors 1..5, commentaire trop court, pas d'achat, déjà commenté
+
+### 10.4 — Supprimer un avis
+
+```
+DELETE /api/reviews/{id}
+```
+
+**Authentifié.** L'utilisateur ne peut supprimer que ses propres avis (admin peut tout).
+
+---
+
+## 11. Favoris (wishlist)
+
+### 11.1 — Mes favoris
+
+```
+GET /api/wishlist
+```
+
+**Authentifié.**
+
+### 11.2 — Ajouter aux favoris
+
+```
+POST /api/wishlist
+```
+
+**Authentifié.** Idempotent — re-ajouter un produit déjà favori renvoie `200` au lieu de `409`.
+
+**Requête :**
+```json
+{ "productId": "hc-sauvage-9-5" }
+```
+
+### 11.3 — Retirer des favoris
+
+```
+DELETE /api/wishlist/{productId}
+```
+
+**Authentifié.** Idempotent aussi — `204` même si le produit n'est pas dans les favoris.
+
+---
+
+## 12. Alertes retour en stock
+
+### 12.1 — S'inscrire à une alerte
+
+```
+POST /api/products/{id}/stock-alerts
+```
+
+**Authentifié.** Le produit doit être à **stock = 0**. Quand l'admin réapprovisionne (transition `0 → >0`), un email est envoyé automatiquement.
+
+**Erreurs :**
+- `400` — produit déjà en stock, produit introuvable
+
+### 12.2 — Mes alertes
+
+```
+GET /api/stock-alerts
+```
+
+**Authentifié.** Liste avec flag `notified` et `notifiedAt`.
+
+---
+
+## 13. Leaderboard mensuel
+
+### 13.1 — Classement d'un mois
+
+```
+GET /api/leaderboard/monthly?year=2026&month=4&species=truite&limit=10
+```
+
+**Public.** Tous params optionnels (défaut : mois courant, toutes espèces, limit 10). Classe les prises du carnet par taille décroissante puis poids puis date d'inscription.
+
+**Réponse `200` :**
+```json
+[
+  {
+    "rank": 1,
+    "species": "truite",
+    "taille": 45,
+    "poids": 800,
+    "spot": "La Têt — Olette",
+    "bait": "Sedge olive",
+    "catchDate": "2026-04-12",
+    "angler": "Marie D."
+  }
+]
+```
+
+### 13.2 — Résumé mois courant
+
+```
+GET /api/leaderboard/summary
+```
+
+**Public.** Top 5 global + tops par espèce phare (truite, carpe, brochet).
+
+---
+
+## 14. Exports CSV admin
+
+Tous les endpoints renvoient un fichier CSV avec BOM UTF-8 + séparateur `;` (format Excel FR compatible).
+
+| Méthode | Endpoint | Contenu |
+|---|---|---|
+| GET | `/api/admin/exports/orders.csv` | Toutes les commandes |
+| GET | `/api/admin/exports/permits.csv` | Toutes les demandes de permis |
+| GET | `/api/admin/exports/contest-registrations.csv` | Toutes les inscriptions concours |
+
+**Admin uniquement.** Nom de fichier daté : `hook-cook-commandes-YYYY-MM-DD.csv`.
+
+---
+
+## 15. RGPD
+
+Couvre les articles 15, 17 et 20 du règlement. Accessibles depuis `/compte` → Paramètres.
+
+### 15.1 — Export de mes données
+
+```
+GET /api/users/me/export
+```
+
+**Authentifié.** Renvoie un JSON pretty-printed téléchargeable contenant le profil + toutes les entités rattachées : commandes, permis, inscriptions concours, carnet, favoris, avis, alertes stock.
+
+**Content-Type** : `application/json; charset=UTF-8`
+**Content-Disposition** : `attachment; filename="hook-cook-export-{userId}-{YYYY-MM-DD}.json"`
+
+### 15.2 — Supprimer mon compte
+
+```
+DELETE /api/users/me
+```
+
+**Authentifié.** **Irréversible.** Le compte est anonymisé plutôt que supprimé :
+
+- Email → `anonyme-{id}@deleted.local`
+- Prénom/nom/téléphone/adresse → vidés
+- Hash BCrypt → invalidé (plus aucune reconnexion possible)
+- Wishlist, alertes stock, carnet, avis, inscriptions concours → **supprimés**
+- Permis → conservés mais anonymisés (nom, prénom, birthDate, doc URLs)
+- Commandes → conservées 10 ans (obligation fiscale) mais détachées de l'identité
+
+**Erreurs :**
+- `400` — impossible d'anonymiser un compte `ROLE_ADMIN`
+
+**Réponse `200` :**
+```json
+{
+  "ok": true,
+  "anonymizedAt": "2026-04-21T18:22:00Z",
+  "deletions": { "wishlist": 3, "stockAlerts": 0, "carnet": 5, "reviews": 2, "contestRegistrations": 1 },
+  "anonymizations": { "permits": 1, "orders": 4 }
+}
+```
+
+---
+
+## 16. Password reset
+
+Flow de réinitialisation du mot de passe par email. Aucune divulgation de l'existence d'un compte — toutes les réponses sont identiques quel que soit l'email.
+
+### 16.1 — Demander un lien
+
+```
+POST /api/auth/password-reset/request
+```
+
+**Public.** Rate limité à **3 demandes / heure / email**.
+
+**Requête :**
+```json
+{ "email": "user@example.fr" }
+```
+
+**Réponse `200` (toujours, même si l'email est inconnu) :**
+```json
+{
+  "ok": true,
+  "message": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé."
+}
+```
+
+Un email contenant le lien `{baseUrl}/reset-password/{token}` est envoyé si l'email existe. Le token est un UUID 128 bits, valable 1h, à usage unique. Tous les tokens précédents non utilisés du user sont invalidés à chaque nouvelle demande.
+
+### 16.2 — Confirmer le reset
+
+```
+POST /api/auth/password-reset/confirm
+```
+
+**Public.** Valide le token et pose le nouveau mot de passe.
+
+**Requête :**
+```json
+{ "token": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "password": "nouveau-mdp" }
+```
+
+**Erreurs :**
+- `400` — token manquant, token invalide/expiré/déjà utilisé, mot de passe < 8 chars
+
+**Réponse `200` :**
+```json
+{ "ok": true, "email": "user@example.fr" }
+```
+
+Le hash BCrypt du user est mis à jour, le token est marqué `used=true` avec `usedAt` timestamp.
 
 ---
 
@@ -824,9 +1130,13 @@ Vue synthétique des entités persistées (voir `postgres/init/01-init.sql` pour
 | `contests` | Concours organisés | 1..N `contest_registrations` |
 | `contest_registrations` | Inscriptions aux concours | N..1 `users`, N..1 `contests` |
 | `catch_entries` | Carnet de prises | N..1 `users` |
+| `product_reviews` | Avis clients vérifiés | N..1 `users`, N..1 `products` (via `productId` slug) |
+| `wishlist_items` | Favoris | N..1 `users`, ref `productId` |
+| `stock_alerts` | Demandes de notification retour stock | N..1 `users`, ref `productId`, flag `notified` |
+| `password_reset_tokens` | Tokens one-shot pour reset mot de passe | N..1 `users`, TTL 1h |
 
 > Les colonnes `*_csv` (ex. `speciesCsv`, `monthsCsv`) stockent des listes sous forme de chaînes séparées par des virgules, et sont exposées comme tableaux dans les réponses JSON.  
-> Les colonnes `*_json` (ex. `variantsJson`, `specsJson`, `historyJson`) stockent des objets/listes sérialisés et sont désérialisés dans `toApiMap()`.
+> Les colonnes `*_json` (ex. `variantsJson`, `specsJson`, `historyJson`, `itemsJson`) stockent des objets/listes sérialisés et sont désérialisés dans `toApiMap()`.
 
 ---
 
