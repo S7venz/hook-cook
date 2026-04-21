@@ -8,6 +8,7 @@ import { useAdminContests } from '../lib/adminContests.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAdminStats } from '../lib/adminStats.js';
+import { useCountUp, useScrollReveal } from '../lib/animations.js';
 import { useAuth } from '../lib/auth.js';
 import { downloadExport } from '../lib/exports.js';
 import { formatPrice } from '../lib/format.js';
@@ -41,6 +42,43 @@ function KpiCard({ label, value, delta, deltaTone }) {
   );
 }
 
+/**
+ * Affiche un entier en animant 0 → target. Fallback instantané pour les
+ * utilisateurs qui préfèrent prefers-reduced-motion (géré par useCountUp).
+ */
+function CountUpNumber({ value, decimals = 0 }) {
+  const n = Number(value ?? 0);
+  const animated = useCountUp(Number.isFinite(n) ? n : 0, 900, decimals);
+  return <>{animated}</>;
+}
+
+/** Variante pour les montants en euros (ex : 12 345,67 €). */
+function CountUpPrice({ value }) {
+  const n = Number(value ?? 0);
+  const animated = useCountUp(Number.isFinite(n) ? n : 0, 900, 2);
+  // animated est une string à deux décimales avec "." → convertit en format FR.
+  const [intPart, decPart] = animated.split('.');
+  const withSpaces = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return (
+    <>
+      {withSpaces},{decPart ?? '00'} €
+    </>
+  );
+}
+
+/**
+ * Wrapper qui applique `hc-reveal` + observe le scroll. Les enfants
+ * apparaissent en fondu montant quand la section entre dans le viewport.
+ */
+function Reveal({ children, ...rest }) {
+  const ref = useScrollReveal();
+  return (
+    <div ref={ref} className="hc-reveal" {...rest}>
+      {children}
+    </div>
+  );
+}
+
 function RevenueBarChart({ data }) {
   if (!data || data.length === 0) return null;
   const amounts = data.map((d) => Number(d.total ?? 0));
@@ -65,6 +103,7 @@ function RevenueBarChart({ data }) {
         return (
           <g key={d.key}>
             <rect
+              className="revenue-bar"
               x={x}
               y={y}
               width={bw}
@@ -175,23 +214,27 @@ function StatsSection({ stats, loading }) {
       <div className="kpi-row">
         <div className="kpi">
           <div className="lbl">CA total</div>
-          <div className="val">{formatPrice(Number(stats.totalRevenue ?? 0))}</div>
+          <div className="val">
+            <CountUpPrice value={stats.totalRevenue} />
+          </div>
         </div>
         <div className="kpi">
           <div className="lbl">Panier moyen</div>
-          <div className="val">{formatPrice(Number(stats.avgBasket ?? 0))}</div>
+          <div className="val">
+            <CountUpPrice value={stats.avgBasket} />
+          </div>
         </div>
         <div className="kpi">
           <div className="lbl">Taux de conversion</div>
           <div className="val">
-            {Number(stats.conversionRate ?? 0).toFixed(1)}
+            <CountUpNumber value={stats.conversionRate} decimals={1} />
             <small>%</small>
           </div>
         </div>
         <div className="kpi">
           <div className="lbl">Acheteurs uniques</div>
           <div className="val">
-            {stats.totalBuyers ?? 0}
+            <CountUpNumber value={stats.totalBuyers} />
             <small> / {stats.totalUsers ?? 0}</small>
           </div>
         </div>
@@ -200,108 +243,121 @@ function StatsSection({ stats, loading }) {
       <div className="kpi-row" style={{ marginTop: 'var(--sp-3)' }}>
         <div className="kpi">
           <div className="lbl">Commandes</div>
-          <div className="val">{stats.totalOrders ?? 0}</div>
+          <div className="val">
+            <CountUpNumber value={stats.totalOrders} />
+          </div>
         </div>
         <div className="kpi">
           <div className="lbl">Permis émis</div>
-          <div className="val">{stats.totalPermits ?? 0}</div>
+          <div className="val">
+            <CountUpNumber value={stats.totalPermits} />
+          </div>
         </div>
         <div className="kpi">
           <div className="lbl">Inscriptions concours</div>
-          <div className="val">{stats.totalRegistrations ?? 0}</div>
+          <div className="val">
+            <CountUpNumber value={stats.totalRegistrations} />
+          </div>
         </div>
         <div className="kpi">
           <div className="lbl">Stocks critiques</div>
           <div className="val">
-            {(stats.lowStock ?? []).length}
+            <CountUpNumber value={(stats.lowStock ?? []).length} />
           </div>
         </div>
       </div>
 
-      <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
-        <div className="panel-header">
-          <h3>CA par mois (6 derniers)</h3>
-        </div>
-        <div className="panel-body" style={{ padding: 'var(--sp-5)' }}>
-          <RevenueBarChart data={stats.revenueByMonth ?? []} />
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 'var(--sp-4)',
-          marginTop: 'var(--sp-5)',
-        }}
-      >
-        <StatusBreakdown
-          title="Commandes par statut"
-          breakdown={stats.ordersByStatus}
-          labels={{
-            paid: 'Payées',
-            shipped: 'Expédiées',
-            delivered: 'Livrées',
-            cancelled: 'Annulées',
-          }}
-        />
-        <StatusBreakdown
-          title="Permis par statut"
-          breakdown={stats.permitsByStatus}
-          labels={{
-            pending: 'En instruction',
-            approved: 'Approuvés',
-            rejected: 'Rejetés',
-          }}
-        />
-      </div>
-
-      <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
-        <div className="panel-header">
-          <h3>Top 5 produits vendus</h3>
-        </div>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Produit</th>
-              <th>SKU</th>
-              <th>Quantité</th>
-              <th>CA généré</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(stats.topProducts ?? []).length === 0 ? (
-              <tr>
-                <td colSpan={4} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucune vente enregistrée pour l'instant.
-                </td>
-              </tr>
-            ) : (
-              stats.topProducts.map((p) => (
-                <tr key={p.productId}>
-                  <td>{p.name}</td>
-                  <td className="mono">{p.sku}</td>
-                  <td className="mono">{p.qty}</td>
-                  <td className="mono">{formatPrice(Number(p.revenue ?? 0))}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 'var(--sp-4)',
-          marginTop: 'var(--sp-5)',
-        }}
-      >
-        <div className="panel">
+      <Reveal>
+        <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
           <div className="panel-header">
-            <h3>Stocks critiques</h3>
+            <h3>CA par mois (6 derniers)</h3>
           </div>
+          <div className="panel-body" style={{ padding: 'var(--sp-5)' }}>
+            <RevenueBarChart data={stats.revenueByMonth ?? []} />
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 'var(--sp-4)',
+            marginTop: 'var(--sp-5)',
+          }}
+        >
+          <StatusBreakdown
+            title="Commandes par statut"
+            breakdown={stats.ordersByStatus}
+            labels={{
+              paid: 'Payées',
+              shipped: 'Expédiées',
+              delivered: 'Livrées',
+              cancelled: 'Annulées',
+            }}
+          />
+          <StatusBreakdown
+            title="Permis par statut"
+            breakdown={stats.permitsByStatus}
+            labels={{
+              pending: 'En instruction',
+              approved: 'Approuvés',
+              rejected: 'Rejetés',
+            }}
+          />
+        </div>
+      </Reveal>
+
+      <Reveal>
+        <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
+          <div className="panel-header">
+            <h3>Top 5 produits vendus</h3>
+          </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>SKU</th>
+                <th>Quantité</th>
+                <th>CA généré</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(stats.topProducts ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                    Aucune vente enregistrée pour l'instant.
+                  </td>
+                </tr>
+              ) : (
+                stats.topProducts.map((p) => (
+                  <tr key={p.productId}>
+                    <td>{p.name}</td>
+                    <td className="mono">{p.sku}</td>
+                    <td className="mono">{p.qty}</td>
+                    <td className="mono">{formatPrice(Number(p.revenue ?? 0))}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Reveal>
+
+      <Reveal>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 'var(--sp-4)',
+            marginTop: 'var(--sp-5)',
+          }}
+        >
+          <div className="panel">
+            <div className="panel-header">
+              <h3>Stocks critiques</h3>
+            </div>
           <table className="table">
             <thead>
               <tr>
@@ -369,8 +425,10 @@ function StatsSection({ stats, loading }) {
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      </Reveal>
 
+      <Reveal>
       <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
         <div className="panel-header">
           <h3>CA par catégorie</h3>
@@ -410,6 +468,7 @@ function StatsSection({ stats, loading }) {
           </tbody>
         </table>
       </div>
+      </Reveal>
     </>
   );
 }
@@ -435,15 +494,15 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
         </span>
       </div>
       <div className="kpi-row">
-        <KpiCard label="CA cumulé" value={formatPrice(totalRevenue)} />
+        <KpiCard label="CA cumulé" value={<CountUpPrice value={totalRevenue} />} />
         <KpiCard
           label="Commandes à expédier"
-          value={ordersToShip}
+          value={<CountUpNumber value={ordersToShip} />}
           delta={`${orders.length} au total`}
           deltaTone="soft"
         />
-        <KpiCard label="Permis en attente" value={pendingPermits ?? 0} />
-        <KpiCard label="Inscriptions concours" value={contestCount} />
+        <KpiCard label="Permis en attente" value={<CountUpNumber value={pendingPermits ?? 0} />} />
+        <KpiCard label="Inscriptions concours" value={<CountUpNumber value={contestCount} />} />
       </div>
 
       <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
