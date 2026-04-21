@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -210,7 +211,9 @@ function TrackingView({ permit, onBack }) {
 }
 
 function ApplyView({ onSubmit, onBack, types, departments }) {
-  const { token } = useAuth();
+  const navigate = useNavigate();
+  const { token, user } = useAuth();
+  const { push } = useToast();
   const [step, setStep] = useState(1);
   const [typeId, setTypeId] = useState(types[0]?.id ?? '');
   const [firstName, setFirstName] = useState('');
@@ -237,6 +240,19 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
       validateName(lastName, { field: 'Le nom' }),
       validateBirthDate(birthDate),
     );
+
+  // Transition Type → Identité : on exige que le user soit connecté
+  // avant de saisir la moindre donnée personnelle. On le redirige vers
+  // /connexion avec next=/permis, il revient ici après login.
+  const goToIdentityStep = () => {
+    if (!user) {
+      push('Connectez-vous pour continuer votre demande de permis.');
+      navigate('/connexion', { state: { from: '/permis' } });
+      return;
+    }
+    setStepError('');
+    setStep(2);
+  };
 
   const goToStep = (n) => {
     if (n === 3) {
@@ -370,11 +386,28 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 </div>
               ))}
             </div>
+            {!user && (
+              <div
+                className="card"
+                style={{
+                  padding: 'var(--sp-3) var(--sp-4)',
+                  background: 'color-mix(in oklch, var(--info) 6%, var(--bg-elev))',
+                  borderLeftWidth: 3,
+                  borderLeftStyle: 'solid',
+                  borderLeftColor: 'var(--info)',
+                  fontSize: 'var(--fs-13)',
+                  color: 'var(--ink-soft)',
+                }}
+              >
+                La suite nécessite un compte Hook &amp; Cook. Vous serez invité·e à
+                vous connecter à l'étape suivante.
+              </div>
+            )}
             <div className="row">
               <Button variant="ghost" onClick={onBack}>
                 ← Annuler
               </Button>
-              <Button variant="primary" size="lg" onClick={() => setStep(2)}>
+              <Button variant="primary" size="lg" onClick={goToIdentityStep}>
                 Continuer →
               </Button>
             </div>
