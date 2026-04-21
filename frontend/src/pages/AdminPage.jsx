@@ -178,6 +178,27 @@ function StatsSection({ stats, loading }) {
           <div className="val">{formatPrice(Number(stats.totalRevenue ?? 0))}</div>
         </div>
         <div className="kpi">
+          <div className="lbl">Panier moyen</div>
+          <div className="val">{formatPrice(Number(stats.avgBasket ?? 0))}</div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Taux de conversion</div>
+          <div className="val">
+            {Number(stats.conversionRate ?? 0).toFixed(1)}
+            <small>%</small>
+          </div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Acheteurs uniques</div>
+          <div className="val">
+            {stats.totalBuyers ?? 0}
+            <small> / {stats.totalUsers ?? 0}</small>
+          </div>
+        </div>
+      </div>
+
+      <div className="kpi-row" style={{ marginTop: 'var(--sp-3)' }}>
+        <div className="kpi">
           <div className="lbl">Commandes</div>
           <div className="val">{stats.totalOrders ?? 0}</div>
         </div>
@@ -188,6 +209,12 @@ function StatsSection({ stats, loading }) {
         <div className="kpi">
           <div className="lbl">Inscriptions concours</div>
           <div className="val">{stats.totalRegistrations ?? 0}</div>
+        </div>
+        <div className="kpi">
+          <div className="lbl">Stocks critiques</div>
+          <div className="val">
+            {(stats.lowStock ?? []).length}
+          </div>
         </div>
       </div>
 
@@ -259,6 +286,127 @@ function StatsSection({ stats, loading }) {
                 </tr>
               ))
             )}
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 'var(--sp-4)',
+          marginTop: 'var(--sp-5)',
+        }}
+      >
+        <div className="panel">
+          <div className="panel-header">
+            <h3>Stocks critiques</h3>
+          </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Stock</th>
+                <th>Seuil</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(stats.lowStock ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                    Aucun produit sous le seuil.
+                  </td>
+                </tr>
+              ) : (
+                stats.lowStock.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.name}</td>
+                    <td
+                      className="mono"
+                      style={{
+                        color: (p.stock ?? 0) === 0 ? 'var(--err)' : 'var(--warn)',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {p.stock ?? 0}
+                    </td>
+                    <td className="mono soft">{p.threshold ?? 15}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="panel">
+          <div className="panel-header">
+            <h3>Jamais vendus</h3>
+          </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Stock</th>
+                <th>Prix</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(stats.neverSold ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                    Tous les produits ont été vendus au moins une fois.
+                  </td>
+                </tr>
+              ) : (
+                stats.neverSold.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.name}</td>
+                    <td className="mono">{p.stock ?? 0}</td>
+                    <td className="mono">{formatPrice(Number(p.price ?? 0))}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
+        <div className="panel-header">
+          <h3>CA par catégorie</h3>
+        </div>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Catégorie</th>
+              <th>CA généré</th>
+              <th>Part</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(() => {
+              const rows = stats.categoryRevenue ?? [];
+              const total = rows.reduce((s, r) => s + Number(r.revenue ?? 0), 0) || 1;
+              if (rows.length === 0) {
+                return (
+                  <tr>
+                    <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                      Pas encore de ventes.
+                    </td>
+                  </tr>
+                );
+              }
+              return rows.map((r) => {
+                const pct = ((Number(r.revenue ?? 0) / total) * 100).toFixed(1);
+                return (
+                  <tr key={r.category}>
+                    <td style={{ textTransform: 'capitalize' }}>{r.category}</td>
+                    <td className="mono">{formatPrice(Number(r.revenue ?? 0))}</td>
+                    <td className="mono soft">{pct} %</td>
+                  </tr>
+                );
+              });
+            })()}
           </tbody>
         </table>
       </div>
