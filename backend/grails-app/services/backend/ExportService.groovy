@@ -1,7 +1,5 @@
 package backend
 
-import grails.gorm.transactions.Transactional
-
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -12,8 +10,10 @@ import java.time.format.DateTimeFormatter
  * séparateur `;` (convention française, Excel en FR ne comprend pas le
  * séparateur `,` par défaut), champs entourés de guillemets seulement
  * quand nécessaire (contient `;`, `"` ou saut de ligne).
+ *
+ * Pas de @Transactional — service read-only, la transaction ambiante
+ * du controller suffit et on évite les soucis d'isolation en test.
  */
-@Transactional(readOnly = true)
 class ExportService {
 
     private static final DateTimeFormatter FR_DATE_TIME = DateTimeFormatter

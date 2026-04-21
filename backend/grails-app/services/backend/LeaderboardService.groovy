@@ -1,7 +1,5 @@
 package backend
 
-import grails.gorm.transactions.Transactional
-
 import java.time.LocalDate
 
 /**
@@ -15,10 +13,10 @@ import java.time.LocalDate
  *     en cas d'égalité totale).
  *   - On expose prénom + initiale nom de l'auteur (privacy).
  *
- * Pas d'index dédié en base — quelques dizaines de prises par mois
- * tout au plus, scan complet acceptable.
+ * Pas de @Transactional — ce service ne fait que des lectures et le
+ * wrapper transactionnel perturbe les tests unitaires avec DataTest.
+ * Volume carnet faible, scan complet acceptable.
  */
-@Transactional(readOnly = true)
 class LeaderboardService {
 
     /**
@@ -27,11 +25,11 @@ class LeaderboardService {
     List<Map> monthly(String species, int year, int month, int limit = 10) {
         String prefix = String.format('%04d-%02d', year, month)
 
-        List<CatchEntry> entries
-        if (species) {
-            entries = CatchEntry.findAllBySpeciesAndCatchDateLike(species, "${prefix}%")
-        } else {
-            entries = CatchEntry.findAllByCatchDateLike("${prefix}%")
+        // Filtrage en mémoire — volume carnet faible (quelques centaines
+        // d'entrées par mois tout au plus) et évite les subtilités de
+        // SQL LIKE selon le dialecte (H2 en test vs Postgres en prod).
+        List<CatchEntry> entries = CatchEntry.list().findAll { e ->
+            e.catchDate?.startsWith(prefix) && (!species || e.species == species)
         }
 
         entries.sort { a, b ->

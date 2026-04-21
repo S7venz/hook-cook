@@ -71,14 +71,17 @@ class ReviewService {
      * livrée contenant le produit.
      */
     private boolean hasBought(User user, String productId) {
-        def count = OrderItem.createCriteria().count {
-            eq('productId', productId)
-            order {
-                eq('user', user)
-                inList('status', ['paid', 'shipped', 'delivered'])
-            }
+        // Deux queries séparées pour éviter l'ambiguïté GORM entre
+        // l'association "order" du OrderItem et la clause `order`
+        // (sort) de l'API criteria.
+        List<CustomerOrder> valid = CustomerOrder.findAllByUser(user).findAll {
+            it.status in ['paid', 'shipped', 'delivered']
         }
-        count > 0
+        if (!valid) return false
+        OrderItem.createCriteria().count {
+            'in'('order', valid)
+            eq('productId', productId)
+        } > 0
     }
 
     /**
