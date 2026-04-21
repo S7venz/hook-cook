@@ -31,7 +31,7 @@ Une fois les 3 conteneurs up :
 - API : http://localhost:8080
 - Postgres : localhost:5432
 
-Au premier boot, Postgres applique automatiquement [`postgres/init/01-init.sql`](postgres/init/01-init.sql) — tu récupères donc 12 produits (avec images), 4 concours, 6 catégories, 6 techniques, 8 espèces et le compte admin. Les images sont dans [`backend/uploads/`](backend/uploads) et copiées dans le volume au premier boot du backend.
+Au premier boot, Postgres applique automatiquement [`postgres/init/01-init.sql`](postgres/init/01-init.sql) — tu récupères donc 11 produits (avec images), 4 concours localisés Perpignan, 6 catégories, 6 techniques, 8 espèces et le compte admin. Les images sont dans [`backend/uploads/`](backend/uploads) et copiées dans le volume au premier boot du backend. Le `BootStrap` ajoute en plus 3 types de permis et 4 départements éligibles dans les tables de référence.
 
 **Compte admin** : email + mot de passe définis dans ton `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). Par défaut, `admin@hookcook.fr` / `admin1234`.
 
@@ -72,9 +72,13 @@ cd backend
 run-app
 ```
 
-Au premier démarrage, `BootStrap` injecte dans la BDD :
-- 1 utilisateur admin
-- 6 catégories, 6 techniques, 8 espèces, 4 concours, 12 produits
+Au premier démarrage (sans Docker), tu dois d'abord importer le seed :
+
+```bash
+docker exec -i hookcook-postgres-1 psql -U hookcook -d hookcook < postgres/init/01-init.sql
+```
+
+Ou utilise la stack Docker complète (recommandé) — le seed est alors appliqué automatiquement.
 
 ### Frontend
 
@@ -127,6 +131,7 @@ hook-cook/
 | GET | `/api/products/:id` | Détail |
 | GET | `/api/categories`, `/api/techniques`, `/api/species` | Référentiels |
 | GET | `/api/contests`, `/api/contests/:id` | Concours |
+| GET | `/api/permit-types`, `/api/departments` | Grille tarifaire + départements éligibles |
 
 ### Commandes (user)
 | Méthode | Path | Description |
@@ -138,8 +143,14 @@ hook-cook/
 ### Permis (user)
 | Méthode | Path | Description |
 |---|---|---|
-| POST | `/api/permits` | Soumettre une demande |
+| POST | `/api/permits` | Soumettre une demande (avec `idDocUrl` + `photoDocUrl`) |
 | GET | `/api/permits/me` | Ma demande en cours |
+
+### Uploads (authentifié)
+| Méthode | Path | Description |
+|---|---|---|
+| POST | `/api/uploads` | Multipart — upload de pièce permis ou image produit |
+| GET | `/api/uploads/:filename` | Sert le fichier (public) |
 
 ### Concours (user)
 | Méthode | Path | Description |
@@ -171,9 +182,10 @@ Tables principales (générées par Hibernate en `dbCreate: update`) :
 
 - `users` — comptes clients/admin
 - `products` — catalogue (+ champs `imageUrl`, `variants_json`, `specs_json`)
-- `categories`, `techniques`, `species`, `contests` — référentiels
+- `categories`, `techniques`, `species`, `contests` — référentiels métier
+- `permit_types`, `departments` — grille tarifaire + départements éligibles
 - `orders` + `order_items` — commandes et lignes
-- `permits` — demandes de permis
+- `permits` — demandes de permis (+ `id_doc_url`, `photo_doc_url`)
 - `contest_registrations` — inscriptions aux concours
 - `catch_entries` — carnet de prise utilisateur
 
@@ -190,7 +202,7 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | 2 | Boutique (navigation, panier, checkout) | ✅ (paiement mocké) |
 | 3 | Clients (inscription, connexion, profil) | ✅ |
 | 4 | Commandes (création, statut, historique) | ✅ |
-| 5 | Permis (formulaire, workflow, timeline) | ✅ (notif email à brancher) |
+| 5 | Permis (formulaire, upload pièces, workflow, timeline, notif email) | ✅ |
 | 6 | Concours locaux (liste, inscription) | ✅ |
 | 7 | Tableau de bord admin | ✅ (produits, commandes, permis, concours) |
 
@@ -244,8 +256,10 @@ Le filtre complet Spring Security (`SecurityFilterChain`) n'est pas en place —
 
 ## Documentation
 
+- [docs/API.md](docs/API.md) — documentation API exhaustive (tous endpoints + payloads + codes d'erreur)
 - [docs/GUIDE-UTILISATEUR.md](docs/GUIDE-UTILISATEUR.md) — manuel client (compte, achat, permis, concours, carnet)
 - [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — manuel admin (produits, commandes, permis, concours, sécurité)
+- [docs/cahier-des-charges.md](docs/cahier-des-charges.md) — spécifications fonctionnelles du projet
 
 ## Tests
 
@@ -280,8 +294,7 @@ docker compose down -v && docker compose up -d postgres
 
 ## À venir
 
-- Intégration Stripe/PayPal réelle (webhook + gestion succès/échec)
-- Notifications email (SendGrid / SMTP) sur validation de permis
-- Tests unitaires et d'intégration
-- Upload d'images produits (actuellement on colle une URL dans le form admin)
-- Internationalisation
+- Intégration Stripe/PayPal réelle (webhook + gestion succès/échec) — actuellement le paiement est simulé : la commande passe directement au statut `paid`
+- Diagramme ERD formel de la base (exportable depuis `postgres/init/01-init.sql`)
+- Tests d'intégration end-to-end (Playwright / Cypress)
+- Internationalisation (i18n)
