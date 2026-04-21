@@ -12,8 +12,7 @@ const CONTEST_COORDS = {
   'etang-carpe-nuit':{ lat: 42.7705, lng: 2.8727, hint: "Rivesaltes (66) — L'Agly" },
 };
 
-// Épingle personnalisée dans la palette du projet, sans dépendre des
-// PNG par défaut de Leaflet (qui posent des problèmes de bundling).
+// Épingle personnalisée dans la palette du projet.
 function buildIcon(accent = '#B15E2F') {
   return L.divIcon({
     className: 'contests-map-pin',
@@ -30,19 +29,21 @@ function buildIcon(accent = '#B15E2F') {
   });
 }
 
-// Tiles libres — sans clé, adaptées au thème
-const TILES_LIGHT = {
-  url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution: '&copy; OpenStreetMap',
-};
-const TILES_DARK = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  attribution: '&copy; OpenStreetMap · &copy; CARTO',
-};
+/**
+ * Tiles OSM France — mêmes données qu'OpenStreetMap mais rendues avec
+ * les noms de lieux en français (Occitanie au lieu d'Occitania, etc.).
+ * Pas de clé API, gratuit. Attribution toujours requise (ODbL) — on
+ * l'affiche dans notre caption custom plutôt que dans le contrôle
+ * Leaflet par défaut.
+ *
+ * Dark mode : on applique un filter CSS invert+hue-rotate sur les
+ * tiles plutôt que de switcher de provider (CARTO dark est en
+ * anglais, et il n'existe pas de provider dark gratuit en français).
+ */
+const TILE_URL = 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
 
 export function ContestsMap({ contests = [] }) {
   const { theme } = useTheme();
-  const tiles = theme === 'dark' ? TILES_DARK : TILES_LIGHT;
   const icon = useMemo(() => buildIcon(), []);
 
   // Ne garde que les concours qu'on sait placer sur la carte
@@ -58,21 +59,22 @@ export function ContestsMap({ contests = [] }) {
       ]
     : [42.65, 2.55];
 
-  // Hack pour forcer le re-render du TileLayer quand le thème change
-  const [renderKey, setRenderKey] = useState(0);
+  // Force un re-render quand le thème change (réapplique la classe filter)
+  const [, setRenderKey] = useState(0);
   useEffect(() => {
     setRenderKey((k) => k + 1);
   }, [theme]);
 
   return (
-    <div className="contests-map">
+    <div className={`contests-map theme-${theme}`}>
       <MapContainer
         center={center}
         zoom={9}
         scrollWheelZoom={false}
+        attributionControl={false}
         style={{ width: '100%', height: '100%', borderRadius: 'var(--r-md)' }}
       >
-        <TileLayer key={renderKey} url={tiles.url} attribution={tiles.attribution} />
+        <TileLayer url={TILE_URL} />
         {pins.map((p) => (
           <Marker key={p.id} position={[p.coords.lat, p.coords.lng]} icon={icon}>
             <Popup>
@@ -86,7 +88,7 @@ export function ContestsMap({ contests = [] }) {
         ))}
       </MapContainer>
       <div className="contests-map-caption">
-        Carte des concours — région Occitanie · {pins.length} épingle{pins.length > 1 ? 's' : ''}
+        {pins.length} concours en Occitanie · © OSM France
       </div>
     </div>
   );

@@ -1125,6 +1125,14 @@ body { overflow-x: hidden; }
   color: oklch(0.95 0.012 85);
 }
 
+/* Dark mode : on assombrit les tiles OSM France côté client via
+   filter CSS — évite de charger un provider dark anglophone.
+   On exclut volontairement les pins (qui sont des divIcon SVG hors
+   .leaflet-tile-pane) pour qu'elles gardent leur couleur ocre. */
+[data-theme="dark"] .contests-map .leaflet-tile-pane {
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.95) contrast(0.9) saturate(0.7);
+}
+
 /* ============ COMPTE / CARNET ============ */
 .account-layout {
   display: grid;
