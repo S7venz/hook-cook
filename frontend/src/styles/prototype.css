@@ -197,7 +197,10 @@ body { overflow-x: hidden; }
 
 /* Saison strip */
 .saison-strip {
-  background: var(--ink); color: var(--bg);
+  background: var(--bg-sunk);
+  color: var(--ink);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
   padding: var(--sp-5) 0;
   margin: 0;
 }
@@ -214,7 +217,7 @@ body { overflow-x: hidden; }
 .saison-item .lbl {
   font-family: var(--font-mono); font-size: var(--fs-12);
   text-transform: uppercase; letter-spacing: var(--tracking-caps);
-  color: color-mix(in oklch, var(--bg) 60%, var(--ink));
+  color: var(--ink-mute);
 }
 .saison-item .val {
   font-family: var(--font-display); font-size: var(--fs-20);
@@ -327,22 +330,6 @@ body { overflow-x: hidden; }
 }
 .product-card.sold-out .card-media { opacity: 0.55; filter: grayscale(0.35); }
 .product-card.sold-out .info .name { color: var(--ink-mute); }
-
-/* Dark mode : les sections "spotlight" (strip saison, hero permis,
-   hero home) utilisent var(--ink) comme fond, qui devient clair en
-   sombre. On force un fond volontairement sombre pour préserver le
-   contraste inversé par rapport au reste de la page. */
-[data-theme="dark"] .saison-strip,
-[data-theme="dark"] .permis-hero {
-  background: oklch(0.12 0.018 250);
-  color: oklch(0.95 0.012 85);
-}
-[data-theme="dark"] .saison-item .lbl {
-  color: oklch(0.62 0.015 85);
-}
-[data-theme="dark"] .permis-hero p {
-  color: oklch(0.78 0.015 85);
-}
 
 /* Dark mode : placeholder map moins "trou noir" */
 [data-theme="dark"] .map-placeholder {
@@ -907,7 +894,9 @@ body { overflow-x: hidden; }
 
 /* ============ PERMIS ============ */
 .permis-hero {
-  background: var(--ink); color: var(--bg);
+  background: var(--bg-sunk);
+  color: var(--ink);
+  border-bottom: 1px solid var(--hairline);
   padding: var(--sp-16) 0;
   position: relative;
   overflow: hidden;
@@ -918,7 +907,7 @@ body { overflow-x: hidden; }
   line-height: 1; letter-spacing: -0.03em;
   max-width: 18ch;
 }
-.permis-hero p { color: color-mix(in oklch, var(--bg) 70%, var(--ink)); max-width: 50ch; }
+.permis-hero p { color: var(--ink-soft); max-width: 50ch; }
 
 .permis-types {
   display: grid;
