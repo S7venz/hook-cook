@@ -11,8 +11,11 @@ import { formatPrice } from '../lib/format.js';
 import { downloadInvoice } from '../lib/invoice.js';
 import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
+import { useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { useToast } from '../lib/toast.js';
+import { useWishlist } from '../lib/wishlist.js';
+import { ProductCard } from '../components/ProductCard.jsx';
 
 const TABS = [
   { id: 'apercu', label: 'Aperçu' },
@@ -20,6 +23,7 @@ const TABS = [
   { id: 'permis', label: 'Permis' },
   { id: 'concours', label: 'Concours' },
   { id: 'carnet', label: 'Carnet de prise' },
+  { id: 'favoris', label: 'Favoris' },
   { id: 'adresses', label: 'Adresses' },
   { id: 'parametres', label: 'Paramètres' },
 ];
@@ -583,6 +587,46 @@ function SettingsTab({ user, onLogout, onSubmit }) {
   );
 }
 
+function FavorisTab({ onShop }) {
+  const { productIds, loading } = useWishlist();
+  const { products } = useProducts();
+  const favorites = products.filter((p) => productIds.has(p.id));
+
+  if (loading) {
+    return <p className="soft">Chargement de vos favoris…</p>;
+  }
+
+  if (favorites.length === 0) {
+    return (
+      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
+        <div
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--fs-24)',
+            marginBottom: 'var(--sp-3)',
+          }}
+        >
+          Aucun favori pour l'instant.
+        </div>
+        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
+          Cliquez sur le cœur d'un produit pour le retrouver ici.
+        </p>
+        <Button variant="primary" onClick={onShop}>
+          Parcourir la boutique
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="catalog-grid">
+      {favorites.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
+    </div>
+  );
+}
+
 function AddressesTab({ user, onGoSettings }) {
   const hasAddress = user.addressLine && user.city;
   if (!hasAddress) {
@@ -732,6 +776,7 @@ export function AccountPage() {
             {tab === 'carnet' && (
               <CarnetTab entries={entries} onAdd={addEntry} onRemove={removeEntry} />
             )}
+            {tab === 'favoris' && <FavorisTab onShop={() => navigate('/boutique')} />}
             {tab === 'adresses' && (
               <AddressesTab user={user} onGoSettings={() => setTab('parametres')} />
             )}

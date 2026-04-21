@@ -18,6 +18,8 @@ const PATHS = {
   moon: 'M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z',
   download:
     'M12 3v12m0 0l-4-4m4 4l4-4M5 21h14',
+  heart:
+    'M12 21s-7-4.35-9.5-9.5A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 5.5C19 16.65 12 21 12 21z',
 };
 
 export function Icon({ name, size = 20, className = '' }) {

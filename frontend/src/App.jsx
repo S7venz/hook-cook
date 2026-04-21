@@ -9,6 +9,7 @@ import { TopNav } from './components/TopNav.jsx';
 import { SiteFooter } from './components/SiteFooter.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
 import { ThemeProvider } from './components/ThemeProvider.jsx';
+import { WishlistProvider } from './components/WishlistProvider.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
@@ -32,6 +33,7 @@ export default function App() {
         <ReferenceDataProvider>
           <ProductsProvider>
             <OrdersProvider>
+              <WishlistProvider>
               <CartProvider>
                 <ToastProvider>
           <div className="app-shell">
@@ -56,6 +58,7 @@ export default function App() {
           </div>
                 </ToastProvider>
               </CartProvider>
+              </WishlistProvider>
             </OrdersProvider>
           </ProductsProvider>
         </ReferenceDataProvider>

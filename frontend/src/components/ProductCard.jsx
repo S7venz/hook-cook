@@ -1,18 +1,37 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
+import { Icon } from './ui/Icon.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
+import { useAuth } from '../lib/auth.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { useToast } from '../lib/toast.js';
+import { useWishlist } from '../lib/wishlist.js';
 
 export function ProductCard({ product }) {
   const navigate = useNavigate();
   const { push } = useToast();
   const { add } = useCart();
+  const { user } = useAuth();
+  const { has, toggle } = useWishlist();
   const { categories, species: speciesList } = useReferenceData();
   const category = categories.find((c) => c.id === product.category);
+  const favorited = has(product.id);
+
+  const handleFavorite = async (event) => {
+    event.stopPropagation();
+    if (!user) {
+      push('Connectez-vous pour enregistrer vos favoris.');
+      navigate('/connexion');
+      return;
+    }
+    const result = await toggle(product.id);
+    if (result.ok) {
+      push(result.added ? 'Ajouté aux favoris' : 'Retiré des favoris');
+    }
+  };
   const tags = product.species
     .map((id) => speciesList.find((s) => s.id === id)?.name)
     .filter(Boolean);
@@ -46,6 +65,15 @@ export function ProductCard({ product }) {
     >
       <div className="card-media">
         <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
+        <button
+          type="button"
+          className={`card-favorite ${favorited ? 'active' : ''}`.trim()}
+          onClick={handleFavorite}
+          aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          aria-pressed={favorited}
+        >
+          <Icon name="heart" size={18} />
+        </button>
         <div className="tag-row">
           {product.wasPrice && <Badge accent>Promo</Badge>}
           {soldOut ? (

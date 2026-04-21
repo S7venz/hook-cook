@@ -65,6 +65,10 @@ class UrlMappings {
         get "/api/products/$productId/reviews/eligibility"(controller: 'review', action: 'eligibility')
         delete "/api/reviews/$id"(controller: 'review', action: 'remove')
 
+        get "/api/wishlist"(controller: 'wishlist', action: 'list')
+        post "/api/wishlist"(controller: 'wishlist', action: 'add')
+        delete "/api/wishlist/$productId"(controller: 'wishlist', action: 'remove')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

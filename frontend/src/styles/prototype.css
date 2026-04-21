@@ -331,6 +331,35 @@ body { overflow-x: hidden; }
 .product-card.sold-out .card-media { opacity: 0.55; filter: grayscale(0.35); }
 .product-card.sold-out .info .name { color: var(--ink-mute); }
 
+/* Bouton favori (cœur) en coin haut-droit de la carte produit */
+.card-favorite {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: color-mix(in oklch, var(--bg-elev) 90%, transparent);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast);
+  z-index: 2;
+}
+.card-favorite:hover {
+  color: var(--accent);
+  transform: scale(1.05);
+}
+.card-favorite.active {
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 12%, var(--bg-elev));
+  border-color: color-mix(in oklch, var(--accent) 40%, var(--hairline));
+}
+.card-favorite.active svg {
+  fill: var(--accent);
+}
+
 /* Dark mode : placeholder map moins "trou noir" */
 [data-theme="dark"] .map-placeholder {
   background: oklch(0.22 0.020 250);
