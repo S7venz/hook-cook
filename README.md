@@ -22,7 +22,8 @@ Projet développé dans le cadre d'un module de développement web.
 ```bash
 git clone https://github.com/S7venz/hook-cook.git
 cd hook-cook
-docker compose up --build
+cp .env.example .env       # puis éditer .env pour mettre de vrais secrets
+bash scripts/start.sh      # équivaut à "docker compose up --build"
 ```
 
 Une fois les 3 conteneurs up :
@@ -30,11 +31,22 @@ Une fois les 3 conteneurs up :
 - API : http://localhost:8080
 - Postgres : localhost:5432
 
-Un compte admin est créé automatiquement au premier boot :
-- **Email** : `admin@hookcook.fr`
-- **Mot de passe** : `admin1234`
+Au premier boot, Postgres applique automatiquement [`postgres/init/01-init.sql`](postgres/init/01-init.sql) — tu récupères donc 12 produits (avec images), 4 concours, 6 catégories, 6 techniques, 8 espèces et le compte admin. Les images sont dans [`backend/uploads/`](backend/uploads) et copiées dans le volume au premier boot du backend.
 
-Un compte utilisateur peut être créé via `/inscription`.
+**Compte admin** : email + mot de passe définis dans ton `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). Par défaut, `admin@hookcook.fr` / `admin1234`.
+
+## Sauvegarder l'état en cours
+
+En fin de session, `bash scripts/stop.sh` dump la BDD + sync les uploads dans le repo, puis arrête les conteneurs. Comme ça tout ce que tu as ajouté (users, commandes, permis…) est versionné avec `git add` / `git commit`.
+
+| Commande | Effet |
+|---|---|
+| `bash scripts/start.sh` | `docker compose up --build` (vérifie `.env`) |
+| `bash scripts/stop.sh` | Dump BDD + uploads → `docker compose down` |
+| `bash scripts/dump.sh` | Dump uniquement (conteneurs restent up) |
+| `bash scripts/reset.sh` | Reset volumes + re-seed depuis le dump |
+
+Voir [`scripts/README.md`](scripts/README.md) pour le détail.
 
 ## Développement en local (sans Docker)
 

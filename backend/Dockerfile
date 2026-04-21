@@ -21,6 +21,10 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/build/libs/*.war /app/app.war
 
+# Images de référence (seed). Le volume uploads est initialisé avec ce
+# contenu au premier boot (volume vide). Après, le volume persiste.
+COPY uploads /app/uploads
+
 # Les variables suivantes sont attendues au runtime.
 # Elles sont fournies par docker-compose.yml (qui les lit depuis .env) :
 #   DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD

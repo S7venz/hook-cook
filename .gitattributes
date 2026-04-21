@@ -1,0 +1,15 @@
+# Force LF endings on shell scripts (bash refuses CRLF on git-bash).
+*.sh text eol=lf
+scripts/* text eol=lf
+
+# SQL seeds in LF for consistency
+*.sql text eol=lf
+
+# Keep binary assets untouched
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.avif binary
+*.gif binary
+*.pdf binary
