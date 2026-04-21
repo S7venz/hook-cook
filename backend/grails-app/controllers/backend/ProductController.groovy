@@ -9,6 +9,7 @@ class ProductController {
     static allowedMethods = [
             list     : 'GET',
             show     : 'GET',
+            related  : 'GET',
             save     : 'POST',
             update   : 'PUT',
             remove   : 'DELETE',
@@ -52,6 +53,55 @@ class ProductController {
             return
         }
         render(product.toApiMap() as JSON)
+    }
+
+    /**
+     * "Souvent acheté avec..." — agrégation des co-occurrences dans
+     * order_items, fallback catégorie si pas assez de matches.
+     */
+    def related() {
+        String id = params.id
+        Product product = Product.get(id)
+        if (!product) {
+            response.status = 404
+            render([error: 'Produit introuvable.'] as JSON)
+            return
+        }
+
+        int limit = Math.min(6, Math.max(1, params.int('limit') ?: 4))
+
+        List orderIds = OrderItem.createCriteria().list {
+            projections { property('order.id') }
+            eq('productId', id)
+        }
+
+        Map<String, Integer> counts = [:]
+        if (orderIds) {
+            OrderItem.createCriteria().list {
+                'in'('order.id', orderIds)
+                ne('productId', id)
+            }.each { item ->
+                counts[item.productId] = (counts[item.productId] ?: 0) + (item.qty ?: 1)
+            }
+        }
+
+        List<Product> related = counts.sort { a, b -> b.value <=> a.value }
+                .collect { k, v -> Product.get(k) }
+                .findAll { it != null }
+                .take(limit)
+
+        if (related.size() < limit) {
+            int missing = limit - related.size()
+            List<Product> fallback = Product.createCriteria().list {
+                eq('category', product.category)
+                ne('id', id)
+                if (related) notIn('id', related*.id)
+                maxResults(missing)
+            }
+            related.addAll(fallback)
+        }
+
+        render(related.collect { it.toApiMap() } as JSON)
     }
 
     @Transactional

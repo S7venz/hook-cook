@@ -8,6 +8,7 @@ import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { Skeleton, SkeletonLine } from '../components/ui/Skeleton.jsx';
 import { ReviewsPanel } from '../components/ui/ReviewsPanel.jsx';
+import { RelatedProducts } from '../components/ui/RelatedProducts.jsx';
 import { useAuth } from '../lib/auth.js';
 import { subscribeStockAlert } from '../lib/stockAlerts.js';
 import { useCart } from '../lib/cart.js';
@@ -390,6 +391,8 @@ export function ProductPage() {
             <div className="tab-panel">{tabContent[tab]}</div>
           </div>
         </div>
+
+        <RelatedProducts productId={product.id} limit={4} />
       </div>
     </div>
   );

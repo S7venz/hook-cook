@@ -11,6 +11,7 @@ class UrlMappings {
         get "/api/products"(controller: 'product', action: 'list')
         post "/api/products"(controller: 'product', action: 'save')
         get "/api/products/$id"(controller: 'product', action: 'show')
+        get "/api/products/$id/related"(controller: 'product', action: 'related')
         put "/api/products/$id"(controller: 'product', action: 'update')
         delete "/api/products/$id"(controller: 'product', action: 'remove')
         post "/api/products/$id/replenish"(controller: 'product', action: 'replenish')
