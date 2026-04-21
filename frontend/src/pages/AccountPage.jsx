@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
+import { EmptyState } from '../components/ui/EmptyState.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { useAuth } from '../lib/auth.js';
@@ -91,23 +92,15 @@ function OrdersTab({ orders, onShop }) {
 
   if (orders.length === 0) {
     return (
-      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-24)',
-            marginBottom: 'var(--sp-3)',
-          }}
-        >
-          Pas encore de commande.
-        </div>
-        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
-          Votre prochaine commande apparaîtra ici avec son numéro de suivi.
-        </p>
+      <EmptyState
+        illus="box"
+        title="Pas encore de commande."
+        description="Votre prochaine commande apparaîtra ici avec son numéro de suivi."
+      >
         <Button variant="primary" onClick={onShop}>
           Parcourir la boutique
         </Button>
-      </div>
+      </EmptyState>
     );
   }
   return (
@@ -173,23 +166,15 @@ function OrdersTab({ orders, onShop }) {
 function PermisTab({ permit, onStart }) {
   if (!permit) {
     return (
-      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-24)',
-            marginBottom: 'var(--sp-3)',
-          }}
-        >
-          Aucun permis en cours.
-        </div>
-        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
-          Faites votre demande en 4 gestes. Traitement sous 2 jours ouvrés.
-        </p>
+      <EmptyState
+        illus="permit"
+        title="Aucun permis en cours."
+        description="Faites votre demande en 4 gestes. Traitement sous 2 jours ouvrés."
+      >
         <Button variant="primary" onClick={onStart}>
           Demander mon permis
         </Button>
-      </div>
+      </EmptyState>
     );
   }
   return (
@@ -220,20 +205,15 @@ function PermisTab({ permit, onStart }) {
 function ConcoursTab({ inscribed, onExplore }) {
   if (inscribed.length === 0) {
     return (
-      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-24)',
-            marginBottom: 'var(--sp-3)',
-          }}
-        >
-          Aucune inscription à un concours.
-        </div>
+      <EmptyState
+        illus="trophy"
+        title="Aucune inscription à un concours."
+        description="Le calendrier local affiche les prochaines dates et catégories."
+      >
         <Button variant="primary" onClick={onExplore}>
           Voir les concours à venir
         </Button>
-      </div>
+      </EmptyState>
     );
   }
   return (
@@ -391,9 +371,15 @@ function CarnetTab({ entries, onAdd, onRemove }) {
       {showForm && <CarnetForm onSubmit={submit} onCancel={() => setShowForm(false)} />}
 
       {entries.length === 0 && !showForm && (
-        <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-          <p className="soft">Votre carnet est vide. Enregistrez votre première prise.</p>
-        </div>
+        <EmptyState
+          illus="fish"
+          title="Votre carnet est vide."
+          description="Enregistrez votre première prise pour lancer votre saison."
+        >
+          <Button variant="primary" size="sm" onClick={() => setShowForm(true)}>
+            <Icon name="plus" size={14} /> Ajouter une prise
+          </Button>
+        </EmptyState>
       )}
 
       <div className="carnet-grid">
@@ -737,23 +723,15 @@ function FavorisTab({ onShop }) {
 
   if (favorites.length === 0) {
     return (
-      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-24)',
-            marginBottom: 'var(--sp-3)',
-          }}
-        >
-          Aucun favori pour l'instant.
-        </div>
-        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
-          Cliquez sur le cœur d'un produit pour le retrouver ici.
-        </p>
+      <EmptyState
+        illus="heart"
+        title="Aucun favori pour l'instant."
+        description="Cliquez sur le cœur d'un produit pour le retrouver ici."
+      >
         <Button variant="primary" onClick={onShop}>
           Parcourir la boutique
         </Button>
-      </div>
+      </EmptyState>
     );
   }
 
@@ -770,24 +748,15 @@ function AddressesTab({ user, onGoSettings }) {
   const hasAddress = user.addressLine && user.city;
   if (!hasAddress) {
     return (
-      <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-24)',
-            marginBottom: 'var(--sp-3)',
-          }}
-        >
-          Aucune adresse enregistrée.
-        </div>
-        <p className="soft" style={{ marginBottom: 'var(--sp-5)' }}>
-          Ajoutez votre adresse de livraison depuis la section Paramètres pour gagner du temps
-          au checkout.
-        </p>
+      <EmptyState
+        illus="box"
+        title="Aucune adresse enregistrée."
+        description="Ajoutez votre adresse de livraison depuis la section Paramètres pour gagner du temps au checkout."
+      >
         <Button variant="primary" onClick={onGoSettings}>
           Renseigner mon adresse
         </Button>
-      </div>
+      </EmptyState>
     );
   }
   return (

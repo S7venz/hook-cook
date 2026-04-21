@@ -20,6 +20,46 @@ export function ForbiddenPage() {
           maxWidth: 620,
         }}
       >
+        <div
+          aria-hidden="true"
+          style={{
+            width: 96,
+            height: 96,
+            margin: '0 auto var(--sp-5)',
+            color: 'var(--accent)',
+            opacity: 0.85,
+          }}
+        >
+          <svg
+            viewBox="0 0 96 96"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ width: '100%', height: '100%' }}
+          >
+            <rect
+              x="24"
+              y="44"
+              width="48"
+              height="36"
+              rx="4"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M34 44v-8a14 14 0 0 1 28 0v8"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="48" cy="60" r="3" fill="currentColor" />
+            <path
+              d="M48 63v6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-4)' }}>
           Erreur 403
         </div>

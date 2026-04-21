@@ -19,6 +19,46 @@ export function NotFoundPage() {
           maxWidth: 620,
         }}
       >
+        <div
+          aria-hidden="true"
+          style={{
+            width: 96,
+            height: 96,
+            margin: '0 auto var(--sp-5)',
+            color: 'var(--accent)',
+            opacity: 0.85,
+          }}
+        >
+          <svg
+            viewBox="0 0 96 96"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ width: '100%', height: '100%' }}
+          >
+            <circle
+              cx="48"
+              cy="48"
+              r="32"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeDasharray="4 6"
+            />
+            <path
+              d="M36 40c0-6 12-6 12 0s-6 6-6 12"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="42" cy="62" r="2" fill="currentColor" />
+            <path
+              d="M62 38l8 8M70 38l-8 8"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              opacity="0.4"
+            />
+          </svg>
+        </div>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-4)' }}>
           Erreur 404
         </div>

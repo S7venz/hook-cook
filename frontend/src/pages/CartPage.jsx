@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
+import { EmptyState } from '../components/ui/EmptyState.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { cartTotals, useCart } from '../lib/cart.js';
@@ -13,28 +14,16 @@ export function CartPage() {
   if (items.length === 0) {
     return (
       <div className="page">
-        <div
-          className="page-container"
-          style={{ textAlign: 'center', padding: 'var(--sp-16) var(--sp-4)' }}
-        >
-          <div
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 6vw, var(--fs-64))',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-            }}
+        <div className="page-container">
+          <EmptyState
+            illus="cart"
+            title="Votre panier attend."
+            description="Rien à préparer pour l'instant. Commencez par une espèce."
           >
-            Votre panier attend.
-          </div>
-          <p className="soft" style={{ margin: 'var(--sp-5) auto 0', maxWidth: '40ch' }}>
-            Rien à préparer pour l'instant. Commencez par une espèce.
-          </p>
-          <div style={{ marginTop: 'var(--sp-6)' }}>
             <Button variant="primary" size="lg" onClick={() => navigate('/boutique')}>
               Parcourir la boutique
             </Button>
-          </div>
+          </EmptyState>
         </div>
       </div>
     );
