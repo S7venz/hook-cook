@@ -22,6 +22,7 @@ class BootStrap {
         PermitType.withTransaction { ensurePermitTypes() }
         Department.withTransaction { ensureDepartments() }
         User.withTransaction { ensureAdmin() }
+        DemoSeedData.seedIfNeeded()
     }
 
     def destroy = {

@@ -36,6 +36,7 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_FROM: ${SMTP_FROM}
+      HC_SEED_DEMO: ${HC_SEED_DEMO:-}
     ports:
       - "8080:8080"
     volumes:

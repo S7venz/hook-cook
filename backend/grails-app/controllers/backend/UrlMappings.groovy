@@ -80,6 +80,14 @@ class UrlMappings {
         get "/api/leaderboard/monthly"(controller: 'leaderboard', action: 'monthly')
         get "/api/leaderboard/summary"(controller: 'leaderboard', action: 'summary')
 
+        // RGPD — export + anonymisation du compte courant
+        get "/api/users/me/export"(controller: 'userData', action: 'export')
+        delete "/api/users/me"(controller: 'userData', action: 'remove')
+
+        // Password reset
+        post "/api/auth/password-reset/request"(controller: 'passwordReset', action: 'request')
+        post "/api/auth/password-reset/confirm"(controller: 'passwordReset', action: 'confirm')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
