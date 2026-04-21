@@ -18,6 +18,11 @@ RUN ./grailsw --stacktrace war
 ########################################
 FROM eclipse-temurin:17-jre-jammy
 
+# Utilisateur non-root dédié — si une CVE/RCE est exploitée dans une
+# dépendance, l'attaquant n'a pas le root du container.
+RUN groupadd --system --gid 10001 app \
+ && useradd --system --uid 10001 --gid app --home /app --shell /sbin/nologin app
+
 WORKDIR /app
 COPY --from=build /workspace/build/libs/*.war /app/app.war
 
@@ -25,14 +30,17 @@ COPY --from=build /workspace/build/libs/*.war /app/app.war
 # contenu au premier boot (volume vide). Après, le volume persiste.
 COPY uploads /app/uploads
 
-# Les variables suivantes sont attendues au runtime.
-# Elles sont fournies par docker-compose.yml (qui les lit depuis .env) :
+# Le user "app" doit pouvoir écrire dans /app/uploads (création de
+# sous-dossiers, écriture des fichiers uploadés)
+RUN chown -R app:app /app
+
+# Variables attendues au runtime (fournies par docker-compose.yml depuis .env) :
 #   DATASOURCE_URL, DATASOURCE_USERNAME, DATASOURCE_PASSWORD
-#   HC_JWT_SECRET
-#   ADMIN_EMAIL, ADMIN_PASSWORD
+#   HC_JWT_SECRET (obligatoire en prod, ≥ 64 chars)
+#   ADMIN_EMAIL, ADMIN_PASSWORD (obligatoires en prod)
 #   SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM
-# Si tu lances ce conteneur sans compose, tu dois les passer via -e VAR=valeur.
 ENV SPRING_PROFILES_ACTIVE=production
 
+USER app:app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.war"]

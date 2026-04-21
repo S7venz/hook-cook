@@ -54,12 +54,19 @@ hc:
 environments:
     development:
         management:
+            # Même en dev, on n'expose que health et info — /env et
+            # /heapdump dumperaient les secrets sur un Wi-Fi partagé.
             endpoints:
-                enabled-by-default: true
+                enabled-by-default: false
                 web:
                     base-path: '/actuator'
                     exposure:
-                        include: '*'
+                        include: 'health,info'
+            endpoint:
+                health:
+                    enabled: true
+                info:
+                    enabled: true
     production:
         management:
             endpoints:

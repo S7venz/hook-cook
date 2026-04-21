@@ -6,7 +6,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      # Bind sur localhost uniquement — évite l'exposition sur le LAN
+      # (Wi-Fi scolaire, etc.). Le backend continue de s'y connecter via
+      # le réseau Docker interne (hostname "postgres"), non impacté.
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Scripts SQL chargés automatiquement par l'image postgres
