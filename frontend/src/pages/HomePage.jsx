@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
@@ -27,7 +28,9 @@ function PermisCard({ onStart }) {
   const steps = ['Type', 'Identité', 'Pièces', 'Paiement'];
   return (
     <div className="card" style={cardStyle}>
-      <div className="eyebrow">Permis 2026</div>
+      <div className="eyebrow">
+        <SectionIcon name="permit" />Permis 2026
+      </div>
       <h3 style={cardTitleStyle}>En 4 gestes · 2 jours ouvrés</h3>
       <div style={{ display: 'flex', gap: 'var(--sp-2)', marginBottom: 'var(--sp-4)' }}>
         {steps.map((label, i) => (
@@ -68,7 +71,9 @@ function PermisCard({ onStart }) {
 function SeasonsCard() {
   return (
     <div className="card" style={cardStyle}>
-      <div className="eyebrow">Saisons en cours</div>
+      <div className="eyebrow">
+        <SectionIcon name="leaf" />Saisons en cours
+      </div>
       <h3 style={cardTitleStyle}>Truite, ombre, perche, bar</h3>
       <SeasonCalendar months={[3, 4, 5, 6, 7, 8, 9]} currentMonth={CURRENT_MONTH} />
       <div
@@ -205,7 +210,7 @@ function ConditionsCard() {
     <div className="card" style={{ ...cardStyle, position: 'relative' }}>
       <MeteoIcon pressure={pressure} temp={temp} />
       <div className="eyebrow">
-        Conditions en direct {loading && ' · màj…'}
+        <SectionIcon name="wave" />Conditions en direct {loading && ' · màj…'}
         {error && ' · données partielles'}
       </div>
       <h3 style={cardTitleStyle}>La Têt — Olette</h3>
@@ -338,7 +343,9 @@ export function HomePage() {
         <div className="page-container">
           <div className="hero-grid">
             <div>
-              <div className="eyebrow">Saison 2026 · Ouverture truite · 14 mars</div>
+              <div className="eyebrow">
+                <SectionIcon name="calendar" />Saison 2026 · Ouverture truite · 14 mars
+              </div>
               <h1>
                 Préparez
                 <br />
@@ -371,15 +378,21 @@ export function HomePage() {
       <section className="saison-strip">
         <div className="saison-inner">
           <div className="saison-item">
-            <span className="lbl">Votre permis</span>
+            <span className="lbl">
+              <SectionIcon name="permit" />Votre permis
+            </span>
             <span className="val">Expire dans 284 jours</span>
           </div>
           <div className="saison-item">
-            <span className="lbl">Prochain concours</span>
+            <span className="lbl">
+              <SectionIcon name="trophy" />Prochain concours
+            </span>
             <span className="val">Open de la Têt · 04 mai</span>
           </div>
           <div className="saison-item">
-            <span className="lbl">Ouverture à venir</span>
+            <span className="lbl">
+              <SectionIcon name="fish" />Ouverture à venir
+            </span>
             <span className="val">Carpe · dans 12 jours</span>
           </div>
         </div>
@@ -389,7 +402,9 @@ export function HomePage() {
         <div className="page-container">
           <div className="section-header">
             <div>
-              <div className="eyebrow">Je m'équipe par</div>
+              <div className="eyebrow">
+                <SectionIcon name="fish" />Je m'équipe par
+              </div>
               <h2>Espèce ciblée</h2>
             </div>
             <a className="more" onClick={openShop}>
@@ -427,7 +442,9 @@ export function HomePage() {
         <div className="page-container">
           <div className="section-header">
             <div>
-              <div className="eyebrow">Avant le geste</div>
+              <div className="eyebrow">
+                <SectionIcon name="compass" />Avant le geste
+              </div>
               <h2>Je prépare</h2>
             </div>
           </div>
@@ -451,7 +468,9 @@ export function HomePage() {
         <div className="page-container">
           <div className="section-header">
             <div>
-              <div className="eyebrow">Curation d'avril · matériel truite rivière</div>
+              <div className="eyebrow">
+                <SectionIcon name="rod" />Curation d'avril · matériel truite rivière
+              </div>
               <h2>Équipement du moment</h2>
             </div>
             <a className="more" onClick={openShop}>
@@ -470,7 +489,9 @@ export function HomePage() {
         <div className="page-container">
           <div className="section-header">
             <div>
-              <div className="eyebrow">Calendrier local</div>
+              <div className="eyebrow">
+                <SectionIcon name="trophy" />Calendrier local
+              </div>
               <h2>Concours à venir</h2>
             </div>
             <a className="more" onClick={openContests}>
@@ -517,7 +538,9 @@ export function HomePage() {
           <div className="page-container">
             <div className="section-header">
               <div>
-                <div className="eyebrow">Votre carnet</div>
+                <div className="eyebrow">
+                  <SectionIcon name="carnet" />Votre carnet
+                </div>
                 <h2>Vos dernières prises</h2>
               </div>
               <a className="more" onClick={openAccount}>

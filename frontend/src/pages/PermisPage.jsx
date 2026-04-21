@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { useAuth } from '../lib/auth.js';
 import {
   useDepartments,
@@ -131,7 +132,7 @@ function TrackingView({ permit, onBack }) {
     <div className="page">
       <div className="page-container" style={{ maxWidth: 720 }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          Suivi de votre demande
+          <SectionIcon name="permit" />Suivi de votre demande
         </div>
         <h1
           style={{
@@ -173,7 +174,7 @@ function TrackingView({ permit, onBack }) {
         {(permit.idDocUrl || permit.photoDocUrl) && (
           <div className="card" style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-5)' }}>
             <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-              Pièces déposées
+              <SectionIcon name="carnet" />Pièces déposées
             </div>
             <div className="row" style={{ gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
               {permit.idDocUrl && (
@@ -707,7 +708,7 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
               marginBottom: 'var(--sp-4)',
             }}
           >
-            Saison 2026
+            <SectionIcon name="calendar" />Saison 2026
           </div>
           <h1>
             Votre permis
@@ -743,7 +744,9 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
         <div className="page-container">
           <div className="section-header">
             <div>
-              <div className="eyebrow">Tarifs 2026</div>
+              <div className="eyebrow">
+                <SectionIcon name="permit" />Tarifs 2026
+              </div>
               <h2>Choisir son permis</h2>
             </div>
           </div>

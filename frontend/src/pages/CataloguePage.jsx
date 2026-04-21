@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
 import { ProductCardSkeleton } from '../components/ui/Skeleton.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
 
@@ -70,7 +71,9 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
   return (
     <>
       <div>
-        <h3>Catégorie</h3>
+        <h3>
+          <SectionIcon name="cart" />Catégorie
+        </h3>
         <div className="filter-group">
           {categories.map((c) => (
             <label key={c.id}>
@@ -86,7 +89,9 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
         </div>
       </div>
       <div>
-        <h3>Espèce ciblée</h3>
+        <h3>
+          <SectionIcon name="fish" />Espèce ciblée
+        </h3>
         <div className="filter-group">
           {species.map((s) => (
             <label key={s.id}>
@@ -101,7 +106,9 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
         </div>
       </div>
       <div>
-        <h3>Technique</h3>
+        <h3>
+          <SectionIcon name="rod" />Technique
+        </h3>
         <div className="filter-group">
           {techniques.map((t) => (
             <label key={t.id}>
@@ -116,7 +123,9 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
         </div>
       </div>
       <div>
-        <h3>Disponibilité</h3>
+        <h3>
+          <SectionIcon name="drop" />Disponibilité
+        </h3>
         <div className="filter-group">
           <label>
             <input type="checkbox" checked={filters.inStock} onChange={onToggleStock} />

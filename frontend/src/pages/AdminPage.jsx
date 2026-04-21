@@ -10,18 +10,19 @@ import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAdminStats } from '../lib/adminStats.js';
 import { useCountUp, useScrollReveal } from '../lib/animations.js';
 import { useAuth } from '../lib/auth.js';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { downloadExport } from '../lib/exports.js';
 import { formatPrice } from '../lib/format.js';
 import { useAdminPermits } from '../lib/permitApplication.js';
 import { useToast } from '../lib/toast.js';
 
 const SECTIONS = [
-  { id: 'overview', label: "Vue d'ensemble", group: 'Activité' },
-  { id: 'stats', label: 'Statistiques', group: 'Activité' },
-  { id: 'orders', label: 'Commandes', group: 'Activité' },
-  { id: 'permis', label: 'Permis', group: 'Pêche' },
-  { id: 'concours', label: 'Concours', group: 'Pêche' },
-  { id: 'products', label: 'Produits', group: 'Catalogue' },
+  { id: 'overview', label: "Vue d'ensemble", group: 'Activité', icon: 'compass' },
+  { id: 'stats', label: 'Statistiques', group: 'Activité', icon: 'calendar' },
+  { id: 'orders', label: 'Commandes', group: 'Activité', icon: 'cart' },
+  { id: 'permis', label: 'Permis', group: 'Pêche', icon: 'permit' },
+  { id: 'concours', label: 'Concours', group: 'Pêche', icon: 'trophy' },
+  { id: 'products', label: 'Produits', group: 'Catalogue', icon: 'fish' },
 ];
 
 const GROUPS = ['Activité', 'Pêche', 'Catalogue'];
@@ -1596,6 +1597,7 @@ export function AdminPage() {
                 className={section === s.id ? 'active' : ''}
                 onClick={() => setSection(s.id)}
               >
+                {s.icon && <SectionIcon name={s.icon} />}
                 {s.label}
               </button>
             ))}

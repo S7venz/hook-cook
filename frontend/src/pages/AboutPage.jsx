@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 
 /**
  * Page "À propos" avec trois sections ancrées (#histoire, #ateliers,
@@ -12,6 +13,7 @@ import { Button } from '../components/ui/Button.jsx';
 const SECTIONS = [
   {
     id: 'histoire',
+    icon: 'compass',
     eyebrow: 'Depuis 2008',
     title: 'Notre histoire',
     body: (
@@ -42,6 +44,7 @@ const SECTIONS = [
   },
   {
     id: 'ateliers',
+    icon: 'rod',
     eyebrow: 'Made in France',
     title: 'Ateliers partenaires',
     body: (
@@ -80,6 +83,7 @@ const SECTIONS = [
   },
   {
     id: 'engagements',
+    icon: 'leaf',
     eyebrow: 'Ce qu\'on défend',
     title: 'Engagements',
     body: (
@@ -192,6 +196,7 @@ export function AboutPage() {
               </div>
             )}
             <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
+              {s.icon && <SectionIcon name={s.icon} />}
               {s.eyebrow}
             </div>
             <h2

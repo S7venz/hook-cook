@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { ContestsMap } from '../components/ui/ContestsMap.jsx';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { useReferenceData } from '../lib/referenceData.js';
@@ -236,6 +237,7 @@ export function ConcoursPage() {
         <div className="section-header" style={{ marginBottom: 'var(--sp-6)' }}>
           <div>
             <div className="eyebrow">
+              <SectionIcon name="trophy" />
               Calendrier local · {contests.length} concours ouverts
             </div>
             <h1
@@ -331,7 +333,9 @@ export function ConcoursPage() {
             }}
           >
             <div>
-              <div className="eyebrow">{selected.format}</div>
+              <div className="eyebrow">
+                <SectionIcon name="fish" />{selected.format}
+              </div>
               <h2
                 style={{
                   fontFamily: 'var(--font-display)',
@@ -360,7 +364,7 @@ export function ConcoursPage() {
               </div>
               <div className="card" style={{ padding: 'var(--sp-5)', marginBottom: 'var(--sp-4)' }}>
                 <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                  Règlement
+                  <SectionIcon name="permit" />Règlement
                 </div>
                 <p className="soft" style={{ fontSize: 'var(--fs-14)' }}>
                   {selected.reglement}
@@ -368,7 +372,7 @@ export function ConcoursPage() {
               </div>
               <div className="card" style={{ padding: 'var(--sp-5)' }}>
                 <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                  Inscrits
+                  <SectionIcon name="trophy" />Inscrits
                 </div>
                 <div
                   className="row"

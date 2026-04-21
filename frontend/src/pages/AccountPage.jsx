@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { EmptyState } from '../components/ui/EmptyState.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
+import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
@@ -20,14 +21,14 @@ import { useWishlist } from '../lib/wishlist.js';
 import { ProductCard } from '../components/ProductCard.jsx';
 
 const TABS = [
-  { id: 'apercu', label: 'Aperçu' },
-  { id: 'commandes', label: 'Commandes' },
-  { id: 'permis', label: 'Permis' },
-  { id: 'concours', label: 'Concours' },
-  { id: 'carnet', label: 'Carnet de prise' },
-  { id: 'favoris', label: 'Favoris' },
-  { id: 'adresses', label: 'Adresses' },
-  { id: 'parametres', label: 'Paramètres' },
+  { id: 'apercu', label: 'Aperçu', icon: 'compass' },
+  { id: 'commandes', label: 'Commandes', icon: 'cart' },
+  { id: 'permis', label: 'Permis', icon: 'permit' },
+  { id: 'concours', label: 'Concours', icon: 'trophy' },
+  { id: 'carnet', label: 'Carnet de prise', icon: 'fish' },
+  { id: 'favoris', label: 'Favoris', icon: 'fly' },
+  { id: 'adresses', label: 'Adresses', icon: 'pin' },
+  { id: 'parametres', label: 'Paramètres', icon: 'carnet' },
 ];
 
 function StatCard({ label, value, small }) {
@@ -854,6 +855,7 @@ export function AccountPage() {
                 className={tab === t.id ? 'active' : ''}
                 onClick={() => setTab(t.id)}
               >
+                {t.icon && <SectionIcon name={t.icon} />}
                 {t.label}
               </button>
             ))}
