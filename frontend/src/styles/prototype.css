@@ -388,6 +388,9 @@ body { overflow-x: hidden; }
 }
 .legal-content .mono { font-family: var(--font-mono); font-size: var(--fs-13); }
 
+/* Liens du footer — état hover clair */
+.footer-link:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+
 /* Dark mode : placeholder map moins "trou noir" */
 [data-theme="dark"] .map-placeholder {
   background: oklch(0.22 0.020 250);

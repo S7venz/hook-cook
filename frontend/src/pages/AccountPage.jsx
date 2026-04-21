@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -699,7 +699,21 @@ export function AccountPage() {
   const { entries, addEntry, removeEntry } = useCarnet();
   const { permit } = useSubmittedPermit();
   const { isRegistered } = useContestRegistrations();
-  const [tab, setTab] = useState('apercu');
+  const { hash } = useLocation();
+
+  // Initial tab depuis le hash (deep linking footer → /compte#carnet).
+  // Si le hash n'est pas un tab valide, fallback sur "apercu".
+  const hashTab = hash?.slice(1);
+  const initialTab = TABS.some((t) => t.id === hashTab) ? hashTab : 'apercu';
+  const [tab, setTab] = useState(initialTab);
+
+  // Quand l'utilisateur navigue avec le bouton retour/avant du navigateur,
+  // le hash change mais on était déjà sur /compte → resynchronise.
+  useEffect(() => {
+    if (hashTab && TABS.some((t) => t.id === hashTab) && hashTab !== tab) {
+      setTab(hashTab);
+    }
+  }, [hashTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const inscribed = remoteContests.filter((c) => isRegistered(c.id));
 

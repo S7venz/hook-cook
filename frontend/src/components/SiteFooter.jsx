@@ -1,9 +1,40 @@
 import { Link } from 'react-router-dom';
 
+/**
+ * Liens du footer — chaque entrée pointe sur une vraie route. Les
+ * catégories produits utilisent le filtre ?category= déjà géré par
+ * CataloguePage. Les items "Marque" pointent sur /a-propos avec
+ * ancres, "Aide" sur sa propre page FAQ.
+ */
 const FOOTER_COLUMNS = [
-  { title: 'Boutique', items: ['Cannes', 'Moulinets', 'Leurres', 'Vêtements', 'Par espèce'] },
-  { title: 'Services', items: ['Permis 2026', 'Concours', 'Carnet de prise', 'Challenges'] },
-  { title: 'Marque', items: ['Notre histoire', 'Ateliers partenaires', 'Engagements', 'Aide'] },
+  {
+    title: 'Boutique',
+    items: [
+      { label: 'Cannes', to: '/boutique?category=cannes' },
+      { label: 'Moulinets', to: '/boutique?category=moulinets' },
+      { label: 'Leurres', to: '/boutique?category=leurres' },
+      { label: 'Vêtements', to: '/boutique?category=vetements' },
+      { label: 'Par espèce', to: '/' },
+    ],
+  },
+  {
+    title: 'Services',
+    items: [
+      { label: 'Permis 2026', to: '/permis' },
+      { label: 'Concours', to: '/concours' },
+      { label: 'Carnet de prise', to: '/compte#carnet' },
+      { label: 'Challenges', to: '/challenges' },
+    ],
+  },
+  {
+    title: 'Marque',
+    items: [
+      { label: 'Notre histoire', to: '/a-propos#histoire' },
+      { label: 'Ateliers partenaires', to: '/a-propos#ateliers' },
+      { label: 'Engagements', to: '/a-propos#engagements' },
+      { label: 'Aide', to: '/aide' },
+    ],
+  },
 ];
 
 const LEGAL_LINKS = [
@@ -44,15 +75,22 @@ const legalLinksStyle = {
   flexWrap: 'wrap',
 };
 
+const columnLinkStyle = {
+  fontSize: 'var(--fs-14)',
+  color: 'var(--ink-soft)',
+  textDecoration: 'none',
+  transition: 'color var(--dur-fast)',
+};
+
 export function SiteFooter() {
   return (
     <footer style={footerStyle}>
       <div className="page-container">
         <div style={gridStyle}>
           <div style={{ gridColumn: 'span 2' }}>
-            <div className="brand" style={{ fontSize: 'var(--fs-32)' }}>
+            <Link to="/" className="brand" style={{ fontSize: 'var(--fs-32)' }}>
               Hook &amp; Cook<span className="dot" />
-            </div>
+            </Link>
             <p className="soft" style={{ maxWidth: '32ch', marginTop: 'var(--sp-3)' }}>
               Boutique, permis et concours de pêche — tenus par des pêcheurs. Perpignan, France.
             </p>
@@ -64,13 +102,14 @@ export function SiteFooter() {
               </div>
               <div className="stack-sm">
                 {col.items.map((item) => (
-                  <a
-                    key={item}
-                    className="soft"
-                    style={{ fontSize: 'var(--fs-14)', cursor: 'pointer' }}
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    className="footer-link"
+                    style={columnLinkStyle}
                   >
-                    {item}
-                  </a>
+                    {item.label}
+                  </Link>
                 ))}
               </div>
             </div>

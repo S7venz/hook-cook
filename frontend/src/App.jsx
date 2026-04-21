@@ -11,7 +11,9 @@ import { SiteFooter } from './components/SiteFooter.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
 import { ThemeProvider } from './components/ThemeProvider.jsx';
 import { WishlistProvider } from './components/WishlistProvider.jsx';
+import { AboutPage } from './pages/AboutPage.jsx';
 import { HomePage } from './pages/HomePage.jsx';
+import { HelpPage } from './pages/HelpPage.jsx';
 import { CataloguePage } from './pages/CataloguePage.jsx';
 import { ProductPage } from './pages/ProductPage.jsx';
 import { CartPage } from './pages/CartPage.jsx';
@@ -53,6 +55,8 @@ export default function App() {
                             <Route path="/concours" element={<ConcoursPage />} />
                             <Route path="/challenges" element={<LeaderboardPage />} />
                             <Route path="/legal/:slug" element={<LegalPage />} />
+                            <Route path="/a-propos" element={<AboutPage />} />
+                            <Route path="/aide" element={<HelpPage />} />
                             <Route path="/403" element={<ForbiddenPage />} />
 
                             {/* ── Pages d'auth (publiques, redirect si déjà connecté n'est pas imposé) ── */}
