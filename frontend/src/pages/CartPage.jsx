@@ -59,7 +59,11 @@ export function CartPage() {
             {items.map((item, index) => (
               <div className="cart-item" key={item.product.id}>
                 <div className="thumb">
-                  <Placeholder label={item.product.img} />
+                  <Placeholder
+                    src={item.product.imageUrl}
+                    label={item.product.img ?? item.product.name}
+                    alt={item.product.name}
+                  />
                 </div>
                 <div className="details">
                   <div className="name">{item.product.name}</div>
@@ -69,6 +73,7 @@ export function CartPage() {
                   <QtyStepper
                     value={item.qty}
                     onChange={(qty) => updateQty(index, qty)}
+                    max={Number(item.product.stock) || 99}
                   />
                   <button
                     type="button"
