@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
+import { Icon } from '../components/ui/Icon.jsx';
 import { ImageUploadField } from '../components/ui/ImageUploadField.jsx';
 import { useAdminContests } from '../lib/adminContests.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
