@@ -69,6 +69,9 @@ class UrlMappings {
         post "/api/wishlist"(controller: 'wishlist', action: 'add')
         delete "/api/wishlist/$productId"(controller: 'wishlist', action: 'remove')
 
+        get "/api/stock-alerts"(controller: 'stockAlert', action: 'list')
+        post "/api/products/$productId/stock-alerts"(controller: 'stockAlert', action: 'subscribe')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

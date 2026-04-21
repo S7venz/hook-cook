@@ -16,6 +16,7 @@ class ProductController {
     ]
 
     AuthService authService
+    StockAlertService stockAlertService
 
     def list() {
         // Pagination optionnelle — si ?page/?size absents, on renvoie la
@@ -127,11 +128,17 @@ class ProductController {
             render([error: 'Quantité invalide (doit être > 0).'] as JSON)
             return
         }
-        product.stock = (product.stock ?: 0) + qty
+        int previousStock = product.stock ?: 0
+        product.stock = previousStock + qty
         if (!product.save(flush: true)) {
             response.status = 400
             render([error: 'Mise à jour impossible.'] as JSON)
             return
+        }
+        // Notifie par email tous les users qui avaient souscrit à
+        // l'alerte retour-en-stock pour ce produit.
+        if (previousStock == 0 && product.stock > 0) {
+            stockAlertService?.notifyReplenish(product.id)
         }
         render(product.toApiMap() as JSON)
     }

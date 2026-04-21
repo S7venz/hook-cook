@@ -8,6 +8,8 @@ import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { Skeleton, SkeletonLine } from '../components/ui/Skeleton.jsx';
 import { ReviewsPanel } from '../components/ui/ReviewsPanel.jsx';
+import { useAuth } from '../lib/auth.js';
+import { subscribeStockAlert } from '../lib/stockAlerts.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useProduct, useProducts } from '../lib/products.js';
@@ -89,9 +91,29 @@ export function ProductPage() {
   const { categories, species: speciesList } = useReferenceData();
   const { push } = useToast();
   const { add } = useCart();
+  const { token, user } = useAuth();
   const [tab, setTab] = useState('specs');
   const [qty, setQty] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({});
+  const [alertSubscribed, setAlertSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+
+  const handleStockAlert = async () => {
+    if (!user) {
+      push('Connectez-vous pour être prévenu du retour en stock.');
+      return;
+    }
+    setSubscribing(true);
+    try {
+      await subscribeStockAlert(product.id, token);
+      setAlertSubscribed(true);
+      push('Vous serez prévenu par mail dès que le produit revient.');
+    } catch (err) {
+      push(err?.message ?? 'Inscription impossible.');
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -232,14 +254,24 @@ export function ProductPage() {
 
             <div className="pd-actions">
               <QtyStepper value={qty} onChange={setQty} max={stock} />
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={addToCart}
-                disabled={soldOut}
-              >
-                {soldOut ? 'Épuisé' : 'Ajouter au panier'}
-              </Button>
+              {soldOut ? (
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  onClick={handleStockAlert}
+                  disabled={subscribing || alertSubscribed}
+                >
+                  {alertSubscribed
+                    ? '✓ Inscrit à l\'alerte'
+                    : subscribing
+                      ? 'Inscription…'
+                      : 'Me prévenir quand dispo'}
+                </Button>
+              ) : (
+                <Button variant="primary" size="lg" onClick={addToCart}>
+                  Ajouter au panier
+                </Button>
+              )}
             </div>
             <div
               style={{
@@ -250,7 +282,7 @@ export function ProductPage() {
               }}
             >
               {soldOut
-                ? 'Rupture de stock — réapprovisionnement sous 10 jours.'
+                ? 'Rupture de stock — vous serez prévenu dès qu\'il revient.'
                 : `Stock : ${stock} en magasin · Livraison estimée sous 48h`}
             </div>
 
