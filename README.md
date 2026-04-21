@@ -127,11 +127,14 @@ hook-cook/
 ### Catalogue (public)
 | Méthode | Path | Description |
 |---|---|---|
-| GET | `/api/products` | Liste complète |
+| GET | `/api/products` | Liste complète ou paginée (`?page=0&size=20`) |
 | GET | `/api/products/:id` | Détail |
+| GET | `/api/products/:id/related` | Souvent acheté avec (co-occurrence + fallback catégorie) |
+| GET | `/api/products/:id/reviews` | Avis clients vérifiés |
 | GET | `/api/categories`, `/api/techniques`, `/api/species` | Référentiels |
 | GET | `/api/contests`, `/api/contests/:id` | Concours |
 | GET | `/api/permit-types`, `/api/departments` | Grille tarifaire + départements éligibles |
+| GET | `/api/leaderboard/monthly` | Classement mensuel des prises |
 
 ### Commandes (user)
 | Méthode | Path | Description |
@@ -149,8 +152,22 @@ hook-cook/
 ### Uploads (authentifié)
 | Méthode | Path | Description |
 |---|---|---|
-| POST | `/api/uploads` | Multipart — upload de pièce permis ou image produit |
-| GET | `/api/uploads/:filename` | Sert le fichier (public) |
+| POST | `/api/uploads` | Multipart — upload de pièce permis ou image produit (magic bytes vérifiés) |
+| GET | `/api/uploads/:filename` | Sert le fichier. Public pour images produits ; auth + owner/admin pour pièces permis |
+
+### Favoris, avis, alertes stock (user)
+| Méthode | Path | Description |
+|---|---|---|
+| GET / POST / DELETE | `/api/wishlist`, `/api/wishlist/:productId` | Gérer ses favoris |
+| POST | `/api/products/:id/reviews` | Laisser un avis (achat vérifié requis) |
+| POST | `/api/products/:id/stock-alerts` | S'inscrire à la notification de retour en stock |
+
+### Admin — exports CSV
+| Méthode | Path | Description |
+|---|---|---|
+| GET | `/api/admin/exports/orders.csv` | Toutes les commandes |
+| GET | `/api/admin/exports/permits.csv` | Toutes les demandes de permis |
+| GET | `/api/admin/exports/contest-registrations.csv` | Toutes les inscriptions concours |
 
 ### Concours (user)
 | Méthode | Path | Description |
@@ -204,15 +221,40 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | 4 | Commandes (création, statut, historique) | ✅ |
 | 5 | Permis (formulaire, upload pièces, workflow, timeline, notif email) | ✅ |
 | 6 | Concours locaux (liste, inscription) | ✅ |
-| 7 | Tableau de bord admin | ✅ (produits, commandes, permis, concours) |
+| 7 | Tableau de bord admin (produits, commandes, permis, concours, stats, exports CSV) | ✅ |
+
+## Features au-delà du cahier
+
+| Feature | Description |
+|---|---|
+| **Conditions live** | Home affiche le débit de la Têt (Hubeau), pression atmosphérique et phase lunaire en temps réel |
+| **Carte des concours** | Leaflet + OSM France, pins custom, dark mode auto |
+| **Carnet de prise** | Chaque user consigne ses prises (espèce, taille, spot, appât) |
+| **Challenges mensuels** | Classement "plus grosse prise" par mois et par espèce |
+| **Favoris** | Bouton cœur sur chaque produit, onglet dédié dans le compte |
+| **Alerte retour en stock** | Notification email dès qu'un produit épuisé est réapprovisionné |
+| **Avis clients vérifiés** | Avec agrégation automatique de la note moyenne sur le produit |
+| **Cross-sell** | "Souvent acheté avec" basé sur les co-occurrences réelles |
+| **Recherche fuzzy** | Tolérance aux fautes de frappe via Fuse.js |
+| **Factures PDF** | Téléchargeables depuis la page de confirmation et le compte |
+| **Export CSV admin** | Commandes, permis, inscriptions — format Excel FR compatible |
+| **Mode sombre** | Toggle avec respect du `prefers-color-scheme` système |
+| **Skeleton loaders** | Transitions fluides pendant les chargements |
+| **Pages légales** | Mentions, CGV, confidentialité RGPD, cookies |
 
 ## Sécurité
 
-- Mots de passe hashés BCrypt (coût 12) avant stockage.
-- JWT HS512 signé avec un secret côté serveur, TTL 12h.
-- Les endpoints admin vérifient le rôle via le claim + la BDD.
-- CORS restreint aux origines localhost pour le dev (modifier `CorsConfig` en prod).
-- Le secret JWT est surchargé en prod via la variable d'environnement `HC_JWT_SECRET`.
+- Mots de passe hashés **BCrypt 12 rounds** avant stockage, jamais renvoyés dans l'API.
+- **JWT HS512** signé serveur, TTL 12h. En production, `HC_JWT_SECRET` doit faire ≥ 64 caractères sinon le backend refuse de démarrer.
+- Admin seedé depuis `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) — plus de hash committé dans le SQL.
+- **Rate limiting** : 5 tentatives / 10 min sur `/login`, 3 créations / heure sur `/register`.
+- **Headers HTTP de sécurité** sur toutes les réponses nginx : X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, Content-Security-Policy.
+- **Uploads** : validation magic bytes (un `.php` renommé `.jpg` est rejeté), noms UUID 128 bits, accès aux pièces d'identité permis restreint au propriétaire + admin.
+- **Containers Docker** en user non-root (uid 10001), Postgres bind sur localhost uniquement.
+- **Actuator** restreint à `health` / `info` — plus de fuite de variables d'environnement.
+- **Anti-IDOR** : messages d'erreur uniformes sur suppressions pour empêcher l'énumération d'IDs.
+- **Références entités** (commandes, permis) : UUID dérivés au lieu de `Math.random()` — plus prédictible.
+- CORS whitelist (pas de `*`), `allowCredentials: false` cohérent avec Bearer JWT.
 
 ## Variables d'environnement
 
