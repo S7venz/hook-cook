@@ -52,19 +52,19 @@ export function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
 
-  const [email, setEmail] = useState('claude@example.fr');
-  const [firstName, setFirstName] = useState('Claude');
-  const [lastName, setLastName] = useState('Desprez');
-  const [phone, setPhone] = useState('06 00 00 00 00');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
 
-  const [address, setAddress] = useState('14 rue des Arènes');
-  const [postal, setPostal] = useState('66000');
-  const [city, setCity] = useState('Perpignan');
+  const [address, setAddress] = useState('');
+  const [postal, setPostal] = useState('');
+  const [city, setCity] = useState('');
   const [shippingId, setShippingId] = useState('standard');
 
-  const [card, setCard] = useState('4242 4242 4242 4242');
-  const [expiry, setExpiry] = useState('12 / 28');
-  const [cvc, setCvc] = useState('123');
+  const [card, setCard] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvc, setCvc] = useState('');
 
   const { subtotal } = cartTotals(items);
   const shippingMode = SHIPPING_MODES.find((m) => m.id === shippingId);
@@ -161,6 +161,8 @@ export function CheckoutPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder="prenom.nom@email.fr"
+                    autoComplete="email"
                   />
                 </div>
                 <div
@@ -172,6 +174,8 @@ export function CheckoutPage() {
                       className="input"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Prénom"
+                      autoComplete="given-name"
                     />
                   </div>
                   <div className="field">
@@ -180,6 +184,8 @@ export function CheckoutPage() {
                       className="input"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Nom"
+                      autoComplete="family-name"
                     />
                   </div>
                 </div>
@@ -195,6 +201,8 @@ export function CheckoutPage() {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    placeholder="06 12 34 56 78"
+                    autoComplete="tel"
                   />
                 </div>
                 <Button
@@ -227,6 +235,8 @@ export function CheckoutPage() {
                     className="input"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
+                    placeholder="14 rue de la République"
+                    autoComplete="street-address"
                   />
                 </div>
                 <div
@@ -238,6 +248,8 @@ export function CheckoutPage() {
                       className="input"
                       value={postal}
                       onChange={(e) => setPostal(e.target.value)}
+                      placeholder="66000"
+                      autoComplete="postal-code"
                     />
                   </div>
                   <div className="field">
@@ -246,6 +258,8 @@ export function CheckoutPage() {
                       className="input"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
+                      placeholder="Perpignan"
+                      autoComplete="address-level2"
                     />
                   </div>
                 </div>
@@ -322,6 +336,9 @@ export function CheckoutPage() {
                       className="input mono"
                       value={card}
                       onChange={(e) => setCard(e.target.value)}
+                      placeholder="1234 5678 9012 3456"
+                      autoComplete="cc-number"
+                      inputMode="numeric"
                     />
                   </div>
                   <div
@@ -338,6 +355,8 @@ export function CheckoutPage() {
                         className="input mono"
                         value={expiry}
                         onChange={(e) => setExpiry(e.target.value)}
+                        placeholder="MM / AA"
+                        autoComplete="cc-exp"
                       />
                     </div>
                     <div className="field">
@@ -346,6 +365,10 @@ export function CheckoutPage() {
                         className="input mono"
                         value={cvc}
                         onChange={(e) => setCvc(e.target.value)}
+                        placeholder="123"
+                        autoComplete="cc-csc"
+                        inputMode="numeric"
+                        maxLength={4}
                       />
                     </div>
                   </div>
