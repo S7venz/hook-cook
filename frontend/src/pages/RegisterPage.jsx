@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
-import { emailValid, passwordStrongEnough, useAuth } from '../lib/auth.js';
+import { useAuth } from '../lib/auth.js';
+import {
+  firstError,
+  validateEmail,
+  validateName,
+  validatePassword,
+} from '../lib/validation.js';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -17,20 +23,15 @@ export function RegisterPage() {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!firstName.trim() || !lastName.trim()) {
-      setError('Prénom et nom requis.');
-      return;
-    }
-    if (!emailValid(email)) {
-      setError('Email invalide.');
-      return;
-    }
-    if (!passwordStrongEnough(password)) {
-      setError('Le mot de passe doit faire au moins 8 caractères.');
-      return;
-    }
-    if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.');
+    const err = firstError(
+      validateName(firstName, { field: 'Le prénom' }),
+      validateName(lastName, { field: 'Le nom' }),
+      validateEmail(email),
+      validatePassword(password),
+      password !== confirm ? 'Les mots de passe ne correspondent pas.' : null,
+    );
+    if (err) {
+      setError(err);
       return;
     }
     setSubmitting(true);

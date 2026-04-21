@@ -10,6 +10,12 @@ import {
 } from '../lib/permitApplication.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
+import {
+  firstError,
+  validateBirthDate,
+  validateCardNumber,
+  validateName,
+} from '../lib/validation.js';
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
@@ -221,8 +227,28 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
   const [photoDocUploading, setPhotoDocUploading] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
+  const [stepError, setStepError] = useState('');
 
   const type = types.find((t) => t.id === typeId) ?? types[0];
+
+  const validateIdentityStep = () =>
+    firstError(
+      validateName(firstName, { field: 'Le prénom' }),
+      validateName(lastName, { field: 'Le nom' }),
+      validateBirthDate(birthDate),
+    );
+
+  const goToStep = (n) => {
+    if (n === 3) {
+      const err = validateIdentityStep();
+      if (err) {
+        setStepError(err);
+        return;
+      }
+    }
+    setStepError('');
+    setStep(n);
+  };
 
   const uploadDoc = async (file, slot) => {
     const setFile = slot === 'id' ? setIdDocFile : setPhotoDocFile;
@@ -271,6 +297,12 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
   const uploadedCount = [idDocUrl, photoDocUrl].filter(Boolean).length;
 
   const pay = () => {
+    const err = firstError(validateIdentityStep(), validateCardNumber(cardNumber));
+    if (err) {
+      setStepError(err);
+      return;
+    }
+    setStepError('');
     onSubmit({
       typeId,
       firstName,
@@ -449,6 +481,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 </select>
               </div>
             </div>
+            {stepError && <div className="error">{stepError}</div>}
             <div className="row">
               <Button variant="ghost" onClick={() => setStep(1)}>
                 ← Retour
@@ -456,7 +489,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={() => setStep(3)}
+                onClick={() => goToStep(3)}
                 disabled={!firstName || !lastName || !birthDate}
               >
                 Continuer →
@@ -618,6 +651,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 />
               </div>
             </div>
+            {stepError && <div className="error">{stepError}</div>}
             <Button variant="accent" size="lg" full onClick={pay}>
               Payer {formatPrice(type.price)}
             </Button>

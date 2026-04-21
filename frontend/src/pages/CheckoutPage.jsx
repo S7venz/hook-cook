@@ -4,6 +4,18 @@ import { Button } from '../components/ui/Button.jsx';
 import { cartTotals, useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useOrders } from '../lib/orders.js';
+import {
+  firstError,
+  validateAddress,
+  validateCardExpiry,
+  validateCardNumber,
+  validateCity,
+  validateCvc,
+  validateEmail,
+  validateName,
+  validatePhone,
+  validatePostalCode,
+} from '../lib/validation.js';
 
 const STEPS = ['Coordonnées', 'Livraison', 'Paiement'];
 
@@ -66,6 +78,8 @@ export function CheckoutPage() {
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');
 
+  const [error, setError] = useState('');
+
   const { subtotal } = cartTotals(items);
   const shippingMode = SHIPPING_MODES.find((m) => m.id === shippingId);
   const shippingPrice = shippingMode ? shippingMode.getPrice(subtotal) : 0;
@@ -99,7 +113,49 @@ export function CheckoutPage() {
     );
   }
 
+  const validateStep = (n) => {
+    if (n === 1) {
+      return firstError(
+        validateEmail(email),
+        validateName(firstName, { field: 'Le prénom' }),
+        validateName(lastName, { field: 'Le nom' }),
+        validatePhone(phone),
+      );
+    }
+    if (n === 2) {
+      return firstError(
+        validateAddress(address),
+        validatePostalCode(postal),
+        validateCity(city),
+      );
+    }
+    if (n === 3) {
+      return firstError(
+        validateCardNumber(card),
+        validateCardExpiry(expiry),
+        validateCvc(cvc),
+      );
+    }
+    return null;
+  };
+
+  const goNext = (next) => {
+    const err = validateStep(step);
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError('');
+    setStep(next);
+  };
+
   const pay = async () => {
+    const err = validateStep(3);
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError('');
     setProcessing(true);
     try {
       const order = await createOrder({
@@ -123,9 +179,9 @@ export function CheckoutPage() {
       });
       clear();
       navigate(`/confirmation/${order.id}`);
-    } catch (err) {
+    } catch (err2) {
       setProcessing(false);
-      alert(err?.message ?? 'Erreur lors de la validation du paiement.');
+      setError(err2?.message ?? 'Erreur lors de la validation du paiement.');
     }
   };
 
@@ -205,12 +261,8 @@ export function CheckoutPage() {
                     autoComplete="tel"
                   />
                 </div>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => setStep(2)}
-                  disabled={!email || !firstName || !lastName}
-                >
+                {error && <div className="error">{error}</div>}
+                <Button variant="primary" size="lg" onClick={() => goNext(2)}>
                   Continuer vers la livraison →
                 </Button>
               </div>
@@ -297,16 +349,12 @@ export function CheckoutPage() {
                     })}
                   </div>
                 </div>
+                {error && <div className="error">{error}</div>}
                 <div className="row">
                   <Button variant="ghost" onClick={() => setStep(1)}>
                     ← Retour
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => setStep(3)}
-                    disabled={!address || !postal || !city}
-                  >
+                  <Button variant="primary" size="lg" onClick={() => goNext(3)}>
                     Continuer vers le paiement →
                   </Button>
                 </div>
@@ -388,10 +436,14 @@ export function CheckoutPage() {
                 <Button variant="ghost" size="lg" full>
                   Payer avec PayPal
                 </Button>
+                {error && <div className="error">{error}</div>}
                 <div className="row">
                   <Button
                     variant="ghost"
-                    onClick={() => setStep(2)}
+                    onClick={() => {
+                      setError('');
+                      setStep(2);
+                    }}
                     disabled={processing}
                   >
                     ← Retour
