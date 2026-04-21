@@ -25,9 +25,10 @@ class UploadController {
     }
 
     def upload() {
-        if (!authService.isAdmin(request)) {
-            response.status = 403
-            render([error: 'Accès réservé aux administrateurs.'] as JSON)
+        Map check = authService.userFromRequest(request)
+        if (!check.user) {
+            response.status = 401
+            render([error: 'Authentification requise.'] as JSON)
             return
         }
 

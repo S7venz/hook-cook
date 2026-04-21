@@ -12,12 +12,6 @@ class PermitService {
 
     MailService mailService
 
-    static final Map<String, Map> TYPES = [
-            annuel    : [title: 'Permis annuel', price: 92.0],
-            semaine   : [title: 'Permis semaine', price: 28.0],
-            decouverte: [title: 'Découverte', price: 6.0],
-    ]
-
     private static String generateReference() {
         int rand = (int) (10000 + Math.random() * 89999)
         "FR-2026-${rand}"
@@ -41,8 +35,19 @@ class PermitService {
     Map create(User user, Map payload) {
         if (!user) return [error: 'Authentification requise.']
         String typeId = payload.typeId ?: 'annuel'
-        Map type = TYPES[typeId]
+        PermitType type = PermitType.get(typeId)
         if (!type) return [error: 'Type de permis invalide.']
+
+        String department = payload.department
+        if (department) {
+            // Accept either a department code ("66") or the full name ("66 — Pyrénées-Orientales").
+            Department dep = Department.get(department) ?: Department.findByName(department)
+            if (!dep) return [error: 'Département invalide.']
+            department = dep.name
+        } else {
+            Department dep = Department.findByName('66 — Pyrénées-Orientales') ?: Department.list(max: 1)[0]
+            department = dep?.name ?: '66 — Pyrénées-Orientales'
+        }
 
         Instant now = Instant.now()
         Permit permit = new Permit(
@@ -51,12 +56,14 @@ class PermitService {
                 typeId     : typeId,
                 typeTitle  : type.title,
                 amount     : type.price,
-                department : payload.department ?: '66 — Pyrénées-Orientales',
+                department : department,
                 firstName  : payload.firstName ?: user.firstName,
                 lastName   : payload.lastName ?: user.lastName,
                 birthDate  : payload.birthDate ?: '',
                 status     : 'pending',
                 statusLabel: 'En instruction',
+                idDocUrl   : payload.idDocUrl,
+                photoDocUrl: payload.photoDocUrl,
         )
         permit.history = initialHistory(now)
 

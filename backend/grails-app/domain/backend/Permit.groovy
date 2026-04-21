@@ -17,6 +17,8 @@ class Permit {
     String status             // pending | approved | rejected
     String statusLabel
     String historyJson        // serialized list of steps
+    String idDocUrl           // URL of uploaded ID document
+    String photoDocUrl        // URL of uploaded ID photo
 
     Date dateCreated
     Date lastUpdated
@@ -34,6 +36,8 @@ class Permit {
         status inList: ['pending', 'approved', 'rejected']
         statusLabel blank: false, maxSize: 40
         historyJson nullable: true, maxSize: 4000
+        idDocUrl nullable: true, maxSize: 500
+        photoDocUrl nullable: true, maxSize: 500
     }
 
     static mapping = {
@@ -67,6 +71,8 @@ class Permit {
                 statusLabel: statusLabel,
                 submittedAt: dateCreated?.toInstant()?.toString(),
                 history    : getHistory(),
+                idDocUrl   : idDocUrl,
+                photoDocUrl: photoDocUrl,
         ]
     }
 }
