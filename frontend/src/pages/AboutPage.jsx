@@ -16,7 +16,7 @@ const SECTIONS = [
     title: 'Notre histoire',
     body: (
       <>
-        <p>
+        <p className="hc-dropcap">
           Hook &amp; Cook ouvre en 2008 dans une petite échoppe de la rue de
           l'Alsace à Perpignan. À l'époque, un comptoir, trois cannes mouche
           accrochées au mur et une boîte de mouches montées à la main par
@@ -46,7 +46,7 @@ const SECTIONS = [
     title: 'Ateliers partenaires',
     body: (
       <>
-        <p>
+        <p className="hc-dropcap">
           Une partie de notre offre est produite directement par des ateliers
           français avec qui on travaille en direct, sans intermédiaire. Ça
           garantit la qualité, la traçabilité, et ça fait vivre le savoir-faire
@@ -85,7 +85,7 @@ const SECTIONS = [
     body: (
       <>
         <h3>Transparence du sourcing</h3>
-        <p>
+        <p className="hc-dropcap">
           Chaque fiche produit indique l'origine, l'atelier ou le fabricant.
           Quand le produit vient d'Asie (c'est le cas de certains leurres de
           masse), on le dit. Pas de packaging trompeur.
@@ -158,7 +158,7 @@ export function AboutPage() {
           la même exigence : aurait-on plaisir à pêcher avec ?
         </p>
 
-        {SECTIONS.map((s) => (
+        {SECTIONS.map((s, i) => (
           <section
             key={s.id}
             id={s.id}
@@ -166,10 +166,31 @@ export function AboutPage() {
             style={{
               paddingTop: 'var(--sp-10)',
               paddingBottom: 'var(--sp-6)',
-              borderTop: '1px solid var(--hairline)',
+              borderTop: i === 0 ? '1px solid var(--hairline)' : 'none',
               scrollMarginTop: 'var(--sp-10)',
             }}
           >
+            {i > 0 && (
+              <div className="hc-ornament" aria-hidden="true">
+                <svg
+                  viewBox="0 0 40 12"
+                  width="40"
+                  height="12"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  {/* Vaguelette + point — rappel visuel eau & hameçon */}
+                  <path
+                    d="M 2 6 Q 8 2 14 6 T 26 6 T 38 6"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="20" cy="6" r="1.6" fill="currentColor" />
+                </svg>
+              </div>
+            )}
             <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
               {s.eyebrow}
             </div>
