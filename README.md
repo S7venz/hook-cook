@@ -199,13 +199,28 @@ docker exec hookcook-postgres-1 pg_dump -U hookcook --schema-only hookcook
 | `DATASOURCE_PASSWORD` | `hookcook` | Password Postgres |
 | `HC_JWT_SECRET` | secret de dev (à changer en prod !) | Clé HMAC pour signer les JWT |
 | `VITE_API_URL` | `http://localhost:8080` | URL API côté frontend (build-time) |
-| `MAIL_HOST` | *(vide → logs seulement)* | Hôte SMTP (ex: `smtp.gmail.com`) |
-| `MAIL_PORT` | `587` | Port SMTP |
-| `MAIL_USER` | — | Nom d'utilisateur SMTP |
-| `MAIL_PASSWORD` | — | Mot de passe SMTP |
-| `MAIL_FROM` | `noreply@hookcook.fr` | Adresse expéditrice |
+| `SMTP_HOST` | *(vide → logs seulement)* | Hôte SMTP (ex: `smtp.gmail.com`) |
+| `SMTP_PORT` | `587` | Port SMTP |
+| `SMTP_USERNAME` | — | Nom d'utilisateur SMTP |
+| `SMTP_PASSWORD` | — | Mot de passe SMTP |
+| `SMTP_FROM` | `no-reply@hookcook.fr` | Adresse expéditrice |
+| `ADMIN_EMAIL` | `admin@hookcook.fr` | Email de l'admin seedé au boot |
+| `ADMIN_PASSWORD` | `admin1234` | Mot de passe de l'admin seedé (à changer en prod !) |
 
-Dès que `MAIL_HOST` est défini, `MailService` bascule automatiquement sur un vrai envoi via `JavaMailSender`. Sans SMTP configuré, les mails sont loggés dans la console Grails (utile pour le dev).
+Dès que `SMTP_HOST` est défini, `MailService` bascule automatiquement sur un vrai envoi via `JavaMailSender`. Sans SMTP configuré, les mails sont loggés dans la console Grails (utile pour le dev).
+
+## Premier démarrage
+
+```bash
+cp .env.example .env
+# édite .env et remplace tous les CHANGE_ME
+# (générer des secrets forts avec :
+#   python -c "import secrets; print(secrets.token_urlsafe(64))"
+# )
+docker compose up --build
+```
+
+Puis connecte-toi avec les credentials que tu as mis dans `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
 
 ## Sécurité (Spring Security)
 

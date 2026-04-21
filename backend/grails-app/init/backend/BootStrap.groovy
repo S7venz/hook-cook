@@ -12,18 +12,19 @@ class BootStrap {
     }
 
     private void seedAdmin() {
-        String email = 'admin@hookcook.fr'
+        String email = System.getenv('ADMIN_EMAIL') ?: 'admin@hookcook.fr'
+        String password = System.getenv('ADMIN_PASSWORD') ?: 'admin1234'
         User.withTransaction {
             if (User.findByEmail(email)) return
             def encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(12)
             new User(
                     email: email,
-                    passwordHash: encoder.encode('admin1234'),
+                    passwordHash: encoder.encode(password),
                     firstName: 'Admin',
                     lastName: 'Hook & Cook',
                     role: 'ROLE_ADMIN',
             ).save(failOnError: true, flush: true)
-            log.info('Seeded admin user: {} / admin1234', email)
+            log.info('Seeded admin user: {} (password from ADMIN_PASSWORD env or default)', email)
         }
     }
 

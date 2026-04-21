@@ -36,12 +36,12 @@ spring:
             max-request-size: 12MB
     mail:
         # SMTP désactivé par défaut — dès que ces variables sont définies
-        # (via variables d'env MAIL_HOST, MAIL_USER, MAIL_PASSWORD, MAIL_PORT),
+        # (via variables d'env SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD, SMTP_PORT),
         # MailService bascule automatiquement sur un vrai envoi.
-        host: ${MAIL_HOST:}
-        port: ${MAIL_PORT:587}
-        username: ${MAIL_USER:}
-        password: ${MAIL_PASSWORD:}
+        host: ${SMTP_HOST:}
+        port: ${SMTP_PORT:587}
+        username: ${SMTP_USERNAME:}
+        password: ${SMTP_PASSWORD:}
         properties:
             mail:
                 smtp:
@@ -50,7 +50,7 @@ spring:
                         enable: true
 hc:
     mail:
-        from: ${MAIL_FROM:noreply@hookcook.fr}
+        from: ${SMTP_FROM:no-reply@hookcook.fr}
 environments:
     development:
         management:
