@@ -465,6 +465,7 @@ function PermisSection({ permits, onUpdate }) {
               <th>Demandeur</th>
               <th>Type</th>
               <th>Déposé</th>
+              <th>Pièces</th>
               <th>Montant</th>
               <th>Statut</th>
               <th>Action</th>
@@ -473,7 +474,7 @@ function PermisSection({ permits, onUpdate }) {
           <tbody>
             {list.length === 0 && (
               <tr>
-                <td colSpan={7} className="soft" style={{ padding: 'var(--sp-4)' }}>
+                <td colSpan={8} className="soft" style={{ padding: 'var(--sp-4)' }}>
                   Aucune demande en cours.
                 </td>
               </tr>
@@ -494,6 +495,24 @@ function PermisSection({ permits, onUpdate }) {
                   {p.submittedAt
                     ? new Intl.DateTimeFormat('fr-FR').format(new Date(p.submittedAt))
                     : '—'}
+                </td>
+                <td style={{ fontSize: 'var(--fs-12)' }}>
+                  <div style={{ display: 'flex', gap: 'var(--sp-2)', flexDirection: 'column' }}>
+                    {p.idDocUrl ? (
+                      <a href={p.idDocUrl} target="_blank" rel="noreferrer">
+                        ID ↗
+                      </a>
+                    ) : (
+                      <span className="soft">—</span>
+                    )}
+                    {p.photoDocUrl ? (
+                      <a href={p.photoDocUrl} target="_blank" rel="noreferrer">
+                        Photo ↗
+                      </a>
+                    ) : (
+                      <span className="soft">—</span>
+                    )}
+                  </div>
                 </td>
                 <td className="mono">{formatPrice(p.amount)}</td>
                 <td>
