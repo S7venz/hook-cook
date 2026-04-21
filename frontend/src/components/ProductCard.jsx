@@ -17,10 +17,14 @@ export function ProductCard({ product }) {
     .map((id) => speciesList.find((s) => s.id === id)?.name)
     .filter(Boolean);
 
+  const stock = Number(product.stock) || 0;
+  const soldOut = stock <= 0;
+
   const open = () => navigate(`/boutique/${product.id}`);
 
   const handleAdd = (event) => {
     event.stopPropagation();
+    if (soldOut) return;
     add(product, 1);
     push(`Ajouté : ${product.name}`);
   };
@@ -34,7 +38,7 @@ export function ProductCard({ product }) {
 
   return (
     <div
-      className="product-card"
+      className={`product-card ${soldOut ? 'sold-out' : ''}`.trim()}
       role="button"
       tabIndex={0}
       onClick={open}
@@ -44,11 +48,21 @@ export function ProductCard({ product }) {
         <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
         <div className="tag-row">
           {product.wasPrice && <Badge accent>Promo</Badge>}
-          {product.stock < 10 && <Badge status="pending">Stock {product.stock}</Badge>}
+          {soldOut ? (
+            <Badge status="rejected">Épuisé</Badge>
+          ) : (
+            stock < 10 && <Badge status="pending">Stock {stock}</Badge>
+          )}
         </div>
         <div className="add-overlay">
-          <Button variant="primary" size="sm" onClick={handleAdd} full>
-            Ajouter au panier
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleAdd}
+            full
+            disabled={soldOut}
+          >
+            {soldOut ? 'Épuisé' : 'Ajouter au panier'}
           </Button>
         </div>
       </div>

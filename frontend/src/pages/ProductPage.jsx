@@ -105,12 +105,16 @@ export function ProductPage() {
   if (!product) return <NotFound />;
 
   const category = categories.find((c) => c.id === product.category);
+  const stock = Number(product.stock) || 0;
+  const soldOut = stock <= 0;
   const addToCart = () => {
-    add(product, qty);
+    if (soldOut) return;
+    const qtyCapped = Math.min(qty, stock);
+    add(product, qtyCapped);
     push(
-      qty === 1
+      qtyCapped === 1
         ? `Ajouté : ${product.name}`
-        : `${qty} × ${product.name} ajouté${qty > 1 ? 's' : ''} au panier`,
+        : `${qtyCapped} × ${product.name} ajouté${qtyCapped > 1 ? 's' : ''} au panier`,
     );
   };
 
@@ -226,20 +230,27 @@ export function ProductPage() {
             )}
 
             <div className="pd-actions">
-              <QtyStepper value={qty} onChange={setQty} />
-              <Button variant="primary" size="lg" onClick={addToCart}>
-                Ajouter au panier
+              <QtyStepper value={qty} onChange={setQty} max={stock} />
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={addToCart}
+                disabled={soldOut}
+              >
+                {soldOut ? 'Épuisé' : 'Ajouter au panier'}
               </Button>
             </div>
             <div
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: 'var(--fs-12)',
-                color: 'var(--ink-mute)',
+                color: soldOut ? 'var(--danger, #c0392b)' : 'var(--ink-mute)',
                 marginTop: 'calc(-1 * var(--sp-3))',
               }}
             >
-              Stock : {product.stock} en magasin · Livraison estimée sous 48h
+              {soldOut
+                ? 'Rupture de stock — réapprovisionnement sous 10 jours.'
+                : `Stock : ${stock} en magasin · Livraison estimée sous 48h`}
             </div>
 
             <div className="adapted-for">
