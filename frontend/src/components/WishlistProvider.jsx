@@ -20,11 +20,15 @@ export function WishlistProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!token || !user) {
-      setProductIds(new Set());
-      return undefined;
-    }
     let cancelled = false;
+    if (!token || !user) {
+      // Reset conditionnel pour éviter un setState redondant et
+      // la cascade de re-renders qui en découle.
+      setProductIds((prev) => (prev.size === 0 ? prev : new Set()));
+      return () => {
+        cancelled = true;
+      };
+    }
     (async () => {
       setLoading(true);
       try {
@@ -33,7 +37,7 @@ export function WishlistProvider({ children }) {
           setProductIds(new Set((list ?? []).map((item) => item.productId)));
         }
       } catch {
-        if (!cancelled) setProductIds(new Set());
+        if (!cancelled) setProductIds((prev) => (prev.size === 0 ? prev : new Set()));
       } finally {
         if (!cancelled) setLoading(false);
       }
