@@ -1,13 +1,14 @@
 package backend
 
-import grails.gorm.transactions.Transactional
-
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 
-@Transactional(readOnly = true)
+// Pas de @Transactional : ce service ne fait que des lectures (meme
+// pattern que LeaderboardService/ExportService). Le wrapper
+// transactionnel interfere avec DataTest en masquant les entites
+// saved dans les tests.
 class StatsService {
 
     private static final DateTimeFormatter MONTH_KEY = DateTimeFormatter.ofPattern('yyyy-MM')

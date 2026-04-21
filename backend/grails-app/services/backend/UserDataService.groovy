@@ -112,19 +112,25 @@ class UserDataService {
         }
 
         // 4. Commandes : conservées (obligation 10 ans) mais anonymisées
+        // Domaine d'email "anonymise" — on utilise anonymised.hookcook.fr
+        // (TLD valide) plutot que .local qui etait rejete silencieusement
+        // par le validateur email de Grails, faisant echouer l'anonymisation
+        // sans erreur visible.
+        String anonEmail = "anonyme-${userId}@anonymised.hookcook.fr"
+
         int ordersCount = 0
         CustomerOrder.findAllByUser(user).each { o ->
-            o.email = "anonyme-${userId}@deleted.local"
+            o.email = anonEmail
             o.addressLine = 'Adresse supprimée (RGPD)'
             o.postalCode = '00000'
             o.city = 'Anonyme'
-            o.save(flush: true)
+            o.save(flush: true, failOnError: true)
             ordersCount++
         }
 
         // 5. User lui-même : email anonymisé, mot de passe neutralisé,
         //    rôle ROLE_USER, prénom/nom/téléphone/adresse vidés.
-        user.email = "anonyme-${userId}@deleted.local"
+        user.email = anonEmail
         user.firstName = 'Anonyme'
         user.lastName = "user-${userId}"
         user.phone = null
@@ -134,8 +140,12 @@ class UserDataService {
         user.country = null
         // Hash BCrypt invalide pour empêcher toute reconnexion. Le préfixe
         // $2a$ reste pour ne pas casser les constraints BCrypt attendues.
-        user.passwordHash = '$2a$12$' + 'INVALIDATED-BY-GDPR-DELETION-REQUEST'
-        user.save(flush: true)
+        user.passwordHash = '$2a$12$' + 'INVALIDATEDBYGDPRDELETIONREQUESTX'
+        // failOnError + flush : on veut que le save plante bruyamment
+        // plutot que de laisser un user actif en base si une contrainte
+        // fail (c'etait le bug : save() silencieux renvoyait null et
+        // l'anonymisation n'etait jamais appliquee).
+        user.save(flush: true, failOnError: true)
 
         [
                 ok              : true,

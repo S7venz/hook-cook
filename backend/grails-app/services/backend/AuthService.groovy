@@ -12,6 +12,16 @@ class AuthService {
 
     static final Set<String> VALID_ROLES = ['ROLE_USER', 'ROLE_ADMIN'] as Set
 
+    // Domaine reserve aux comptes anonymises RGPD — tout user dont
+    // l'email matche ce suffixe est considere comme "supprime". Empeche
+    // la reconnexion ET invalide les JWT stateless encore en circulation
+    // (sans avoir a maintenir une blacklist de tokens).
+    private static final String DELETED_DOMAIN_SUFFIX = '@anonymised.hookcook.fr'
+
+    private static boolean isDeletedAccount(User u) {
+        u?.email?.endsWith(DELETED_DOMAIN_SUFFIX)
+    }
+
     Map register(Map command) {
         String email = command.email?.toString()?.trim()?.toLowerCase()
         String password = command.password?.toString()
@@ -53,7 +63,9 @@ class AuthService {
         }
 
         User user = User.findByEmail(email)
-        if (!user || !ENCODER.matches(password, user.passwordHash)) {
+        if (!user || isDeletedAccount(user) || !ENCODER.matches(password, user.passwordHash)) {
+            // Meme message qu'un mdp faux pour ne pas reveler qu'un
+            // compte a ete supprime via RGPD (anti-enumeration).
             return [error: 'Email ou mot de passe incorrect.']
         }
 
@@ -79,6 +91,11 @@ class AuthService {
         if (!sub) return [error: 'auth_invalid']
         User user = User.get(sub as Long)
         if (!user) return [error: 'auth_invalid']
+        // Comptes anonymises RGPD : on refuse meme si le JWT est
+        // techniquement valide (signature OK + non expire). Invalide
+        // donc les tokens stateless encore en circulation apres
+        // suppression, sans avoir besoin d'une blacklist cote BDD.
+        if (isDeletedAccount(user)) return [error: 'auth_invalid']
         [user: user, role: claims.get('role') as String]
     }
 

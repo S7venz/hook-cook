@@ -127,4 +127,70 @@ class AuthServiceSpec extends Specification implements ServiceUnitTest<AuthServi
         then:
         result.error == 'Email ou mot de passe incorrect.'
     }
+
+    // ────────── Comptes anonymisés RGPD ──────────────────────────
+
+    void "login refuse un compte anonymisé (email @anonymised.hookcook.fr)"() {
+        // Regression guard : apres anonymisation RGPD, login doit echouer
+        // avec le meme message que mdp faux (anti-enumeration).
+        given:
+        new User(
+                email: 'anonyme-42@anonymised.hookcook.fr',
+                passwordHash: '$2a$12$INVALIDATEDBYGDPRDELETIONREQUESTX',
+                firstName: 'Anonyme',
+                lastName: 'user-42',
+                role: 'ROLE_USER',
+        ).save(failOnError: true, validate: false)
+
+        when:
+        Map result = service.login([
+                email   : 'anonyme-42@anonymised.hookcook.fr',
+                password: 'anything',
+        ])
+
+        then:
+        result.error == 'Email ou mot de passe incorrect.'
+    }
+
+    void "userFromRequest rejette le JWT d'un compte anonymisé même si la signature est valide"() {
+        // Regression guard : JWT etant stateless, meme apres anonymisation
+        // les tokens emis AVANT restent valides 12h. On doit les rejeter
+        // en comparant l'email de l'user en BDD au suffixe reserve.
+        given:
+        User anon = new User(
+                email: 'anonyme-99@anonymised.hookcook.fr',
+                passwordHash: '$2a$12$INVALIDATEDBYGDPRDELETIONREQUESTX',
+                firstName: 'Anonyme',
+                lastName: 'user-99',
+                role: 'ROLE_USER',
+        ).save(failOnError: true, validate: false)
+        String token = service.jwtService.issue(anon)
+        def request = [getHeader: { String h -> h == 'Authorization' ? "Bearer $token" : null }]
+
+        when:
+        Map check = service.userFromRequest(request)
+
+        then:
+        check.error == 'auth_invalid'
+        !check.user
+    }
+
+    void "userFromRequest accepte normalement un user actif"() {
+        given:
+        Map reg = service.register([
+                email    : 'active@test.fr',
+                password : 'password1234',
+                firstName: 'Active',
+                lastName : 'User',
+        ])
+        String token = reg.token
+        def request = [getHeader: { String h -> h == 'Authorization' ? "Bearer $token" : null }]
+
+        when:
+        Map check = service.userFromRequest(request)
+
+        then:
+        check.user?.email == 'active@test.fr'
+        !check.error
+    }
 }
