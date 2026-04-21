@@ -7,6 +7,7 @@ import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { QtyStepper } from '../components/ui/QtyStepper.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { Skeleton, SkeletonLine } from '../components/ui/Skeleton.jsx';
+import { ReviewsPanel } from '../components/ui/ReviewsPanel.jsx';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
 import { useProduct, useProducts } from '../lib/products.js';
@@ -164,11 +165,7 @@ export function ProductPage() {
         </p>
       </div>
     ),
-    avis: (
-      <p className="soft">
-        {product.reviews} avis vérifiés post-achat. Note moyenne {product.rating}/5.
-      </p>
-    ),
+    avis: <ReviewsPanel productId={product.id} />,
   };
 
   return (

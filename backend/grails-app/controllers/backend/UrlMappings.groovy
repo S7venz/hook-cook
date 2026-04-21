@@ -60,6 +60,11 @@ class UrlMappings {
 
         get "/api/admin/stats"(controller: 'stats', action: 'overview')
 
+        get "/api/products/$productId/reviews"(controller: 'review', action: 'list')
+        post "/api/products/$productId/reviews"(controller: 'review', action: 'create')
+        get "/api/products/$productId/reviews/eligibility"(controller: 'review', action: 'eligibility')
+        delete "/api/reviews/$id"(controller: 'review', action: 'remove')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
