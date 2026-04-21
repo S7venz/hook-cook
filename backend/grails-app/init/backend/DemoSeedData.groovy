@@ -50,8 +50,14 @@ class DemoSeedData {
         // Guard : seulement si HC_SEED_DEMO est activé
         if (System.getenv('HC_SEED_DEMO') != 'true') return
 
-        // Guard d'idempotence : si le premier user démo existe, on sort
-        if (User.findByEmail('marie.dupont@demo.hookcook.fr')) {
+        // Guard d'idempotence : si AU MOINS UN des 10 emails demo existe
+        // deja en BDD, on sort. On ne peut pas se reposer sur un seul
+        // email sentinelle car celui-ci peut avoir ete anonymise via
+        // RGPD (email transforme en anonyme-N@anonymised.hookcook.fr),
+        // laissant la garde penser que le seed n'a jamais tourne alors
+        // que les 9 autres users existent encore.
+        List<String> emails = DEMO_USERS*.email
+        if (User.countByEmailInList(emails) > 0) {
             return
         }
 
