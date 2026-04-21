@@ -17,6 +17,8 @@ import { CartPage } from './pages/CartPage.jsx';
 import { CheckoutPage } from './pages/CheckoutPage.jsx';
 import { ConfirmationPage } from './pages/ConfirmationPage.jsx';
 import { ConcoursPage } from './pages/ConcoursPage.jsx';
+import { LeaderboardPage } from './pages/LeaderboardPage.jsx';
+import { LegalPage } from './pages/LegalPage.jsx';
 import { PermisPage } from './pages/PermisPage.jsx';
 import { LoginPage } from './pages/LoginPage.jsx';
 import { RegisterPage } from './pages/RegisterPage.jsx';
@@ -51,6 +53,7 @@ export default function App() {
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
                 <Route path="/challenges" element={<LeaderboardPage />} />
+                <Route path="/legal/:slug" element={<LegalPage />} />
                 <Route path="/compte" element={<AccountPage />} />
                 <Route path="/admin" element={<AdminPage />} />
               </Routes>

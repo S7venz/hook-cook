@@ -1,7 +1,16 @@
+import { Link } from 'react-router-dom';
+
 const FOOTER_COLUMNS = [
   { title: 'Boutique', items: ['Cannes', 'Moulinets', 'Leurres', 'Vêtements', 'Par espèce'] },
-  { title: 'Services', items: ['Permis 2026', 'Concours', 'Carnet de prise', 'Guides locaux'] },
+  { title: 'Services', items: ['Permis 2026', 'Concours', 'Carnet de prise', 'Challenges'] },
   { title: 'Marque', items: ['Notre histoire', 'Ateliers partenaires', 'Engagements', 'Aide'] },
+];
+
+const LEGAL_LINKS = [
+  { to: '/legal/mentions-legales', label: 'Mentions légales' },
+  { to: '/legal/cgv', label: 'CGV' },
+  { to: '/legal/politique-confidentialite', label: 'Confidentialité' },
+  { to: '/legal/cookies', label: 'Cookies' },
 ];
 
 const footerStyle = {
@@ -27,6 +36,12 @@ const legalStyle = {
   fontFamily: 'var(--font-mono)',
   fontSize: 'var(--fs-12)',
   color: 'var(--ink-mute)',
+};
+
+const legalLinksStyle = {
+  display: 'flex',
+  gap: 'var(--sp-4)',
+  flexWrap: 'wrap',
 };
 
 export function SiteFooter() {
@@ -62,8 +77,15 @@ export function SiteFooter() {
           ))}
         </div>
         <div style={legalStyle}>
-          <span>© 2026 Hook &amp; Cook · SIRET 819 284 562 00018</span>
-          <span>Paiement sécurisé Stripe &amp; PayPal · Livraison Colissimo</span>
+          <span>© 2026 Hook &amp; Cook · Perpignan</span>
+          <nav style={legalLinksStyle} aria-label="Liens légaux">
+            {LEGAL_LINKS.map((l) => (
+              <Link key={l.to} to={l.to} style={{ color: 'inherit' }}>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <span>Paiement sécurisé · Livraison Colissimo</span>
         </div>
       </div>
     </footer>

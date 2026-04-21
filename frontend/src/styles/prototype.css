@@ -360,6 +360,34 @@ body { overflow-x: hidden; }
   fill: var(--accent);
 }
 
+/* Pages légales — typographie lisible, listes bien espacées */
+.legal-content h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-24);
+  margin: var(--sp-6) 0 var(--sp-3);
+  color: var(--ink);
+}
+.legal-content p {
+  font-size: var(--fs-15);
+  line-height: var(--lh-body);
+  margin: 0 0 var(--sp-3);
+  color: var(--ink-soft);
+}
+.legal-content ul {
+  font-size: var(--fs-15);
+  line-height: var(--lh-body);
+  color: var(--ink-soft);
+  padding-left: 1.2em;
+  margin: 0 0 var(--sp-3);
+}
+.legal-content li { margin-bottom: var(--sp-2); }
+.legal-content a {
+  color: var(--accent);
+  border-bottom: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+}
+.legal-content .mono { font-family: var(--font-mono); font-size: var(--fs-13); }
+
 /* Dark mode : placeholder map moins "trou noir" */
 [data-theme="dark"] .map-placeholder {
   background: oklch(0.22 0.020 250);
