@@ -1,26 +1,75 @@
 package backend
 
 import groovy.json.JsonOutput
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 /**
  * Boot hook.
  *
- * Le gros du référentiel (produits, concours, catégories, espèces, techniques,
- * compte admin) est chargé une seule fois en SQL par Postgres au premier
- * démarrage du volume, via `postgres/init/01-init.sql`.
+ * Le gros du référentiel (produits, concours, catégories, espèces, techniques)
+ * est chargé une seule fois en SQL par Postgres au premier démarrage du volume,
+ * via `postgres/init/01-init.sql`.
  *
- * On conserve ici un seed idempotent pour les tables de référence ajoutées
- * après le dump initial (types de permis, départements). Ces insertions sont
- * protégées par un `get(id)` pour ne jamais dupliquer.
+ * Ici on gère idempotemment :
+ *   1. Les tables de référence ajoutées après le dump initial (types de permis,
+ *      départements) — protégées par un `get(id)` pour ne jamais dupliquer.
+ *   2. Le compte admin, créé/mis à jour depuis les variables d'environnement
+ *      ADMIN_EMAIL / ADMIN_PASSWORD (fail si absents en PRODUCTION).
  */
 class BootStrap {
 
     def init = { servletContext ->
         PermitType.withTransaction { ensurePermitTypes() }
         Department.withTransaction { ensureDepartments() }
+        User.withTransaction { ensureAdmin() }
     }
 
     def destroy = {
+    }
+
+    private void ensureAdmin() {
+        String email = System.getenv('ADMIN_EMAIL')
+        String password = System.getenv('ADMIN_PASSWORD')
+
+        boolean isProd = grails.util.Environment.current == grails.util.Environment.PRODUCTION
+
+        if (!email || !password) {
+            if (isProd) {
+                throw new IllegalStateException(
+                        'ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis en production. ' +
+                        'Ajoute-les à ton .env avant de démarrer.')
+            }
+            email = email ?: 'admin@hookcook.fr'
+            password = password ?: 'admin1234'
+            log.warn('Admin seeding : utilisation des valeurs par défaut (dev). Ne pas déployer en prod.')
+        }
+
+        if (isProd && password.length() < 10) {
+            throw new IllegalStateException(
+                    'ADMIN_PASSWORD trop court (< 10 caractères) pour un déploiement production. ' +
+                    'Génère-en un fort avec :\n' +
+                    '  python -c "import secrets; print(secrets.token_urlsafe(24))"')
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12)
+        User admin = User.findByEmail(email)
+        if (!admin) {
+            admin = new User(
+                    email: email,
+                    passwordHash: encoder.encode(password),
+                    firstName: 'Admin',
+                    lastName: 'Hook & Cook',
+                    role: 'ROLE_ADMIN',
+            )
+            admin.save(flush: true, failOnError: true)
+            log.info('Admin créé : {}', email)
+        } else if (!encoder.matches(password, admin.passwordHash)) {
+            // Si le mot de passe a changé dans l'env, on met à jour
+            admin.passwordHash = encoder.encode(password)
+            admin.role = 'ROLE_ADMIN'
+            admin.save(flush: true, failOnError: true)
+            log.info('Admin mis à jour : {}', email)
+        }
     }
 
     private void ensurePermitTypes() {

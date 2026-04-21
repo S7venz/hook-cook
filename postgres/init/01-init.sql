@@ -420,7 +420,8 @@ INSERT INTO public.techniques VALUES ('streetfishing', 0, 'Street-fishing');
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: hookcook
 --
 
-INSERT INTO public.users VALUES (1, 0, NULL, '2026-04-21 09:40:59.536', 'Admin', NULL, '$2a$12$kObfvIHri5YSM5DeCJRyqOtgigcvqYI77Lp1zNYrkxszqdnJgcADS', NULL, '2026-04-21 09:40:59.536', 'ROLE_ADMIN', NULL, 'Hook & Cook', NULL, 'admin@hookcook.fr');
+-- Admin : créé au boot par BootStrap.groovy depuis ADMIN_EMAIL / ADMIN_PASSWORD (.env)
+-- (ancien INSERT supprimé — évite de versionner un hash BCrypt en clair public)
 
 
 --
