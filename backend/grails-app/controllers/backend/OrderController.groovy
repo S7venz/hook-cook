@@ -11,10 +11,12 @@ class OrderController {
             show       : 'GET',
             listAll    : 'GET',
             patchStatus: 'PATCH',
+            invoice    : 'GET',
     ]
 
     AuthService authService
     OrderService orderService
+    InvoiceService invoiceService
 
     def myOrders() {
         User user = requireUser()
@@ -70,6 +72,34 @@ class OrderController {
             return
         }
         render(result.order.toApiMap() as JSON)
+    }
+
+    def invoice() {
+        User user = requireUser()
+        if (!user) return
+        CustomerOrder order = orderService.findByReference(params.reference)
+        if (!order) {
+            response.status = 404
+            render([error: 'Commande introuvable.'] as JSON)
+            return
+        }
+        boolean isAdmin = user.role == 'ROLE_ADMIN'
+        if (!isAdmin && order.user.id != user.id) {
+            response.status = 403
+            render([error: 'Facture non autorisée.'] as JSON)
+            return
+        }
+        byte[] pdf = invoiceService.renderPdf(order)
+        response.contentType = 'application/pdf'
+        response.setHeader(
+                'Content-Disposition',
+                "attachment; filename=\"facture-${order.reference}.pdf\""
+        )
+        response.contentLength = pdf.length
+        response.outputStream.withStream { out ->
+            out.write(pdf)
+            out.flush()
+        }
     }
 
     private User requireUser() {

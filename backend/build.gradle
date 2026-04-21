@@ -62,6 +62,9 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:0.12.5"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.5"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.5"
+    // Génération de factures PDF depuis HTML
+    implementation "com.openhtmltopdf:openhtmltopdf-core:1.0.10"
+    implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10"
     profile "org.grails.profiles:rest-api"
     runtimeOnly "org.glassfish.web:el-impl:2.2.1-b05"
     runtimeOnly "org.postgresql:postgresql:42.7.3"

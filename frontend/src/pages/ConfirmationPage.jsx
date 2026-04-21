@@ -1,13 +1,32 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
+import { useAuth } from '../lib/auth.js';
+import { downloadInvoice } from '../lib/invoice.js';
 import { findOrder, useOrders } from '../lib/orders.js';
+import { useToast } from '../lib/toast.js';
 
 export function ConfirmationPage() {
   const navigate = useNavigate();
   const { orderId } = useParams();
   const { orders } = useOrders();
+  const { token } = useAuth();
+  const { push } = useToast();
+  const [downloading, setDownloading] = useState(false);
   const order = findOrder(orders, orderId);
+
+  const handleDownload = async () => {
+    if (!order || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadInvoice(order.id, token);
+    } catch (err) {
+      push(err?.message ?? 'Téléchargement impossible.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (!order) {
     return (
@@ -83,6 +102,10 @@ export function ConfirmationPage() {
             flexWrap: 'wrap',
           }}
         >
+          <Button variant="ghost" onClick={handleDownload} disabled={downloading}>
+            <Icon name="download" size={16} />
+            {downloading ? 'Préparation…' : 'Télécharger la facture'}
+          </Button>
           <Button variant="ghost" onClick={() => navigate('/compte')}>
             Voir mes commandes
           </Button>

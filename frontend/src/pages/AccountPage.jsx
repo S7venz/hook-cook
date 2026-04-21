@@ -8,9 +8,11 @@ import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { formatPrice } from '../lib/format.js';
+import { downloadInvoice } from '../lib/invoice.js';
 import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
 import { useReferenceData } from '../lib/referenceData.js';
+import { useToast } from '../lib/toast.js';
 
 const TABS = [
   { id: 'apercu', label: 'Aperçu' },
@@ -67,6 +69,21 @@ function Overview({ carnetCount, orderCount, contestCount, hasPermit, onTab }) {
 }
 
 function OrdersTab({ orders, onShop }) {
+  const { token } = useAuth();
+  const { push } = useToast();
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownload = async (reference) => {
+    setDownloadingId(reference);
+    try {
+      await downloadInvoice(reference, token);
+    } catch (err) {
+      push(err?.message ?? 'Téléchargement impossible.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   if (orders.length === 0) {
     return (
       <div className="card" style={{ padding: 'var(--sp-8)', textAlign: 'center' }}>
@@ -130,6 +147,17 @@ function OrdersTab({ orders, onShop }) {
                 </span>
               </div>
             ))}
+          </div>
+          <div style={{ marginTop: 'var(--sp-3)' }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDownload(order.id)}
+              disabled={downloadingId === order.id}
+            >
+              <Icon name="download" size={14} />
+              {downloadingId === order.id ? 'Préparation…' : 'Télécharger la facture'}
+            </Button>
           </div>
         </div>
       ))}

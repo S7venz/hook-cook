@@ -38,6 +38,7 @@ class UrlMappings {
         get "/api/orders"(controller: 'order', action: 'listAll')
         get "/api/orders/$reference"(controller: 'order', action: 'show')
         patch "/api/orders/$reference"(controller: 'order', action: 'patchStatus')
+        get "/api/orders/$reference/invoice"(controller: 'order', action: 'invoice')
 
         get "/api/permits/me"(controller: 'permit', action: 'current')
         post "/api/permits"(controller: 'permit', action: 'create')
