@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { formatPrice } from '../lib/format.js';
+import { deleteAccount, downloadGdprExport } from '../lib/gdpr.js';
 import { downloadInvoice } from '../lib/invoice.js';
 import { useOrders } from '../lib/orders.js';
 import { useSubmittedPermit } from '../lib/permitApplication.js';
@@ -575,6 +576,7 @@ function SettingsTab({ user, onLogout, onSubmit }) {
   return (
     <div className="stack-lg">
       <ProfileForm user={user} onSubmit={onSubmit} />
+      <GdprPanel onLogout={onLogout} />
       <div className="card" style={{ padding: 'var(--sp-5)' }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
           Session
@@ -582,6 +584,143 @@ function SettingsTab({ user, onLogout, onSubmit }) {
         <Button variant="ghost" onClick={onLogout}>
           Se déconnecter
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function GdprPanel({ onLogout }) {
+  const { token } = useAuth();
+  const { push } = useToast();
+  const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await downloadGdprExport(token);
+      push('Export téléchargé — conformité RGPD.');
+    } catch (err) {
+      push(err?.message ?? 'Export impossible.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (confirmText !== 'SUPPRIMER') {
+      push('Tapez SUPPRIMER pour confirmer.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteAccount(token);
+      push('Compte anonymisé — vous êtes déconnecté.');
+      onLogout();
+    } catch (err) {
+      push(err?.message ?? 'Suppression impossible.');
+    } finally {
+      setDeleting(false);
+      setConfirmOpen(false);
+    }
+  };
+
+  return (
+    <div className="card" style={{ padding: 'var(--sp-5)' }}>
+      <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+        Données personnelles · RGPD
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 'var(--sp-4)',
+          paddingBottom: 'var(--sp-4)',
+          borderBottom: '1px solid var(--hairline)',
+          marginBottom: 'var(--sp-4)',
+        }}
+      >
+        <div>
+          <div style={{ fontWeight: 500, marginBottom: 'var(--sp-1)' }}>
+            Télécharger mes données
+          </div>
+          <p className="soft" style={{ margin: 0, fontSize: 'var(--fs-13)' }}>
+            Export JSON complet : profil, commandes, permis, inscriptions concours,
+            carnet, favoris, avis, alertes stock.
+          </p>
+        </div>
+        <Button variant="ghost" onClick={handleExport} disabled={exporting}>
+          <Icon name="download" size={14} />
+          {exporting ? 'Préparation…' : 'Exporter'}
+        </Button>
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontWeight: 500,
+            marginBottom: 'var(--sp-1)',
+            color: 'var(--err)',
+          }}
+        >
+          Supprimer mon compte
+        </div>
+        <p className="soft" style={{ margin: '0 0 var(--sp-3)', fontSize: 'var(--fs-13)' }}>
+          Anonymise vos données. Les commandes restent conservées 10 ans pour
+          obligation fiscale mais sont détachées de votre identité.{' '}
+          <strong>Action irréversible.</strong>
+        </p>
+        {!confirmOpen ? (
+          <Button variant="ghost" onClick={() => setConfirmOpen(true)}>
+            Supprimer mon compte
+          </Button>
+        ) : (
+          <div
+            className="stack-sm"
+            style={{
+              padding: 'var(--sp-4)',
+              border: '1px solid var(--err)',
+              borderRadius: 'var(--r-md)',
+              background: 'color-mix(in oklch, var(--err) 6%, var(--bg-elev))',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: 'var(--fs-13)' }}>
+              Tapez <span className="mono">SUPPRIMER</span> pour confirmer.
+            </p>
+            <input
+              className="input mono"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="SUPPRIMER"
+              autoFocus
+            />
+            <div className="row">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setConfirmOpen(false);
+                  setConfirmText('');
+                }}
+                disabled={deleting}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="accent"
+                size="sm"
+                onClick={handleDelete}
+                disabled={deleting || confirmText !== 'SUPPRIMER'}
+              >
+                {deleting ? 'Suppression…' : 'Supprimer définitivement'}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
