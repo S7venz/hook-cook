@@ -58,6 +58,22 @@ class OrderController {
 
     def listAll() {
         if (!requireAdmin()) return
+        Integer page = params.int('page')
+        Integer size = params.int('size')
+        if (page != null || size != null) {
+            int pageNum = Math.max(0, page ?: 0)
+            int pageSize = Math.min(100, Math.max(1, size ?: 20))
+            int offset = pageNum * pageSize
+            long total = CustomerOrder.count()
+            List slice = CustomerOrder.list(
+                    sort: 'dateCreated', order: 'desc', max: pageSize, offset: offset,
+            )
+            response.setHeader('X-Total-Count', total.toString())
+            response.setHeader('X-Page', pageNum.toString())
+            response.setHeader('X-Page-Size', pageSize.toString())
+            render(slice.collect { it.toApiMap() } as JSON)
+            return
+        }
         render(orderService.allOrders().collect { it.toApiMap() } as JSON)
     }
 

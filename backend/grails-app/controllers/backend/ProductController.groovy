@@ -18,6 +18,27 @@ class ProductController {
     AuthService authService
 
     def list() {
+        // Pagination optionnelle — si ?page/?size absents, on renvoie la
+        // liste complète (compat front existant). Sinon on pagine et on
+        // expose le total via le header X-Total-Count.
+        Integer page = params.int('page')
+        Integer size = params.int('size')
+
+        if (page != null || size != null) {
+            int pageNum = Math.max(0, page ?: 0)
+            int pageSize = Math.min(100, Math.max(1, size ?: 20))
+            int offset = pageNum * pageSize
+            long total = Product.count()
+            List<Product> slice = Product.list(
+                    sort: 'name', order: 'asc', max: pageSize, offset: offset,
+            )
+            response.setHeader('X-Total-Count', total.toString())
+            response.setHeader('X-Page', pageNum.toString())
+            response.setHeader('X-Page-Size', pageSize.toString())
+            render(slice.collect { it.toApiMap() } as JSON)
+            return
+        }
+
         List<Product> all = Product.list(sort: 'name')
         render(all.collect { it.toApiMap() } as JSON)
     }
