@@ -88,7 +88,6 @@ export function ProductPage() {
   const { categories, species: speciesList } = useReferenceData();
   const { push } = useToast();
   const { add } = useCart();
-  const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState('specs');
   const [qty, setQty] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({});
@@ -181,19 +180,6 @@ export function ProductPage() {
           <div className="pd-gallery">
             <div className="pd-main-img">
               <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
-            </div>
-            <div className="pd-thumbs">
-              {[0, 1, 2, 3].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={`pd-thumb ${i === thumb ? 'active' : ''}`}
-                  onClick={() => setThumb(i)}
-                  aria-label={`Vue ${i + 1}`}
-                >
-                  <Placeholder label={`vue ${i + 1}`} />
-                </button>
-              ))}
             </div>
           </div>
 
