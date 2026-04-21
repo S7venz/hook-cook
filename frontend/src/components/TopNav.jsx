@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/boutique', label: 'Boutique' },
   { to: '/permis', label: 'Permis' },
   { to: '/concours', label: 'Concours' },
+  { to: '/challenges', label: 'Challenges' },
 ];
 
 export function TopNav() {

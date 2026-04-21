@@ -50,6 +50,7 @@ export default function App() {
                 <Route path="/inscription" element={<RegisterPage />} />
                 <Route path="/permis" element={<PermisPage />} />
                 <Route path="/concours" element={<ConcoursPage />} />
+                <Route path="/challenges" element={<LeaderboardPage />} />
                 <Route path="/compte" element={<AccountPage />} />
                 <Route path="/admin" element={<AdminPage />} />
               </Routes>

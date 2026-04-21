@@ -76,6 +76,9 @@ class UrlMappings {
         get "/api/admin/exports/permits.csv"(controller: 'export', action: 'permits')
         get "/api/admin/exports/contest-registrations.csv"(controller: 'export', action: 'contestRegistrations')
 
+        get "/api/leaderboard/monthly"(controller: 'leaderboard', action: 'monthly')
+        get "/api/leaderboard/summary"(controller: 'leaderboard', action: 'summary')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")
