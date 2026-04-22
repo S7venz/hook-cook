@@ -38,7 +38,7 @@ class PasswordResetServiceSpec extends Specification
         then:
         r.ok == true
         // Pas d'email envoyé puisque le compte n'existe pas
-        0 * service.mailService.send(_, _, _)
+        0 * service.mailService.passwordReset(_, _)
     }
 
     void "requestReset crée un token et envoie un mail si l'email existe"() {
@@ -57,10 +57,9 @@ class PasswordResetServiceSpec extends Specification
         tok.token.length() >= 32 // UUID full length
 
         and: 'un email a été envoyé contenant le lien vers la page de reset'
-        1 * service.mailService.send(
-                'alice@test.fr',
-                { String subject -> subject?.contains('mot de passe') || subject?.contains('Réinitialisation') },
-                { String body -> body?.contains('http://localhost:5173/reset-password/') }
+        1 * service.mailService.passwordReset(
+                { User user -> user?.email == 'alice@test.fr' },
+                { String url -> url?.startsWith('http://localhost:5173/reset-password/') }
         )
     }
 
@@ -73,7 +72,7 @@ class PasswordResetServiceSpec extends Specification
 
         then:
         r.ok == true
-        1 * service.mailService.send('alice@test.fr', _, _)
+        1 * service.mailService.passwordReset({ User user -> user?.email == 'alice@test.fr' }, _)
     }
 
     void "requestReset invalide les tokens précédents du user"() {
@@ -103,7 +102,7 @@ class PasswordResetServiceSpec extends Specification
         (1..5).each { service.requestReset('alice@test.fr', 'http://localhost:5173') }
 
         then: 'seuls 3 emails sont envoyes (limite respectee)'
-        3 * service.mailService.send(_, _, _)
+        3 * service.mailService.passwordReset(_, _)
     }
 
     // ────────── confirmReset ─────────────────────────────────────

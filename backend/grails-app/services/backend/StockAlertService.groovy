@@ -56,18 +56,6 @@ class StockAlertService {
     }
 
     private void sendReplenishEmail(StockAlert alert, Product product) {
-        if (!alert.user?.email) return
-        String body = """Bonjour ${alert.user.firstName ?: ''},
-
-Bonne nouvelle : "${product.name}" est de retour en stock chez Hook & Cook !
-
-Prix : ${product.price} €
-Stock disponible : ${product.stock} unités
-
-Retrouvez-le ici : http://localhost:5173/boutique/${product.id}
-
-— L'équipe Hook & Cook
-"""
-        mailService?.send(alert.user.email, "Retour en stock : ${product.name}", body)
+        mailService?.stockReplenish(alert.user, product)
     }
 }

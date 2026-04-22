@@ -95,19 +95,6 @@ class PasswordResetService {
 
     private void sendResetEmail(User user, String token, String baseUrl) {
         String url = "${baseUrl}/reset-password/${token}"
-        String body = """Bonjour ${user.firstName ?: ''},
-
-Vous avez demandé à réinitialiser votre mot de passe Hook & Cook.
-
-Ouvrez ce lien dans votre navigateur pour choisir un nouveau mot de passe :
-${url}
-
-Ce lien est valable 1 heure. Si vous n'êtes pas à l'origine de cette
-demande, ignorez simplement cet email — votre mot de passe actuel
-reste inchangé.
-
-— L'équipe Hook & Cook
-"""
-        mailService?.send(user.email, 'Réinitialisation de votre mot de passe', body)
+        mailService?.passwordReset(user, url)
     }
 }

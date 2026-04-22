@@ -95,7 +95,7 @@ class StockAlertServiceSpec extends Specification implements ServiceUnitTest<Sto
         service.notifyReplenish('waited')
 
         then:
-        2 * service.mailService.send(_, _, _)
+        2 * service.mailService.stockReplenish(_, _)
         StockAlert.findAllByProductId('waited').every { it.notified }
         StockAlert.findAllByProductId('waited').every { it.notifiedAt != null }
     }
@@ -110,7 +110,7 @@ class StockAlertServiceSpec extends Specification implements ServiceUnitTest<Sto
         service.notifyReplenish('still-empty')
 
         then:
-        0 * service.mailService.send(_, _, _)
+        0 * service.mailService.stockReplenish(_, _)
         StockAlert.findByProductId('still-empty').notified == false
     }
 }
