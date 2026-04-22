@@ -11,6 +11,19 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- Préconnexion à l'API backend pour shave quelques dizaines de ms
+         sur la première requête (DNS + TCP + TLS handshakes anticipés). -->
+    <link rel="preconnect" href="http://localhost:8080" crossorigin />
+    <!-- Préchargement de l'image LCP de la home pour que le navigateur
+         commence à la fetcher avant même de parser le JS. Ressource
+         principale qui détermine le LCP. -->
+    <link
+      rel="preload"
+      as="image"
+      href="http://localhost:8080/api/uploads/hero-home.webp"
+      fetchpriority="high"
+      type="image/webp"
+    />
     <title>Hook &amp; Cook — Boutique, permis et concours de pêche</title>
   </head>
   <body>
