@@ -23,6 +23,7 @@ API REST du backend Grails, consommée par le frontend React et par le tableau d
 - [Exports CSV admin](#14-exports-csv-admin)
 - [RGPD (export et suppression)](#15-rgpd)
 - [Password reset](#16-password-reset)
+- [Paiements Stripe](#17-paiements-stripe)
 - [Modèle de données](#modèle-de-données)
 - [Codes de statut HTTP](#codes-de-statut-http)
 
@@ -462,9 +463,12 @@ GET /api/orders/me
 POST /api/orders
 ```
 
-**Authentifié.** Crée une commande à partir du panier côté client. Envoie l'email de confirmation (`MailService.orderConfirmation`).
+**Authentifié.** Crée une commande à partir du panier côté client. Vérifie le stock côté serveur, recalcule le total à partir du prix BDD (jamais confiance au montant client) et :
 
-**Requête :**
+- **Mode Stripe** (`STRIPE_SECRET_KEY` défini) : crée un PaymentIntent Stripe, statut initial `pending`. Le passage à `paid` + décrémentation stock + email de confirmation se font dans le webhook `payment_intent.succeeded` (cf. §17).
+- **Mode mock** (CI / démo sans clé) : statut directement `paid`, stock décrémenté, email envoyé.
+
+**Requête :** seuls `id` et `qty` du produit sont nécessaires (le backend hydrate le reste depuis la BDD).
 ```json
 {
   "email": "alice@example.com",
@@ -472,28 +476,37 @@ POST /api/orders
   "shippingMode": "Standard Colissimo",
   "shipping": 5.9,
   "items": [
-    {
-      "qty": 1,
-      "product": {
-        "id": "hc-sauvage-9-5",
-        "name": "Canne...",
-        "sku": "HC-C-095-6#4",
-        "brand": "Hook & Cook",
-        "imageUrl": "...",
-        "price": 489.0
-      }
-    }
+    { "qty": 1, "product": { "id": "hc-sauvage-9-5" } }
   ]
 }
 ```
 
-**Réponse `201` :** commande créée.
+**Réponse `201` (mode Stripe) :**
+```json
+{
+  "order": {
+    "id": "HC-2186-4829",
+    "status": "pending",
+    "statusLabel": "En attente de paiement",
+    "stripePaymentIntentId": "pi_3OXxXxxxxxxxxxxx",
+    "total": 494.9,
+    "items": [/* … */]
+  },
+  "clientSecret": "pi_3OXxXxxxxxxxxxxx_secret_xxxxxxxx",
+  "publishableKey": "pk_test_xxxxxxxxxxxx"
+}
+```
 
-> ℹ️ Le paiement est pour l'instant **simulé** — la commande passe directement au statut `paid`.  
-> Pour brancher une vraie passerelle (Stripe / PayPal), intercaler un webhook qui valide le paiement avant de basculer le statut.
+**Réponse `201` (mode mock) :**
+```json
+{
+  "order": { "id": "HC-2186-4829", "status": "paid", /* … */ },
+  "mockPayment": true
+}
+```
 
 **Erreurs :**
-- `400` — panier vide ou données invalides
+- `400` — panier vide, produit introuvable, stock insuffisant, ou échec d'init Stripe
 
 ### 4.3 — Détail d'une commande
 
@@ -529,6 +542,8 @@ PATCH /api/orders/{reference}
 ```
 
 **Valeurs autorisées :** `paid`, `shipped`, `delivered`, `cancelled`.
+
+> ⚠️ Les statuts `pending` et `payment_failed` sont gérés exclusivement par le webhook Stripe — refusés ici.
 
 ---
 
@@ -1108,6 +1123,60 @@ POST /api/auth/password-reset/confirm
 ```
 
 Le hash BCrypt du user est mis à jour, le token est marqué `used=true` avec `usedAt` timestamp.
+
+---
+
+## 17. Paiements Stripe
+
+### 17.1 — Webhook Stripe
+
+```
+POST /api/payments/webhook
+```
+
+**Public** (pas de JWT). La sécurité repose sur la **vérification HMAC** de l'header `Stripe-Signature` via le secret `STRIPE_WEBHOOK_SECRET`.
+
+Events traités :
+
+| Event | Action |
+|---|---|
+| `payment_intent.succeeded` | Marque la commande `paid`, décrémente le stock, envoie l'email de confirmation. Idempotent (rejouable sans effet de bord). |
+| `payment_intent.payment_failed` | Marque la commande `payment_failed`, ne touche pas au stock. |
+| autres | Ignoré (réponse `200` pour confirmer la réception à Stripe). |
+
+**Réponse `200` :**
+```json
+{ "received": true }
+```
+
+**Erreurs :**
+- `400` — signature manquante ou invalide
+- `503` — `STRIPE_WEBHOOK_SECRET` non configuré (refus de traiter)
+
+### 17.2 — Mode test local
+
+Pour relayer les webhooks de Stripe vers `localhost:8080` :
+
+```bash
+stripe listen --forward-to localhost:8080/api/payments/webhook
+```
+
+La CLI affiche le `whsec_...` à mettre dans `.env` sous `STRIPE_WEBHOOK_SECRET`.
+
+**Cartes de test** (date future quelconque, CVC 3 chiffres) :
+- `4242 4242 4242 4242` — succès
+- `4000 0000 0000 9995` — refus (fonds insuffisants)
+- `4000 0027 6000 3184` — déclenche 3D Secure
+
+### 17.3 — Variables d'environnement
+
+| Var | Description | Obligatoire |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | `sk_test_...` ou `sk_live_...` | Pour activer Stripe (sinon : mode mock) |
+| `STRIPE_PUBLIC_KEY` | `pk_test_...` ou `pk_live_...` | Renvoyée au front à la création de commande |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Pour valider les webhooks |
+| `STRIPE_CURRENCY` | code ISO (défaut: `eur`) | Non |
+| `VITE_STRIPE_PUBLIC_KEY` | clé publique exposée au navigateur | Build front |
 
 ---
 
