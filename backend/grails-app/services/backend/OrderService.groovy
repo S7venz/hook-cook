@@ -27,6 +27,30 @@ class OrderService {
         List cartItems = (payload.items ?: []) as List
         if (!cartItems) return [error: 'Le panier est vide.']
 
+        // Agrège les quantités par produit (un même id peut apparaître
+        // plusieurs fois si le panier contient des variantes), puis vérifie
+        // le stock avant toute écriture pour garantir l'atomicité métier.
+        Map<String, Integer> qtyByProduct = [:]
+        cartItems.each { entry ->
+            Map itemData = entry as Map
+            Map productData = (itemData.product ?: [:]) as Map
+            String pid = productData.id as String
+            Integer qty = (itemData.qty ?: 1) as Integer
+            if (pid) qtyByProduct[pid] = (qtyByProduct[pid] ?: 0) + qty
+        }
+
+        Map<String, Product> productsById = [:]
+        for (Map.Entry<String, Integer> e : qtyByProduct.entrySet()) {
+            Product p = Product.get(e.key)
+            if (!p) {
+                return [error: "Produit introuvable : ${e.key}".toString()]
+            }
+            if ((p.stock ?: 0) < e.value) {
+                return [error: "Stock insuffisant pour « ${p.name} » (disponible : ${p.stock ?: 0}, demandé : ${e.value}).".toString()]
+            }
+            productsById[e.key] = p
+        }
+
         CustomerOrder order = new CustomerOrder(
                 reference   : generateReference(),
                 user        : user,
@@ -66,6 +90,13 @@ class OrderService {
         if (!order.save(flush: true)) {
             return [error: 'Impossible de créer la commande.']
         }
+
+        qtyByProduct.each { pid, qty ->
+            Product p = productsById[pid]
+            p.stock = (p.stock ?: 0) - qty
+            p.save(flush: true)
+        }
+
         mailService?.orderConfirmation(order)
         [order: order]
     }
