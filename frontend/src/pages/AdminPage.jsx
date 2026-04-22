@@ -57,8 +57,9 @@ function CountUpNumber({ value, decimals = 0 }) {
 function CountUpPrice({ value }) {
   const n = Number(value ?? 0);
   const animated = useCountUp(Number.isFinite(n) ? n : 0, 900, 2);
-  // animated est une string à deux décimales avec "." → convertit en format FR.
-  const [intPart, decPart] = animated.split('.');
+  // useCountUp retourne un Number — on le re-formate à 2 décimales avant de splitter.
+  const fixed = (Number(animated) || 0).toFixed(2);
+  const [intPart, decPart] = fixed.split('.');
   const withSpaces = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   return (
     <>

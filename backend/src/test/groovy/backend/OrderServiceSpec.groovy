@@ -194,7 +194,7 @@ class OrderServiceSpec extends Specification implements ServiceUnitTest<OrderSer
         result.clientSecret == 'pi_test_123_secret_abc'
         result.publishableKey == 'pk_test_xxx'
         result.order.status == 'pending'
-        result.order.statusLabel == 'En attente de paiement'
+        result.order.statusLabel == 'En attente'
         result.order.stripePaymentIntentId == 'pi_test_123'
         // CRITIQUE : le stock n'est PAS décrémenté tant que le webhook n'a pas confirmé
         Product.get('hc-x').stock == 10

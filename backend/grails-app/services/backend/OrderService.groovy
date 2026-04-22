@@ -9,9 +9,9 @@ class OrderService {
     StripeService stripeService
 
     static final Map<String, String> STATUS_LABELS = [
-            pending       : 'En attente de paiement',
+            pending       : 'En attente',
             paid          : 'Payée',
-            payment_failed: 'Paiement échoué',
+            payment_failed: 'Paiement refusé',
             shipped       : 'Expédiée',
             delivered     : 'Livrée',
             cancelled     : 'Annulée',

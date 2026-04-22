@@ -329,14 +329,16 @@ img, svg { display: block; max-width: 100%; }
 /* BADGE — statut permis, stock, etc. */
 .badge {
   display: inline-flex; align-items: center; gap: var(--sp-2);
-  height: 22px; padding: 0 var(--sp-2);
+  min-height: 22px; padding: 3px var(--sp-2);
   font-size: var(--fs-12);
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
+  line-height: 1.2;
   text-transform: uppercase;
   border-radius: var(--r-sm);
   background: var(--bg-sunk); color: var(--ink-soft);
   border: 1px solid var(--hairline);
+  white-space: nowrap;
 }
 .badge-dot::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%;
