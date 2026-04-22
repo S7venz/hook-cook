@@ -20,13 +20,16 @@ class StatsService {
         List<Product> allProducts = Product.list()
         List<User> allUsers = User.list()
 
-        // KPIs agrégés
-        BigDecimal revenue = allOrders.sum { it.total ?: BigDecimal.ZERO } ?: BigDecimal.ZERO
+        // KPIs agrégés — on exclut pending/payment_failed du chiffre d'affaires
+        // (commandes en cours de paiement, le PaymentIntent peut encore échouer)
         List<CustomerOrder> paidPlus = allOrders.findAll {
             it.status in ['paid', 'shipped', 'delivered']
         }
+        BigDecimal revenue = paidPlus.sum { it.total ?: BigDecimal.ZERO } ?: BigDecimal.ZERO
         BigDecimal avgBasket = paidPlus.isEmpty() ? BigDecimal.ZERO :
                 (revenue / paidPlus.size()).setScale(2, BigDecimal.ROUND_HALF_UP)
+        Integer pendingCount = allOrders.count { it.status == 'pending' } as Integer
+        Integer paymentFailedCount = allOrders.count { it.status == 'payment_failed' } as Integer
 
         // Taux de conversion : commandes / users (brut — on n'a pas
         // d'analytics de visites pour l'instant). Proxy utile quand
@@ -80,6 +83,8 @@ class StatsService {
                 totalRegistrations : allRegistrations.size(),
                 totalUsers         : allUsers.size(),
                 totalBuyers        : buyerIds.size(),
+                pendingOrders      : pendingCount,
+                paymentFailedOrders: paymentFailedCount,
                 // Nouveaux KPIs enrichis
                 avgBasket          : avgBasket,
                 conversionRate     : conversionRate,

@@ -61,28 +61,31 @@ class StatsServiceSpec extends Specification implements ServiceUnitTest<StatsSer
         stats.neverSold == []
         stats.categoryRevenue == []
         stats.revenueByMonth.size() == 6 // toujours 6 buckets
+        stats.pendingOrders == 0
+        stats.paymentFailedOrders == 0
     }
 
-    void "avgBasket = CA total / nombre de commandes payées+"() {
+    void "totalRevenue exclut cancelled, pending et payment_failed (encaissement réel)"() {
         given:
         User u = buildUser('u@x.fr')
         buildOrder(u, 100, 'paid')
         buildOrder(u, 200, 'delivered')
         buildOrder(u, 300, 'shipped')
-        buildOrder(u, 999, 'cancelled') // exclu du calcul
+        buildOrder(u, 999, 'cancelled')      // exclu
+        buildOrder(u, 50, 'pending')         // exclu (paiement Stripe en cours)
+        buildOrder(u, 75, 'payment_failed')  // exclu (paiement refusé)
 
         when:
         Map stats = service.buildStats()
 
         then:
-        stats.totalRevenue == 1599.0g
-        // avgBasket = (100+200+300+999) / 4 = 399.75 — mais attention,
-        // on exclut les cancelled du denominateur aussi. Verifions que
-        // la logique est coherente avec le service :
-        // revenue = sum TOUTES les commandes = 1599
-        // paidPlus = [paid, shipped, delivered] = 3 commandes
-        // avgBasket = 1599 / 3 = 533
-        stats.avgBasket == 533.00g
+        // Seules les commandes paid|shipped|delivered comptent
+        stats.totalRevenue == 600.0g
+        // avgBasket = 600 / 3 = 200
+        stats.avgBasket == 200.00g
+        stats.totalOrders == 6
+        stats.pendingOrders == 1
+        stats.paymentFailedOrders == 1
     }
 
     void "conversionRate = % d'utilisateurs ayant acheté au moins 1 fois"() {
