@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
+import { PondJump } from '../components/ui/PondJump.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
@@ -374,6 +375,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      <PondJump />
 
       <section className="saison-strip">
         <div className="saison-inner">

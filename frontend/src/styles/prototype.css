@@ -2021,3 +2021,138 @@ html { scroll-behavior: smooth; }
   .hc-sicon *,
   .hc-sicon { animation: none !important; }
 }
+
+/* ── 20. Pond jump — scène décorative hero → saison-strip ─────── */
+/*
+ * Petit poisson qui saute d'une flaque et y retombe avec splash.
+ * Positionné entre les deux sections via margin-top négatif,
+ * overflow: visible pour que le saut dépasse du conteneur.
+ */
+.hc-pond-break {
+  position: relative;
+  height: 70px;
+  margin-top: -50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+.hc-pond {
+  width: 240px;
+  height: 100px;
+  overflow: visible;
+  color: var(--accent);
+}
+@media (max-width: 640px) {
+  .hc-pond-break { display: none; }
+}
+
+/* Flaque : couleur accent diluée pour suggérer l'eau */
+.pond-base {
+  fill: color-mix(in oklch, var(--accent) 24%, transparent);
+}
+.pond-ripple {
+  fill: none;
+  stroke: color-mix(in oklch, var(--accent) 40%, transparent);
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.pond-ripple-1 { animation: hc-pond-ripple 4.2s ease-in-out infinite; }
+.pond-ripple-2 { animation: hc-pond-ripple 4.2s ease-in-out infinite 1.4s; }
+.pond-shine {
+  fill: none;
+  stroke: color-mix(in oklch, var(--bg) 70%, white);
+  stroke-width: 0.8;
+  opacity: 0.55;
+}
+
+/* Gouttelettes de splash — synchronisées avec l'atterrissage du poisson
+ * qui arrive à t=73% du cycle (cycle total 5 s). */
+.splash {
+  fill: color-mix(in oklch, var(--accent) 55%, transparent);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.splash-l { animation: hc-splash-l 5s ease-out infinite; }
+.splash-c { animation: hc-splash-c 5s ease-out infinite; }
+.splash-r { animation: hc-splash-r 5s ease-out infinite; }
+.splash-t { animation: hc-splash-c 5s ease-out infinite 0.08s; }
+
+/* Poisson : arc parabolique fluide via offset-path + offset-rotate auto.
+ * Le navigateur interpole la position en continu le long de la courbe
+ * de Bézier quadratique (bien plus lisse que 12 keyframes manuels).
+ * offset-rotate auto aligne automatiquement le poisson sur la tangente
+ * du chemin — nez en l'air au départ, horizontal à l'apex, nez en bas
+ * à la rentrée dans l'eau. */
+.fish-leap {
+  offset-path: path('M 0 0 Q 7 -150 14 0');
+  offset-rotate: auto;
+  offset-distance: 0%;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    hc-fish-arc 5s cubic-bezier(0.42, 0, 0.58, 1) infinite,
+    hc-fish-life 5s ease-in-out infinite;
+  will-change: offset-distance, opacity, transform;
+}
+
+@keyframes hc-pond-ripple {
+  0%, 100% { transform: scale(1); opacity: 0.65; }
+  50%      { transform: scale(1.06); opacity: 0.25; }
+}
+
+/* Arc : offset-distance animé en cubic-bezier pour une courbe type
+ * "gravité" — accélère en montant, ralentit à l'apex, ré-accélère
+ * en redescendant. 12% → 72% = 60% de la timeline = 3 s de vol. */
+@keyframes hc-fish-arc {
+  0%, 12% { offset-distance: 0%; }
+  72%     { offset-distance: 100%; }
+  100%    { offset-distance: 100%; }
+}
+
+/* Opacité + scale indépendants : apparition nette à l'émergence,
+ * disparition nette à la ré-immersion. */
+@keyframes hc-fish-life {
+  0%, 12%   { opacity: 0; transform: scale(0.55); }
+  14%       { opacity: 0.95; transform: scale(0.92); }
+  18%       { opacity: 1; transform: scale(1); }
+  70%       { opacity: 1; transform: scale(1); }
+  72%       { opacity: 1; transform: scale(0.92); }
+  74%       { opacity: 0.3; transform: scale(0.55); }
+  76%, 100% { opacity: 0; transform: scale(0.55); }
+}
+
+/* Splashes : apparaissent au moment où le poisson atterrit (≈75%).
+ * Chaque goutte part dans une direction différente. */
+@keyframes hc-splash-c {
+  0%, 73% { opacity: 0; transform: translate(0, 0); }
+  75%     { opacity: 1; transform: translate(0, -1px); }
+  82%     { opacity: 0.7; transform: translate(0, -8px); }
+  88%, 100% { opacity: 0; transform: translate(0, -11px); }
+}
+@keyframes hc-splash-l {
+  0%, 73% { opacity: 0; transform: translate(0, 0); }
+  75%     { opacity: 1; transform: translate(0, 0); }
+  82%     { opacity: 0.6; transform: translate(-5px, -6px); }
+  88%, 100% { opacity: 0; transform: translate(-7px, -8px); }
+}
+@keyframes hc-splash-r {
+  0%, 73% { opacity: 0; transform: translate(0, 0); }
+  75%     { opacity: 1; transform: translate(0, 0); }
+  82%     { opacity: 0.6; transform: translate(5px, -6px); }
+  88%, 100% { opacity: 0; transform: translate(7px, -8px); }
+}
+
+/* Si l'utilisateur préfère peu d'animations : on fige la scène,
+ * on cache le poisson, on garde juste la flaque + une ride */
+@media (prefers-reduced-motion: reduce) {
+  .fish-leap,
+  .splash,
+  .pond-ripple-1,
+  .pond-ripple-2 { animation: none !important; }
+  .fish-leap { opacity: 0 !important; }
+}
