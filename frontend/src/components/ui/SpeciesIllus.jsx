@@ -32,6 +32,9 @@ export function SpeciesIllus({ species, imageUrl, alt }) {
           src={imageUrl}
           alt={alt ?? species}
           loading="lazy"
+          decoding="async"
+          width={400}
+          height={300}
           onError={() => setErrored(true)}
           style={{
             maxWidth: '100%',

@@ -395,10 +395,10 @@ Elle est taillée pour la truite farios en eau vive — ce que Jean-Marc appelle
 --
 
 INSERT INTO public.species VALUES ('truite', 0, '3,4,5,6,7,8,9', 'Truite', 'http://localhost:8080/api/uploads/species-truite.webp', 'Salmo trutta', 'rivière');
-INSERT INTO public.species VALUES ('brochet', 0, '5,6,7,8,9,10,11,12,1', 'Brochet', 'http://localhost:8080/api/uploads/species-brochet.jpg', 'Esox lucius', 'lac/rivière');
+INSERT INTO public.species VALUES ('brochet', 0, '5,6,7,8,9,10,11,12,1', 'Brochet', 'http://localhost:8080/api/uploads/species-brochet.webp', 'Esox lucius', 'lac/rivière');
 INSERT INTO public.species VALUES ('sandre', 0, '5,6,7,8,9,10,11,12,1', 'Sandre', 'http://localhost:8080/api/uploads/species-sandre.jpg', 'Sander lucioperca', 'lac/rivière');
-INSERT INTO public.species VALUES ('carpe', 0, '4,5,6,7,8,9,10,11', 'Carpe', 'http://localhost:8080/api/uploads/species-carpe.jpg', 'Cyprinus carpio', 'étang/lac');
-INSERT INTO public.species VALUES ('bar', 0, '3,4,5,6,7,8,9,10,11', 'Bar', 'http://localhost:8080/api/uploads/species-bar.png', 'Dicentrarchus labrax', 'mer');
+INSERT INTO public.species VALUES ('carpe', 0, '4,5,6,7,8,9,10,11', 'Carpe', 'http://localhost:8080/api/uploads/species-carpe.webp', 'Cyprinus carpio', 'étang/lac');
+INSERT INTO public.species VALUES ('bar', 0, '3,4,5,6,7,8,9,10,11', 'Bar', 'http://localhost:8080/api/uploads/species-bar.webp', 'Dicentrarchus labrax', 'mer');
 INSERT INTO public.species VALUES ('perche', 0, '3,4,5,6,7,8,9,10,11', 'Perche', 'http://localhost:8080/api/uploads/species-perche.png', 'Perca fluviatilis', 'lac/rivière');
 INSERT INTO public.species VALUES ('silure', 0, '5,6,7,8,9,10', 'Silure', 'http://localhost:8080/api/uploads/species-silure.jpg', 'Silurus glanis', 'rivière');
 INSERT INTO public.species VALUES ('ombre', 0, '5,6,7,8,9,10,11,12', 'Ombre', 'http://localhost:8080/api/uploads/species-ombre.jpg', 'Thymallus thymallus', 'rivière');

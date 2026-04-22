@@ -64,7 +64,13 @@ export function ProductCard({ product }) {
       onKeyDown={handleKey}
     >
       <div className="card-media">
-        <Placeholder label={product.img} src={product.imageUrl} alt={product.name} />
+        <Placeholder
+          label={product.img}
+          src={product.imageUrl}
+          alt={product.name}
+          width={400}
+          height={400}
+        />
         <button
           type="button"
           className={`card-favorite ${favorited ? 'active' : ''}`.trim()}

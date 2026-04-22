@@ -373,9 +373,13 @@ export function HomePage() {
             </div>
             <div className="hero-illus">
               <Placeholder
-                src="http://localhost:8080/api/uploads/hero-home.png"
+                src="http://localhost:8080/api/uploads/hero-home.webp"
                 label="Matin sur la Têt — brume, pêcheur au loin"
                 alt="Pêcheur à la mouche au lever du jour sur une rivière embrumée"
+                width={1200}
+                height={900}
+                fetchpriority="high"
+                loading="eager"
               />
             </div>
           </div>
