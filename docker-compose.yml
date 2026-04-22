@@ -40,7 +40,12 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - uploads:/app/uploads
+      # Bind mount : les images dans backend/uploads du repo sont
+      # directement servies par le container. Plus besoin de rebuild
+      # quand on ajoute de nouveaux fichiers (ex: .webp optimisés via
+      # frontend/scripts/optimize-uploads.mjs). Permissions : le user
+      # "app" (uid 10001) doit pouvoir lire/écrire le dossier host.
+      - ./backend/uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -57,4 +62,3 @@ services:
 
 volumes:
   pgdata:
-  uploads:
