@@ -38,9 +38,17 @@ export function OrdersProvider({ children }) {
 
   const createOrder = useCallback(
     async (payload) => {
-      const order = await api.post('/api/orders', payload, { token });
+      // Le backend renvoie soit { order, mockPayment: true } (pas de clé Stripe),
+      // soit { order, clientSecret, publishableKey } (mode Stripe).
+      const response = await api.post('/api/orders', payload, { token });
+      const order = response.order ?? response;
       setOrders((current) => [order, ...current]);
-      return order;
+      return {
+        order,
+        clientSecret: response.clientSecret ?? null,
+        publishableKey: response.publishableKey ?? null,
+        mockPayment: Boolean(response.mockPayment),
+      };
     },
     [token],
   );

@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { Button } from '../components/ui/Button.jsx';
 import { cartTotals, useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
@@ -7,10 +9,7 @@ import { useOrders } from '../lib/orders.js';
 import {
   firstError,
   validateAddress,
-  validateCardExpiry,
-  validateCardNumber,
   validateCity,
-  validateCvc,
   validateEmail,
   validateName,
   validatePhone,
@@ -57,6 +56,73 @@ function Stepper({ step }) {
   );
 }
 
+// Cache la promesse de loadStripe par clé publique pour éviter
+// de recharger le script Stripe.js à chaque re-render.
+const stripePromiseCache = new Map();
+function getStripePromise(publishableKey) {
+  if (!publishableKey) return null;
+  if (!stripePromiseCache.has(publishableKey)) {
+    stripePromiseCache.set(publishableKey, loadStripe(publishableKey));
+  }
+  return stripePromiseCache.get(publishableKey);
+}
+
+function StripePaymentForm({ orderRef, total, onSuccess, onError, processing, setProcessing }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [stripeError, setStripeError] = useState('');
+
+  const handlePay = async () => {
+    if (!stripe || !elements) return;
+    setStripeError('');
+    setProcessing(true);
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        // 3DS et Apple/Google Pay redirigent ici. En cas de succès sans 3DS,
+        // confirmPayment retourne directement avec paymentIntent.status = 'succeeded'.
+        return_url: `${window.location.origin}/confirmation/${orderRef}`,
+      },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      setStripeError(error.message || 'Paiement refusé.');
+      setProcessing(false);
+      onError?.(error);
+      return;
+    }
+    if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+      onSuccess?.(paymentIntent);
+    } else {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="stack-md">
+      <div className="card" style={{ padding: 'var(--sp-5)' }}>
+        <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
+          Carte bancaire · Stripe (mode test)
+        </div>
+        <PaymentElement options={{ layout: 'tabs' }} />
+      </div>
+      {stripeError && <div className="error">{stripeError}</div>}
+      <Button
+        variant="accent"
+        size="lg"
+        onClick={handlePay}
+        disabled={processing || !stripe || !elements}
+      >
+        {processing ? 'Traitement…' : `Payer ${formatPrice(total)}`}
+      </Button>
+      <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
+        Carte de test : 4242 4242 4242 4242 — date future quelconque, CVC 3 chiffres.
+      </div>
+    </div>
+  );
+}
+
 export function CheckoutPage() {
   const navigate = useNavigate();
   const { items, clear } = useCart();
@@ -74,18 +140,29 @@ export function CheckoutPage() {
   const [city, setCity] = useState('');
   const [shippingId, setShippingId] = useState('standard');
 
-  const [card, setCard] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvc, setCvc] = useState('');
-
   const [error, setError] = useState('');
+
+  // État du paiement (créé à l'entrée step 3)
+  const [paymentSetup, setPaymentSetup] = useState(null);
+  // { orderRef, clientSecret, publishableKey, mockPayment, total }
+  const [preparing, setPreparing] = useState(false);
 
   const { subtotal } = cartTotals(items);
   const shippingMode = SHIPPING_MODES.find((m) => m.id === shippingId);
   const shippingPrice = shippingMode ? shippingMode.getPrice(subtotal) : 0;
   const total = subtotal + shippingPrice;
 
-  if (items.length === 0) {
+  const stripePromise = useMemo(
+    () => getStripePromise(paymentSetup?.publishableKey),
+    [paymentSetup?.publishableKey],
+  );
+
+  // Si le panier devient vide après création d'ordre (ex: paiement OK), on évite l'effet "panier vide"
+  useEffect(() => {
+    if (paymentSetup && items.length === 0) return;
+  }, [paymentSetup, items.length]);
+
+  if (items.length === 0 && !paymentSetup) {
     return (
       <div className="page">
         <div
@@ -129,13 +206,6 @@ export function CheckoutPage() {
         validateCity(city),
       );
     }
-    if (n === 3) {
-      return firstError(
-        validateCardNumber(card),
-        validateCardExpiry(expiry),
-        validateCvc(cvc),
-      );
-    }
     return null;
   };
 
@@ -149,25 +219,19 @@ export function CheckoutPage() {
     setStep(next);
   };
 
-  const pay = async () => {
-    const err = validateStep(3);
+  // Création de la commande + récupération clientSecret (au passage step 2 → 3)
+  const startPayment = async () => {
+    const err = validateStep(2);
     if (err) {
       setError(err);
       return;
     }
     setError('');
-    setProcessing(true);
+    setPreparing(true);
     try {
-      const order = await createOrder({
+      const result = await createOrder({
         items: items.map((it) => ({
-          product: {
-            id: it.product.id,
-            name: it.product.name,
-            sku: it.product.sku,
-            brand: it.product.brand,
-            imageUrl: it.product.imageUrl ?? null,
-            price: it.product.price,
-          },
+          product: { id: it.product.id },
           qty: it.qty,
         })),
         email,
@@ -177,12 +241,35 @@ export function CheckoutPage() {
         city,
         shippingMode: shippingMode.title,
       });
-      clear();
-      navigate(`/confirmation/${order.id}`);
+
+      if (result.mockPayment) {
+        // Pas de Stripe configuré côté backend : ordre déjà payée, on saute le step 3
+        clear();
+        navigate(`/confirmation/${result.order.id}`);
+        return;
+      }
+
+      if (!result.clientSecret) {
+        throw new Error('Configuration de paiement introuvable.');
+      }
+
+      setPaymentSetup({
+        orderRef: result.order.id,
+        clientSecret: result.clientSecret,
+        publishableKey: result.publishableKey || import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+        total: result.order.total,
+      });
+      setStep(3);
     } catch (err2) {
-      setProcessing(false);
-      setError(err2?.message ?? 'Erreur lors de la validation du paiement.');
+      setError(err2?.message ?? 'Impossible d\'initialiser le paiement.');
+    } finally {
+      setPreparing(false);
     }
+  };
+
+  const onPaymentSuccess = () => {
+    clear();
+    navigate(`/confirmation/${paymentSetup.orderRef}`);
   };
 
   return (
@@ -354,14 +441,19 @@ export function CheckoutPage() {
                   <Button variant="ghost" onClick={() => setStep(1)}>
                     ← Retour
                   </Button>
-                  <Button variant="primary" size="lg" onClick={() => goNext(3)}>
-                    Continuer vers le paiement →
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={startPayment}
+                    disabled={preparing}
+                  >
+                    {preparing ? 'Préparation…' : 'Continuer vers le paiement →'}
                   </Button>
                 </div>
               </div>
             )}
 
-            {step === 3 && (
+            {step === 3 && paymentSetup && (
               <div className="stack-md">
                 <h2
                   className="disp"
@@ -374,92 +466,29 @@ export function CheckoutPage() {
                 >
                   Paiement
                 </h2>
-                <div className="card" style={{ padding: 'var(--sp-5)' }}>
-                  <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                    Carte bancaire · Stripe
-                  </div>
-                  <div className="field">
-                    <label>Numéro de carte</label>
-                    <input
-                      className="input mono"
-                      value={card}
-                      onChange={(e) => setCard(e.target.value)}
-                      placeholder="1234 5678 9012 3456"
-                      autoComplete="cc-number"
-                      inputMode="numeric"
+                {stripePromise ? (
+                  <Elements
+                    stripe={stripePromise}
+                    options={{
+                      clientSecret: paymentSetup.clientSecret,
+                      appearance: { theme: 'stripe' },
+                    }}
+                  >
+                    <StripePaymentForm
+                      orderRef={paymentSetup.orderRef}
+                      total={paymentSetup.total}
+                      processing={processing}
+                      setProcessing={setProcessing}
+                      onSuccess={onPaymentSuccess}
+                      onError={() => undefined}
                     />
+                  </Elements>
+                ) : (
+                  <div className="error">
+                    Stripe n'a pas pu être initialisé (clé publique manquante).
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 'var(--sp-3)',
-                      marginTop: 'var(--sp-3)',
-                    }}
-                  >
-                    <div className="field">
-                      <label>Expiration</label>
-                      <input
-                        className="input mono"
-                        value={expiry}
-                        onChange={(e) => setExpiry(e.target.value)}
-                        placeholder="MM / AA"
-                        autoComplete="cc-exp"
-                      />
-                    </div>
-                    <div className="field">
-                      <label>CVC</label>
-                      <input
-                        className="input mono"
-                        value={cvc}
-                        onChange={(e) => setCvc(e.target.value)}
-                        placeholder="123"
-                        autoComplete="cc-csc"
-                        inputMode="numeric"
-                        maxLength={4}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div
-                  style={{
-                    textAlign: 'center',
-                    color: 'var(--ink-mute)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 'var(--fs-12)',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  — ou —
-                </div>
-                <Button variant="ghost" size="lg" full>
-                  Payer avec PayPal
-                </Button>
+                )}
                 {error && <div className="error">{error}</div>}
-                <div className="row">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setError('');
-                      setStep(2);
-                    }}
-                    disabled={processing}
-                  >
-                    ← Retour
-                  </Button>
-                  <Button
-                    variant="accent"
-                    size="lg"
-                    onClick={pay}
-                    disabled={processing}
-                  >
-                    {processing ? 'Traitement…' : `Payer ${formatPrice(total)}`}
-                  </Button>
-                </div>
-                <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
-                  En validant, vous acceptez les CGV. Vos données sont chiffrées (TLS).
-                </div>
               </div>
             )}
           </div>
