@@ -1981,15 +1981,18 @@ html { scroll-behavior: smooth; }
 }
 .hc-sicon--calendar .dot { animation: hc-cal-pulse 2s ease-in-out infinite; }
 
-/* Carnet : trait d'écriture qui apparaît */
-@keyframes hc-ink-dash {
-  0%   { stroke-dashoffset: 18; }
-  60%  { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 0; opacity: 1; }
+/* Carnet : trait d'écriture qui apparaît.
+ * On utilise scaleX (composité GPU) au lieu de stroke-dashoffset
+ * (qui déclenche un paint à chaque frame → non composité). */
+@keyframes hc-ink-draw {
+  0%   { transform: scaleX(0); }
+  60%  { transform: scaleX(1); }
+  100% { transform: scaleX(1); }
 }
 .hc-sicon--carnet .ink {
-  stroke-dasharray: 18;
-  animation: hc-ink-dash 3.6s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: hc-ink-draw 3.6s ease-in-out infinite alternate;
 }
 
 /* Panier : roues qui roulent légèrement */
@@ -2256,9 +2259,9 @@ html { scroll-behavior: smooth; }
   transform-origin: center;
   animation: hc-lure-bob 2.4s ease-in-out infinite;
 }
-.cast-line {
-  animation: hc-cast-tension 2.4s ease-in-out infinite;
-}
+/* .cast-line statique : pas d'animation (stroke-opacity n'est pas
+ * composité, le rendu était donc déclenché à chaque frame). On
+ * garde le leurre qui bobbe comme seul élément animé de la scène. */
 .cast-ripple {
   transform-box: fill-box;
   transform-origin: center;
@@ -2271,10 +2274,7 @@ html { scroll-behavior: smooth; }
   0%, 100% { transform: translate(0, 0); }
   50%      { transform: translate(0, 3px); }
 }
-@keyframes hc-cast-tension {
-  0%, 100% { stroke-opacity: 0.7; }
-  50%      { stroke-opacity: 0.4; }
-}
+/* hc-cast-tension retiré : stroke-opacity force un paint. */
 @keyframes hc-ripple-out {
   0%   { transform: scale(0.4); opacity: 0.8; }
   100% { transform: scale(1.5); opacity: 0; }

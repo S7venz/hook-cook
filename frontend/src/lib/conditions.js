@@ -82,9 +82,17 @@ export function useLiveConditions() {
 
     (async () => {
       try {
+        // Les deux APIs tierces ont parfois des blocages CORS ou renvoient
+        // 403 depuis certaines origines. Dans ce cas on tombe silencieusement
+        // sur null plutôt que de polluer la console d'erreurs.
+        const silentFetch = (url) =>
+          fetch(url)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null);
+
         const [meteoRes, hubeauRes] = await Promise.all([
-          fetch(METEO_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-          fetch(HUBEAU_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+          silentFetch(METEO_URL),
+          silentFetch(HUBEAU_URL),
         ]);
 
         if (cancelled) return;
