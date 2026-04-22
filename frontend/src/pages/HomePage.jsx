@@ -1,6 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
+import {
+  CastScene,
+  FlyScene,
+  SchoolScene,
+  TrophyScene,
+} from '../components/ui/HomeScenes.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { PondJump } from '../components/ui/PondJump.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
@@ -408,7 +414,10 @@ export function HomePage() {
               <div className="eyebrow">
                 <SectionIcon name="fish" />Je m'équipe par
               </div>
-              <h2>Espèce ciblée</h2>
+              <h2>
+                Espèce ciblée
+                <SchoolScene />
+              </h2>
             </div>
             <a className="more" onClick={openShop}>
               Voir toutes →
@@ -448,7 +457,10 @@ export function HomePage() {
               <div className="eyebrow">
                 <SectionIcon name="compass" />Avant le geste
               </div>
-              <h2>Je prépare</h2>
+              <h2>
+                Je prépare
+                <FlyScene />
+              </h2>
             </div>
           </div>
 
@@ -474,7 +486,10 @@ export function HomePage() {
               <div className="eyebrow">
                 <SectionIcon name="rod" />Curation d'avril · matériel truite rivière
               </div>
-              <h2>Équipement du moment</h2>
+              <h2>
+                Équipement du moment
+                <CastScene />
+              </h2>
             </div>
             <a className="more" onClick={openShop}>
               Tout le catalogue →
@@ -495,7 +510,10 @@ export function HomePage() {
               <div className="eyebrow">
                 <SectionIcon name="trophy" />Calendrier local
               </div>
-              <h2>Concours à venir</h2>
+              <h2>
+                Concours à venir
+                <TrophyScene />
+              </h2>
             </div>
             <a className="more" onClick={openContests}>
               Tous les concours →

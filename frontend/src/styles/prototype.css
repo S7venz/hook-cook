@@ -2169,3 +2169,153 @@ html { scroll-behavior: smooth; }
   .pond-ripple-2 { animation: none !important; }
   .fish-leap { opacity: 0 !important; }
 }
+
+/* ── 21. Scènes headers home — micro-animations thématiques ──── */
+/*
+ * Chaque header de section principale de la home a sa scène
+ * animée adaptée au sujet. Perf : uniquement transform + opacity
+ * (composité GPU). Pas de will-change — ça coûte cher si appliqué
+ * à plusieurs scènes en permanence. Les navigateurs modernes
+ * throttle déjà les anims composited hors viewport.
+ */
+.hc-scene {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: var(--sp-4);
+  color: var(--accent);
+  opacity: 0.7;
+  overflow: visible;
+  flex-shrink: 0;
+}
+.hc-scene--school  { width: 140px; height: 40px; }
+.hc-scene--fly     { width: 70px;  height: 40px; }
+.hc-scene--cast    { width: 130px; height: 50px; }
+.hc-scene--trophy  { width: 70px;  height: 50px; }
+
+/* En responsive, on masque les scènes pour garder la lisibilité
+ * et la perf sur les écrans petits / bande passante restreinte. */
+@media (max-width: 768px) {
+  .hc-scene { display: none; }
+}
+
+/* ── Scène 1 : banc de poissons (Espèce ciblée) ────────────── */
+.sch-fish {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.sch-f1 { animation: hc-swim 8s linear infinite; }
+.sch-f2 { animation: hc-swim 8s linear infinite -2.8s; }
+.sch-f3 { animation: hc-swim 8s linear infinite -5.3s; }
+
+.sch-tail {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: hc-tail-wag 0.45s ease-in-out infinite;
+}
+
+@keyframes hc-swim {
+  0%   { transform: translateX(-15px); }
+  100% { transform: translateX(155px); }
+}
+@keyframes hc-tail-wag {
+  0%, 100% { transform: rotate(-14deg); }
+  50%      { transform: rotate(14deg); }
+}
+
+/* ── Scène 2 : mouche battant des ailes (Je prépare) ──────── */
+.fly-body {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hc-fly-hover 3s ease-in-out infinite;
+}
+.fly-wing {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+}
+.fly-wing-l {
+  transform-origin: 100% 50%;
+  animation: hc-wing-flap 0.35s ease-in-out infinite;
+}
+.fly-wing-r {
+  transform-origin: 0% 50%;
+  animation: hc-wing-flap 0.35s ease-in-out infinite;
+}
+
+@keyframes hc-fly-hover {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2.5px); }
+}
+@keyframes hc-wing-flap {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(0.35); }
+}
+
+/* ── Scène 3 : leurre + rides (Équipement du moment) ──────── */
+.cast-lure {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hc-lure-bob 2.4s ease-in-out infinite;
+}
+.cast-line {
+  animation: hc-cast-tension 2.4s ease-in-out infinite;
+}
+.cast-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.cast-r1 { animation: hc-ripple-out 3s ease-out infinite; }
+.cast-r2 { animation: hc-ripple-out 3s ease-out infinite 1.4s; }
+
+@keyframes hc-lure-bob {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(0, 3px); }
+}
+@keyframes hc-cast-tension {
+  0%, 100% { stroke-opacity: 0.7; }
+  50%      { stroke-opacity: 0.4; }
+}
+@keyframes hc-ripple-out {
+  0%   { transform: scale(0.4); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── Scène 4 : trophée + confettis (Concours à venir) ─────── */
+.conf {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.c1 { animation: hc-confetti 3.6s linear infinite 0s; }
+.c2 { animation: hc-confetti 3.6s linear infinite 0.8s; }
+.c3 { animation: hc-confetti 3.6s linear infinite 1.6s; }
+.c4 { animation: hc-confetti 3.6s linear infinite 2.4s; }
+
+.trophy-shine {
+  animation: hc-trophy-sweep 3.6s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes hc-confetti {
+  0%   { transform: translate(0, -4px) rotate(0); opacity: 0; }
+  8%   { opacity: 0.9; }
+  70%  { opacity: 0.9; }
+  100% { transform: translate(6px, 10px) rotate(280deg); opacity: 0; }
+}
+@keyframes hc-trophy-sweep {
+  0%, 65%  { opacity: 0; transform: translateX(0); }
+  70%      { opacity: 0.85; transform: translateX(0); }
+  82%      { opacity: 0.55; transform: translateX(14px); }
+  90%, 100% { opacity: 0; transform: translateX(18px); }
+}
+
+/* Respecte prefers-reduced-motion : toutes les scènes figées */
+@media (prefers-reduced-motion: reduce) {
+  .sch-fish, .sch-tail,
+  .fly-body, .fly-wing,
+  .cast-lure, .cast-line, .cast-ripple,
+  .conf, .trophy-shine {
+    animation: none !important;
+  }
+  .conf, .trophy-shine, .cast-ripple { opacity: 0.4 !important; }
+}
