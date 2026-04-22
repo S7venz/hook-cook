@@ -53,7 +53,11 @@ class OrderController {
             return
         }
         response.status = 201
-        render(result.order.toApiMap() as JSON)
+        Map body = [order: result.order.toApiMap()]
+        if (result.clientSecret) body.clientSecret = result.clientSecret
+        if (result.publishableKey) body.publishableKey = result.publishableKey
+        if (result.mockPayment) body.mockPayment = true
+        render(body as JSON)
     }
 
     def listAll() {

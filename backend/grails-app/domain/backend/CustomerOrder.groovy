@@ -12,8 +12,9 @@ class CustomerOrder {
     String postalCode
     String city
     String shippingMode       // "Standard Colissimo", "Chronopost 24h", "Point relais"
-    String status             // paid | shipped | delivered | cancelled
+    String status             // pending | paid | payment_failed | shipped | delivered | cancelled
     String statusLabel
+    String stripePaymentIntentId
 
     Date dateCreated
     Date lastUpdated
@@ -31,29 +32,32 @@ class CustomerOrder {
         postalCode blank: false, maxSize: 20
         city blank: false, maxSize: 120
         shippingMode blank: false, maxSize: 80
-        status inList: ['paid', 'shipped', 'delivered', 'cancelled']
+        status inList: ['pending', 'paid', 'payment_failed', 'shipped', 'delivered', 'cancelled']
         statusLabel blank: false, maxSize: 40
+        stripePaymentIntentId nullable: true, maxSize: 80
     }
 
     static mapping = {
         table 'orders'
         reference index: 'orders_reference_idx'
         user index: 'orders_user_idx'
+        stripePaymentIntentId index: 'orders_stripe_pi_idx'
     }
 
     Map toApiMap() {
         [
-                id          : reference,
-                date        : dateCreated?.toInstant()?.toString(),
-                email       : email,
-                subtotal    : subtotal,
-                shipping    : shipping,
-                total       : total,
-                status      : status,
-                statusLabel : statusLabel,
-                shippingMode: shippingMode,
-                address     : [line: addressLine, postal: postalCode, city: city],
-                items       : (items ?: []).collect { it.toApiMap() },
+                id                   : reference,
+                date                 : dateCreated?.toInstant()?.toString(),
+                email                : email,
+                subtotal             : subtotal,
+                shipping             : shipping,
+                total                : total,
+                status               : status,
+                statusLabel          : statusLabel,
+                shippingMode         : shippingMode,
+                stripePaymentIntentId: stripePaymentIntentId,
+                address              : [line: addressLine, postal: postalCode, city: city],
+                items                : (items ?: []).collect { it.toApiMap() },
         ]
     }
 }

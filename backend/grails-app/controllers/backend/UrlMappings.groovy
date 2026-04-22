@@ -88,6 +88,14 @@ class UrlMappings {
         post "/api/auth/password-reset/request"(controller: 'passwordReset', action: 'request')
         post "/api/auth/password-reset/confirm"(controller: 'passwordReset', action: 'confirm')
 
+        // Admin : envoi d'email de démo pour valider le rendu HTML
+        post "/api/admin/test-email"(controller: 'adminTest', action: 'sendSampleEmail')
+
+        // Stripe webhook (public, signature HMAC vérifiée côté contrôleur)
+        post "/api/payments/webhook"(controller: 'payment', action: 'webhook')
+        // Force-sync du statut d'une commande avec Stripe (fallback si webhook non relayé)
+        post "/api/payments/sync/$reference"(controller: 'payment', action: 'sync')
+
         delete "/$controller/$id(.$format)?"(action:"delete")
         get "/$controller(.$format)?"(action:"index")
         get "/$controller/$id(.$format)?"(action:"show")

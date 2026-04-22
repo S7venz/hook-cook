@@ -65,6 +65,8 @@ dependencies {
     // Génération de factures PDF depuis HTML
     implementation "com.openhtmltopdf:openhtmltopdf-core:1.0.10"
     implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10"
+    // Stripe SDK pour paiements (PaymentIntent + webhooks)
+    implementation "com.stripe:stripe-java:26.10.0"
     profile "org.grails.profiles:rest-api"
     runtimeOnly "org.glassfish.web:el-impl:2.2.1-b05"
     runtimeOnly "org.postgresql:postgresql:42.7.3"
