@@ -93,7 +93,9 @@ class UrlMappings {
 
         // Stripe webhook (public, signature HMAC vérifiée côté contrôleur)
         post "/api/payments/webhook"(controller: 'payment', action: 'webhook')
-        // Force-sync du statut d'une commande avec Stripe (fallback si webhook non relayé)
+        // Force-sync du statut avec Stripe (fallback si webhook non relayé)
+        post "/api/payments/sync/permit/$reference"(controller: 'payment', action: 'syncPermit')
+        post "/api/payments/sync/contest/$id"(controller: 'payment', action: 'syncContestReg')
         post "/api/payments/sync/$reference"(controller: 'payment', action: 'sync')
 
         delete "/$controller/$id(.$format)?"(action:"delete")

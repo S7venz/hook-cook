@@ -30,13 +30,20 @@ export function useContestRegistrations() {
 
   const register = useCallback(
     async (contestId, { category, permitNumber }) => {
-      const created = await api.post(
+      // Backend renvoie { registration } (gratuit) ou
+      // { registration, clientSecret, publishableKey } (Stripe).
+      const response = await api.post(
         `/api/contests/${encodeURIComponent(contestId)}/register`,
         { category, permitNumber },
         { token },
       );
+      const created = response.registration ?? response;
       setRegistrations((current) => [created, ...current]);
-      return created;
+      return {
+        registration: created,
+        clientSecret: response.clientSecret ?? null,
+        publishableKey: response.publishableKey ?? null,
+      };
     },
     [token],
   );

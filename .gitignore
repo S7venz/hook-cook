@@ -35,6 +35,9 @@ database/data/
 *.sqlite
 *.db
 
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 CLAUDE.md
 .claude/
 .claude-code/

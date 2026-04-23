@@ -21,7 +21,10 @@ class ContestRegistrationController {
             return
         }
         response.status = 201
-        render(result.registration.toApiMap() as JSON)
+        Map body = [registration: result.registration.toApiMap()]
+        if (result.clientSecret) body.clientSecret = result.clientSecret
+        if (result.publishableKey) body.publishableKey = result.publishableKey
+        render(body as JSON)
     }
 
     def myList() {

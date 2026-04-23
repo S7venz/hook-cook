@@ -14,11 +14,12 @@ class Permit {
     String firstName
     String lastName
     String birthDate
-    String status             // pending | approved | rejected
+    String status             // pending_payment | pending | approved | rejected | payment_failed
     String statusLabel
     String historyJson        // serialized list of steps
     String idDocUrl           // URL of uploaded ID document
     String photoDocUrl        // URL of uploaded ID photo
+    String stripePaymentIntentId
 
     Date dateCreated
     Date lastUpdated
@@ -33,11 +34,12 @@ class Permit {
         firstName blank: false, maxSize: 120
         lastName blank: false, maxSize: 120
         birthDate blank: false, maxSize: 20
-        status inList: ['pending', 'approved', 'rejected']
+        status inList: ['pending_payment', 'pending', 'approved', 'rejected', 'payment_failed']
         statusLabel blank: false, maxSize: 40
         historyJson nullable: true, maxSize: 4000
         idDocUrl nullable: true, maxSize: 500
         photoDocUrl nullable: true, maxSize: 500
+        stripePaymentIntentId nullable: true, maxSize: 80
     }
 
     static mapping = {
@@ -45,6 +47,7 @@ class Permit {
         reference index: 'permits_reference_idx'
         user index: 'permits_user_idx'
         historyJson type: 'text'
+        stripePaymentIntentId index: 'permits_stripe_pi_idx'
     }
 
     static transients = ['history']
@@ -59,20 +62,21 @@ class Permit {
 
     Map toApiMap() {
         [
-                id         : reference,
-                typeId     : typeId,
-                typeTitle  : typeTitle,
-                amount     : amount,
-                department : department,
-                firstName  : firstName,
-                lastName   : lastName,
-                birthDate  : birthDate,
-                status     : status,
-                statusLabel: statusLabel,
-                submittedAt: dateCreated?.toInstant()?.toString(),
-                history    : getHistory(),
-                idDocUrl   : idDocUrl,
-                photoDocUrl: photoDocUrl,
+                id                   : reference,
+                typeId               : typeId,
+                typeTitle            : typeTitle,
+                amount               : amount,
+                department           : department,
+                firstName            : firstName,
+                lastName             : lastName,
+                birthDate            : birthDate,
+                status               : status,
+                statusLabel          : statusLabel,
+                submittedAt          : dateCreated?.toInstant()?.toString(),
+                history              : getHistory(),
+                idDocUrl             : idDocUrl,
+                photoDocUrl          : photoDocUrl,
+                stripePaymentIntentId: stripePaymentIntentId,
         ]
     }
 }

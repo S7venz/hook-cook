@@ -4,6 +4,7 @@ import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
+import { StripePaymentBlock } from '../components/StripePaymentBlock.jsx';
 import { useAuth } from '../lib/auth.js';
 import {
   useDepartments,
@@ -15,7 +16,6 @@ import { useToast } from '../lib/toast.js';
 import {
   firstError,
   validateBirthDate,
-  validateCardNumber,
   validateName,
 } from '../lib/validation.js';
 
@@ -230,8 +230,10 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
   const [photoDocError, setPhotoDocError] = useState('');
   const [photoDocUploading, setPhotoDocUploading] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [cardNumber, setCardNumber] = useState('');
   const [stepError, setStepError] = useState('');
+  // Stripe : créé à la transition step 4 → 5 quand l'user clique "Procéder au paiement"
+  const [paymentSetup, setPaymentSetup] = useState(null);
+  const [preparingPayment, setPreparingPayment] = useState(false);
 
   const type = types.find((t) => t.id === typeId) ?? types[0];
 
@@ -313,22 +315,48 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
 
   const uploadedCount = [idDocUrl, photoDocUrl].filter(Boolean).length;
 
-  const pay = () => {
-    const err = firstError(validateIdentityStep(), validateCardNumber(cardNumber));
+  // Crée le permit côté backend (status pending_payment) et récupère
+  // le clientSecret Stripe pour monter le PaymentElement à l'étape 5.
+  const startPayment = async () => {
+    const err = validateIdentityStep();
     if (err) {
       setStepError(err);
       return;
     }
     setStepError('');
-    onSubmit({
-      typeId,
-      firstName,
-      lastName,
-      birthDate,
-      department,
-      idDocUrl,
-      photoDocUrl,
-    });
+    setPreparingPayment(true);
+    try {
+      const result = await onSubmit({
+        typeId,
+        firstName,
+        lastName,
+        birthDate,
+        department,
+        idDocUrl,
+        photoDocUrl,
+      });
+      // Si le backend renvoie clientSecret on monte Stripe ; sinon le permis
+      // est déjà validé (mode mock / type gratuit) → on passe directement au tracking.
+      if (result?.clientSecret) {
+        setPaymentSetup({
+          clientSecret: result.clientSecret,
+          publishableKey: result.publishableKey || import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+          permitRef: result.permit.id,
+        });
+        setStep(5);
+      }
+      // Sinon onSubmit a déjà déclenché le passage en track view côté parent.
+    } catch (e) {
+      setStepError(e?.message ?? 'Impossible de soumettre la demande.');
+    } finally {
+      setPreparingPayment(false);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    // Le webhook Stripe va passer le permit en "pending" (En instruction) côté
+    // serveur. On notifie le parent pour qu'il bascule en TrackingView.
+    onSubmit({ __paymentDone: true, permitRef: paymentSetup?.permitRef });
   };
 
   if (!type) {
@@ -647,16 +675,16 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
               <Button
                 variant="accent"
                 size="lg"
-                disabled={!accepted}
-                onClick={() => setStep(5)}
+                disabled={!accepted || preparingPayment}
+                onClick={startPayment}
               >
-                Procéder au paiement →
+                {preparingPayment ? 'Préparation…' : 'Procéder au paiement →'}
               </Button>
             </div>
           </div>
         )}
 
-        {step === 5 && (
+        {step === 5 && paymentSetup && (
           <div className="stack-md">
             <h2
               className="disp"
@@ -672,23 +700,15 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
             <p className="soft">
               Le montant inclut la Cotisation Pêche Milieux Aquatiques (CPMA).
             </p>
-            <div className="card" style={{ padding: 'var(--sp-5)' }}>
-              <div className="field">
-                <label>Numéro de carte</label>
-                <input
-                  className="input mono"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  placeholder="1234 5678 9012 3456"
-                  autoComplete="cc-number"
-                  inputMode="numeric"
-                />
-              </div>
-            </div>
+            <StripePaymentBlock
+              clientSecret={paymentSetup.clientSecret}
+              publishableKey={paymentSetup.publishableKey}
+              amount={type.price}
+              returnUrl={`${window.location.origin}/permis`}
+              onSuccess={handlePaymentSuccess}
+              label="Payer"
+            />
             {stepError && <div className="error">{stepError}</div>}
-            <Button variant="accent" size="lg" full onClick={pay}>
-              Payer {formatPrice(type.price)}
-            </Button>
           </div>
         )}
       </div>
@@ -779,13 +799,31 @@ export function PermisPage() {
   const [view, setView] = useState('landing');
   const { push } = useToast();
 
+  // Deux phases :
+  // 1. submit({...payload}) → crée le permit côté backend.
+  //    - Si Stripe configuré + permis payant : retourne {permit, clientSecret, ...}
+  //      pour que ApplyView monte le PaymentElement à l'étape 5.
+  //    - Sinon : permit déjà 'pending' (En instruction), on bascule en TrackingView.
+  // 2. submit({__paymentDone:true}) → notifié par ApplyView après que Stripe
+  //    a confirmé le paiement → on bascule en TrackingView (le webhook
+  //    bascule le statut côté serveur, le polling AccountPage le verra).
   const handleSubmit = async (input) => {
-    try {
-      await submit(input);
-      push('Demande envoyée — en instruction');
+    if (input?.__paymentDone) {
+      push('Paiement confirmé — demande en instruction');
       setView('track');
+      return null;
+    }
+    try {
+      const result = await submit(input);
+      if (!result.clientSecret) {
+        // Mode mock / gratuit : permit déjà en instruction → tracking direct
+        push('Demande envoyée — en instruction');
+        setView('track');
+      }
+      return result;
     } catch (err) {
       push(err?.message ?? 'Impossible de soumettre la demande.');
+      throw err;
     }
   };
 

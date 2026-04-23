@@ -5,6 +5,7 @@ import { Icon } from '../components/ui/Icon.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { ContestsMap } from '../components/ui/ContestsMap.jsx';
 import { FishRain } from '../components/decor/FishRain.jsx';
+import { StripePaymentBlock } from '../components/StripePaymentBlock.jsx';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { formatPrice } from '../lib/format.js';
@@ -182,10 +183,27 @@ export function ConcoursPage() {
     };
   }, [showModal]);
 
+  // Setup Stripe créé après "Confirmer mon inscription" si le concours est payant.
+  // Tant qu'il n'est pas null, le modal affiche le PaymentElement au lieu du form.
+  const [paymentSetup, setPaymentSetup] = useState(null);
+
   const handleConfirm = async ({ contestId, category, permit }) => {
     const label = CATEGORIES.find((c) => c.id === category)?.label ?? '';
     try {
-      await register(contestId, { category, permitNumber: permit });
+      const result = await register(contestId, { category, permitNumber: permit });
+      if (result.clientSecret) {
+        // Concours payant + Stripe configuré : on bascule le modal en paiement
+        setPaymentSetup({
+          clientSecret: result.clientSecret,
+          publishableKey: result.publishableKey || import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+          regId: result.registration.id,
+          amount: selected.prix,
+          contestTitle: selected.title,
+          categoryLabel: label,
+        });
+        return;
+      }
+      // Concours gratuit : déjà validé côté backend
       push(`Inscrit à ${selected.title} · ${label}`);
       setShowModal(false);
       setCelebrate(true);
@@ -193,6 +211,14 @@ export function ConcoursPage() {
     } catch (err) {
       push(err?.message ?? 'Inscription impossible.');
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    push(`Inscrit à ${paymentSetup.contestTitle} · ${paymentSetup.categoryLabel}`);
+    setShowModal(false);
+    setPaymentSetup(null);
+    setCelebrate(true);
+    setTimeout(() => setCelebrate(false), 4500);
   };
 
   if (loading) {
@@ -473,7 +499,7 @@ export function ConcoursPage() {
         </section>
       </div>
 
-      {showModal && (
+      {showModal && !paymentSetup && (
         <RegistrationModal
           contest={selected}
           onClose={() => setShowModal(false)}
@@ -481,7 +507,83 @@ export function ConcoursPage() {
         />
       )}
 
+      {showModal && paymentSetup && (
+        <ContestPaymentModal
+          setup={paymentSetup}
+          onClose={() => {
+            setShowModal(false);
+            setPaymentSetup(null);
+          }}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
+
       <FishRain count={26} duration={3500} active={celebrate} />
     </div>
+  );
+}
+
+function ContestPaymentModal({ setup, onClose, onSuccess }) {
+  return (
+    <>
+      <div className="drawer-backdrop" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contest-payment-title"
+        style={{
+          position: 'fixed',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%,-50%)',
+          width: 520,
+          maxWidth: '95vw',
+          maxHeight: '92vh',
+          overflowY: 'auto',
+          background: 'var(--bg)',
+          borderRadius: 'var(--r-lg)',
+          border: '1px solid var(--rule)',
+          boxShadow: 'var(--shadow-3)',
+          zIndex: 82,
+          padding: 'var(--sp-6)',
+        }}
+      >
+        <div
+          className="row"
+          style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-4)' }}
+        >
+          <h3
+            id="contest-payment-title"
+            style={{
+              margin: 0,
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--fs-24)',
+              fontWeight: 500,
+            }}
+          >
+            Paiement de l'inscription
+          </h3>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            <Icon name="close" />
+          </button>
+        </div>
+        <p className="soft" style={{ marginTop: 0, marginBottom: 'var(--sp-3)' }}>
+          {setup.contestTitle} · {setup.categoryLabel}
+        </p>
+        <StripePaymentBlock
+          clientSecret={setup.clientSecret}
+          publishableKey={setup.publishableKey}
+          amount={setup.amount}
+          returnUrl={`${window.location.origin}/concours`}
+          onSuccess={onSuccess}
+          label="Confirmer et payer"
+        />
+      </div>
+    </>
   );
 }

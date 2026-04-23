@@ -24,6 +24,10 @@ class PermitServiceSpec extends Specification implements ServiceUnitTest<PermitS
         Department d = new Department(name: '66 — Pyrénées-Orientales')
         d.id = '66'
         d.save(failOnError: true)
+
+        // Par défaut Stripe désactivé → permis créé directement en pending.
+        // Tests Stripe-on overridenront isConfigured().
+        service.stripeService = Mock(StripeService) { isConfigured() >> false }
     }
 
     User buildUser() {
@@ -149,5 +153,67 @@ class PermitServiceSpec extends Specification implements ServiceUnitTest<PermitS
         then:
         refs.size() == 10
         refs.every { it ==~ /^FR-2026-[0-9A-F]{10}$/ }
+    }
+
+    void "create en mode Stripe crée le permis pending_payment + retourne clientSecret"() {
+        given:
+        User u = buildUser()
+        service.stripeService = Mock(StripeService) {
+            isConfigured() >> true
+            getPublishableKey() >> 'pk_test_xxx'
+            createPaymentIntent(_, _) >> [
+                    paymentIntentId: 'pi_permit_123',
+                    clientSecret   : 'pi_permit_123_secret_abc',
+            ]
+        }
+
+        when:
+        Map r = service.create(u, [
+                typeId: 'annuel', firstName: 'A', lastName: 'B', birthDate: '1990-01-01',
+        ])
+
+        then:
+        !r.error
+        r.permit.status == 'pending_payment'
+        r.permit.statusLabel == 'En attente de paiement'
+        r.permit.stripePaymentIntentId == 'pi_permit_123'
+        r.clientSecret == 'pi_permit_123_secret_abc'
+        r.publishableKey == 'pk_test_xxx'
+    }
+
+    void "markPaidByPaymentIntent bascule pending_payment → pending (En instruction)"() {
+        given:
+        User u = buildUser()
+        service.stripeService = Mock(StripeService) {
+            isConfigured() >> true
+            createPaymentIntent(_, _) >> [paymentIntentId: 'pi_pay_ok', clientSecret: 'cs']
+        }
+        service.create(u, [typeId: 'annuel', firstName: 'A', lastName: 'B', birthDate: '1990-01-01'])
+
+        when:
+        Map r = service.markPaidByPaymentIntent('pi_pay_ok')
+
+        then:
+        !r.error
+        r.permit.status == 'pending'
+        r.permit.statusLabel == 'En instruction'
+    }
+
+    void "markPaidByPaymentIntent est idempotent"() {
+        given:
+        User u = buildUser()
+        service.stripeService = Mock(StripeService) {
+            isConfigured() >> true
+            createPaymentIntent(_, _) >> [paymentIntentId: 'pi_idem', clientSecret: 'cs']
+        }
+        service.create(u, [typeId: 'annuel', firstName: 'A', lastName: 'B', birthDate: '1990-01-01'])
+
+        when:
+        Map r1 = service.markPaidByPaymentIntent('pi_idem')
+        Map r2 = service.markPaidByPaymentIntent('pi_idem')
+
+        then:
+        !r1.error
+        r2.alreadyProcessed == true
     }
 }

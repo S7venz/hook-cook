@@ -37,7 +37,10 @@ class PermitController {
             return
         }
         response.status = 201
-        render(result.permit.toApiMap() as JSON)
+        Map body = [permit: result.permit.toApiMap()]
+        if (result.clientSecret) body.clientSecret = result.clientSecret
+        if (result.publishableKey) body.publishableKey = result.publishableKey
+        render(body as JSON)
     }
 
     def listAll() {

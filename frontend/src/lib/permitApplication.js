@@ -78,9 +78,16 @@ export function useSubmittedPermit() {
 
   const submit = useCallback(
     async (input) => {
-      const created = await api.post('/api/permits', input, { token });
+      // Le backend renvoie soit { permit } (gratuit / mode mock),
+      // soit { permit, clientSecret, publishableKey } (mode Stripe).
+      const response = await api.post('/api/permits', input, { token });
+      const created = response.permit ?? response;
       setPermit(created);
-      return created;
+      return {
+        permit: created,
+        clientSecret: response.clientSecret ?? null,
+        publishableKey: response.publishableKey ?? null,
+      };
     },
     [token],
   );
