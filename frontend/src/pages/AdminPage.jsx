@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { ImageUploadField } from '../components/ui/ImageUploadField.jsx';
 import { useAdminContests } from '../lib/adminContests.js';
+import { useAdminContestRegistrations } from '../lib/adminContestRegistrations.js';
 import { useAdminOrders } from '../lib/adminOrders.js';
 import { useAdminProducts } from '../lib/adminProducts.js';
 import { useAdminStats } from '../lib/adminStats.js';
@@ -660,24 +661,43 @@ function OrdersSection({ orders, onUpdateStatus }) {
                   </Badge>
                 </td>
                 <td>
-                  {order.status === 'paid' && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onUpdateStatus(order.id, 'shipped')}
-                    >
-                      Marquer expédiée
-                    </Button>
-                  )}
-                  {order.status === 'shipped' && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onUpdateStatus(order.id, 'delivered')}
-                    >
-                      Marquer livrée
-                    </Button>
-                  )}
+                  <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+                    {order.status === 'paid' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onUpdateStatus(order.id, 'shipped')}
+                      >
+                        Marquer expédiée
+                      </Button>
+                    )}
+                    {order.status === 'shipped' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onUpdateStatus(order.id, 'delivered')}
+                      >
+                        Marquer livrée
+                      </Button>
+                    )}
+                    {(order.status === 'paid' || order.status === 'shipped') && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Annuler la commande ${order.id} ? Le stock sera restauré.`,
+                            )
+                          ) {
+                            onUpdateStatus(order.id, 'cancelled');
+                          }
+                        }}
+                      >
+                        Annuler
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -996,6 +1016,8 @@ function ContestForm({ initial, onCancel, onSubmit }) {
 
 function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelete, notify }) {
   const [mode, setMode] = useState('list');
+  const [viewingId, setViewingId] = useState(null);
+  const { registrations } = useAdminContestRegistrations();
   const editing = typeof mode === 'string' && mode.startsWith('edit:')
     ? remoteContests.find((c) => c.id === mode.slice(5))
     : null;
@@ -1091,7 +1113,14 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
                     </Badge>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
+                    <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setViewingId(c.id)}
+                      >
+                        Voir inscrits
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1113,6 +1142,110 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
             })}
           </tbody>
         </table>
+      </div>
+
+      {viewingId && (
+        <ContestRegistrationsModal
+          contest={remoteContests.find((c) => c.id === viewingId)}
+          registrations={registrations.filter((r) => r.contestId === viewingId)}
+          onClose={() => setViewingId(null)}
+        />
+      )}
+    </>
+  );
+}
+
+function ContestRegistrationsModal({ contest, registrations, onClose }) {
+  if (!contest) return null;
+  return (
+    <>
+      <div className="drawer-backdrop" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contest-regs-title"
+        style={{
+          position: 'fixed',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%,-50%)',
+          width: 720,
+          maxWidth: '95vw',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+          background: 'var(--bg)',
+          borderRadius: 'var(--r-lg)',
+          border: '1px solid var(--rule)',
+          boxShadow: 'var(--shadow-3)',
+          zIndex: 82,
+          padding: 'var(--sp-6)',
+        }}
+      >
+        <div
+          className="row"
+          style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-4)' }}
+        >
+          <div>
+            <h3
+              id="contest-regs-title"
+              style={{
+                margin: 0,
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-24)',
+                fontWeight: 500,
+              }}
+            >
+              Inscrits — {contest.title}
+            </h3>
+            <div className="soft mono" style={{ fontSize: 'var(--fs-12)' }}>
+              {contest.dateDisplay} · {contest.lieu} · {registrations.length}/{contest.max}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            ×
+          </button>
+        </div>
+        {registrations.length === 0 ? (
+          <p className="soft" style={{ textAlign: 'center', padding: 'var(--sp-6) 0' }}>
+            Aucune inscription pour ce concours.
+          </p>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Catégorie</th>
+                <th>Permis</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {registrations.map((r) => (
+                <tr key={r.id}>
+                  <td>{r.userEmail ?? '—'}</td>
+                  <td>{r.category}</td>
+                  <td className="mono">{r.permitNumber ?? '—'}</td>
+                  <td>
+                    <Badge status={r.status === 'paid' ? 'approved' : 'pending'}>
+                      {r.status}
+                    </Badge>
+                  </td>
+                  <td className="soft">
+                    {r.submittedAt
+                      ? new Intl.DateTimeFormat('fr-FR').format(new Date(r.submittedAt))
+                      : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );

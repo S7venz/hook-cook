@@ -229,6 +229,19 @@ class OrderService {
         }
     }
 
+    private void restockOrder(CustomerOrder order) {
+        Map<String, Integer> qtyByProduct = [:]
+        order.items?.each { OrderItem it ->
+            qtyByProduct[it.productId] = (qtyByProduct[it.productId] ?: 0) + (it.qty ?: 0)
+        }
+        qtyByProduct.each { String pid, Integer qty ->
+            Product p = Product.get(pid)
+            if (p == null) return
+            p.stock = (p.stock ?: 0) + qty
+            p.save(flush: true)
+        }
+    }
+
     List<CustomerOrder> ordersForUser(User user) {
         CustomerOrder.findAllByUser(user, [sort: 'dateCreated', order: 'desc'])
     }
@@ -248,11 +261,17 @@ class OrderService {
         String label = STATUS_LABELS[status]
         CustomerOrder order = findByReference(reference)
         if (!order) return [error: 'Commande introuvable.']
+        // Annulation d'une commande déjà payée → on remet le stock
+        // (on n'a décrémenté qu'à partir de "paid", donc on n'incrémente
+        // que dans cette transition).
+        boolean cancellingPaid = (status == 'cancelled') &&
+                (order.status in ['paid', 'shipped'])
         order.status = status
         order.statusLabel = label
         if (!order.save(flush: true)) {
             return [error: 'Mise à jour impossible.']
         }
+        if (cancellingPaid) restockOrder(order)
         [order: order]
     }
 }

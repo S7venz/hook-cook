@@ -26,6 +26,8 @@ function useCatalogFilters() {
       techniques: searchParams.getAll('technique'),
       inStock: searchParams.get('stock') === '1',
       query: searchParams.get('q') ?? '',
+      priceMin: searchParams.get('priceMin') ?? '',
+      priceMax: searchParams.get('priceMax') ?? '',
     }),
     [searchParams],
   );
@@ -61,13 +63,27 @@ function useCatalogFilters() {
         else next.delete('q');
       });
     },
+    setPrice(kind, value) {
+      update((next) => {
+        if (value === '' || value == null) next.delete(kind);
+        else next.set(kind, String(value));
+      });
+    },
     reset() {
       setSearchParams({}, { replace: true });
     },
   };
 }
 
-function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, techniques }) {
+function FiltersPanel({
+  filters,
+  onToggle,
+  onToggleStock,
+  onSetPrice,
+  categories,
+  species,
+  techniques,
+}) {
   return (
     <>
       <div>
@@ -124,6 +140,41 @@ function FiltersPanel({ filters, onToggle, onToggleStock, categories, species, t
       </div>
       <div>
         <h3>
+          <SectionIcon name="cart" />Prix (€)
+        </h3>
+        <div
+          className="row"
+          style={{ gap: 'var(--sp-2)', alignItems: 'center' }}
+        >
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="1"
+            className="input mono"
+            placeholder="Min"
+            aria-label="Prix minimum"
+            value={filters.priceMin}
+            onChange={(e) => onSetPrice('priceMin', e.target.value)}
+            style={{ width: '50%' }}
+          />
+          <span className="soft mono">—</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="1"
+            className="input mono"
+            placeholder="Max"
+            aria-label="Prix maximum"
+            value={filters.priceMax}
+            onChange={(e) => onSetPrice('priceMax', e.target.value)}
+            style={{ width: '50%' }}
+          />
+        </div>
+      </div>
+      <div>
+        <h3>
           <SectionIcon name="drop" />Disponibilité
         </h3>
         <div className="filter-group">
@@ -171,6 +222,14 @@ function filterProducts(items, filters, sort, fuse) {
   if (filters.inStock) {
     list = list.filter((p) => p.stock > 0);
   }
+  const min = Number.parseFloat(filters.priceMin);
+  if (Number.isFinite(min)) {
+    list = list.filter((p) => Number(p.price) >= min);
+  }
+  const max = Number.parseFloat(filters.priceMax);
+  if (Number.isFinite(max)) {
+    list = list.filter((p) => Number(p.price) <= max);
+  }
 
   if (filters.query) {
     const q = filters.query.trim();
@@ -193,7 +252,7 @@ function filterProducts(items, filters, sort, fuse) {
 }
 
 export function CataloguePage() {
-  const { filters, toggle, toggleInStock, setQuery, reset } = useCatalogFilters();
+  const { filters, toggle, toggleInStock, setQuery, setPrice, reset } = useCatalogFilters();
   const { products, loading } = useProducts();
   const { categories, species, techniques } = useReferenceData();
   const [sort, setSort] = useState('pertinence');
@@ -207,7 +266,12 @@ export function CataloguePage() {
     () => filterProducts(products, filters, sort, fuse),
     [products, filters, sort, fuse],
   );
-  const activeCount = filters.species.length + filters.categories.length + filters.techniques.length;
+  const priceActive = filters.priceMin !== '' || filters.priceMax !== '';
+  const activeCount =
+    filters.species.length +
+    filters.categories.length +
+    filters.techniques.length +
+    (priceActive ? 1 : 0);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
@@ -229,6 +293,23 @@ export function CataloguePage() {
       const t = techniques.find((x) => x.id === id);
       return { id: `tech-${id}`, label: t?.name, onRemove: () => toggle('technique', id) };
     }),
+    ...(priceActive
+      ? [
+          {
+            id: 'price',
+            label:
+              filters.priceMin && filters.priceMax
+                ? `${filters.priceMin}–${filters.priceMax} €`
+                : filters.priceMin
+                  ? `≥ ${filters.priceMin} €`
+                  : `≤ ${filters.priceMax} €`,
+            onRemove: () => {
+              setPrice('priceMin', '');
+              setPrice('priceMax', '');
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -240,6 +321,7 @@ export function CataloguePage() {
               filters={filters}
               onToggle={toggle}
               onToggleStock={toggleInStock}
+              onSetPrice={setPrice}
               categories={categories}
               species={species}
               techniques={techniques}
