@@ -16,8 +16,6 @@
  * - cachées sur mobile < 768 px via .hc-scene media query
  */
 
-/* eslint-disable react/no-unknown-property */
-
 // ─── Banc de poissons qui nage vers la droite ─────────────
 export function SchoolScene() {
   return (

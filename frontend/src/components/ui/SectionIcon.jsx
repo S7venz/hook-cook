@@ -16,8 +16,6 @@
  * le keyframe correspondant dans le CSS.
  */
 
-/* eslint-disable react/no-unknown-property */
-
 const SW = 1.8; // strokeWidth uniforme, suit le poids du trait des autres icônes
 
 // ─── Poisson avec queue animée ─────────────────────────────

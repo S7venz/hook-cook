@@ -41,7 +41,7 @@ export function ConfirmationPage() {
         try {
           const synced = await api.post(`/api/payments/sync/${orderId}`, {}, { token });
           fresh = synced?.order ?? synced;
-        } catch (err) {
+        } catch {
           fresh = await api.get(`/api/orders/${orderId}`, { token });
         }
         if (fresh) {

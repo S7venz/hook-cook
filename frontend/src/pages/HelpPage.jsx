@@ -372,7 +372,7 @@ export function HelpPage() {
             >
               {cat.title}
             </h2>
-            {cat.faqs.map((f, i) => (
+            {cat.faqs.map((f) => (
               <Accordion key={f.q} title={f.q} defaultOpen={false}>
                 {f.a}
               </Accordion>

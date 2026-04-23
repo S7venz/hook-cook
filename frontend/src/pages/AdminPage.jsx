@@ -1670,7 +1670,7 @@ function ProductsSection({
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
   const { permits, updateStatus: updatePermitStatus } = useAdminPermits();

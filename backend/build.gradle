@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://repo.grails.org/grails/core" }
+        maven { url = uri("https://plugins.gradle.org/m2/") }
+        maven { url = uri("https://repo.grails.org/grails/core") }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
@@ -22,7 +22,7 @@ apply plugin:"org.grails.plugins.views-json"
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.grails.org/grails/core" }
+    maven { url = uri("https://repo.grails.org/grails/core") }
 }
 
 configurations {
