@@ -120,10 +120,16 @@
 .product-sticker-ocean  { color: oklch(0.45 0.10 235); }
 .product-sticker-warn   { color: oklch(0.55 0.15 35); }
 
-/* Subtle hover sur la card → sticker se redresse un peu */
-.product-card:hover .product-sticker {
-  transform: rotate(-3deg) translateY(-1px);
-  transition: transform 240ms ease;
+.product-sticker {
+  transition: opacity 180ms ease, transform 240ms ease;
+}
+
+/* Au hover/focus de la carte, l'overlay "Ajouter au panier" remonte
+   par le bas — on efface le sticker pour ne pas couvrir le CTA. */
+.product-card:hover .product-sticker,
+.product-card:focus-within .product-sticker {
+  opacity: 0;
+  transform: rotate(-3deg) translateY(6px);
 }
 
 /* ── Bulles d'eau (Bubbles) ──────────────────────────────────── */
