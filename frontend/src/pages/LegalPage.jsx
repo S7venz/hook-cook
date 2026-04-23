@@ -43,8 +43,7 @@ const LEGAL = {
           Les contenus du site (textes, visuels, photos de produits, charte
           graphique) sont la propriété de Hook &amp; Cook sauf mention contraire.
           Les illustrations de poissons et cartes proviennent d'OpenStreetMap
-          France (ODbL), d'Hubeau (service public Eaufrance) et
-          d'Open-Meteo (données libres).
+          France (ODbL) et d'Open-Meteo (données libres).
         </p>
 
         <h2>Crédit typographique</h2>
