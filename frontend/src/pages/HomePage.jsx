@@ -10,6 +10,9 @@ import {
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { PondJump } from '../components/ui/PondJump.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
+import { Bubbles } from '../components/decor/Bubbles.jsx';
+import { SwimmingFish } from '../components/decor/SwimmingFish.jsx';
+import { Doodle } from '../components/decor/Doodle.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
@@ -159,59 +162,18 @@ function MeteoIcon({ pressure, temp }) {
   );
 }
 
-// Sparkline minimaliste : courbe + remplissage tendance sur les
-// dernières heures de débit Hubeau. Vide si moins de 4 points.
-function FlowSparkline({ series }) {
-  if (!Array.isArray(series) || series.length < 4) return null;
-  const W = 320;
-  const H = 48;
-  const PAD = 2;
-  const min = Math.min(...series);
-  const max = Math.max(...series);
-  const range = max - min || 1;
-  const step = (W - PAD * 2) / (series.length - 1);
-
-  const points = series.map((v, i) => {
-    const x = PAD + i * step;
-    const y = PAD + (H - PAD * 2) * (1 - (v - min) / range);
-    return [x, y];
-  });
-
-  const stroke = points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
-  const fill = `${stroke} L ${W - PAD} ${H - PAD} L ${PAD} ${H - PAD} Z`;
-
-  return (
-    <svg
-      className="conditions-sparkline"
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
-      aria-label={`Tendance débit ${series.length} dernières heures`}
-    >
-      <path d={fill} className="fill" />
-      <path d={stroke} className="stroke" />
-    </svg>
-  );
-}
-
 function ConditionsCard() {
-  const { temp, pressure, flow, flowHistory, moon, loading, error } = useLiveConditions();
+  const { temp, pressure, moon, loading, error } = useLiveConditions();
 
   const tempDisplay = temp != null ? `${Math.round(temp)}°` : '—';
   const pressureDisplay = pressure != null ? Math.round(pressure) : '—';
-  const flowDisplay = flow != null ? flow.toFixed(1) : null;
   const moonDisplay = moon.short;
 
-  const metrics = flowDisplay
-    ? [
-        { value: `${flowDisplay}`, label: 'm³/s débit' },
-        { value: tempDisplay, label: 'air' },
-        { value: moonDisplay, label: 'lune' },
-      ]
-    : [
-        { value: tempDisplay, label: 'air' },
-        { value: pressureDisplay, label: 'hPa' },
-        { value: moonDisplay, label: 'lune' },
-      ];
+  const metrics = [
+    { value: tempDisplay, label: 'air' },
+    { value: pressureDisplay, label: 'hPa' },
+    { value: moonDisplay, label: 'lune' },
+  ];
 
   return (
     <div className="card" style={{ ...cardStyle, position: 'relative' }}>
@@ -245,7 +207,6 @@ function ConditionsCard() {
           </div>
         ))}
       </div>
-      <FlowSparkline series={flowHistory} />
       <div
         style={{
           marginTop: 'var(--sp-3)',
@@ -263,7 +224,7 @@ function ConditionsCard() {
           color: 'var(--ink-mute)',
         }}
       >
-        Sources : Open-Meteo · Hubeau (Eaufrance)
+        Source : Open-Meteo
       </div>
     </div>
   );
@@ -298,8 +259,10 @@ export function HomePage() {
 
   return (
     <div className="page">
-      <section className="hero">
+      <section className="hero cursor-rod" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="hero-bg" aria-hidden="true" />
+        <SwimmingFish count={4} layer="back" />
+        <Bubbles count={14} side="left" />
         <svg
           className="hero-deco"
           viewBox="0 0 800 600"

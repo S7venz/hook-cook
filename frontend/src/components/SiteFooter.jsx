@@ -84,7 +84,7 @@ const columnLinkStyle = {
 
 export function SiteFooter() {
   return (
-    <footer style={footerStyle}>
+    <footer className="net-pattern" style={footerStyle}>
       <div className="page-container">
         <div style={gridStyle}>
           <div style={{ gridColumn: 'span 2' }}>

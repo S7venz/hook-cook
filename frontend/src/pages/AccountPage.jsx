@@ -6,6 +6,8 @@ import { EmptyState } from '../components/ui/EmptyState.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
+import { FishRain } from '../components/decor/FishRain.jsx';
+import { HookStamp } from '../components/decor/HookStamp.jsx';
 import { useAuth } from '../lib/auth.js';
 import { useCarnet } from '../lib/carnet.js';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
@@ -165,6 +167,20 @@ function OrdersTab({ orders, onShop }) {
 }
 
 function PermisTab({ permit, onStart }) {
+  // Pluie de poissons une seule fois quand l'utilisateur découvre que
+  // son permis vient d'être approuvé. Persisté en localStorage pour
+  // ne pas se rejouer à chaque visite.
+  const [celebrate, setCelebrate] = useState(false);
+  useEffect(() => {
+    if (!permit || permit.status !== 'approved' || !permit.id) return;
+    const key = `hc-permit-celebrated-${permit.id}`;
+    if (localStorage.getItem(key)) return;
+    setCelebrate(true);
+    localStorage.setItem(key, '1');
+    const t = setTimeout(() => setCelebrate(false), 4500);
+    return () => clearTimeout(t);
+  }, [permit?.id, permit?.status]);
+
   if (!permit) {
     return (
       <EmptyState
@@ -178,8 +194,15 @@ function PermisTab({ permit, onStart }) {
       </EmptyState>
     );
   }
+  const approved = permit.status === 'approved';
   return (
     <div className="stack-md">
+      <FishRain count={28} duration={4000} active={celebrate} />
+      {approved && celebrate && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--sp-3)' }}>
+          <HookStamp label="PERMIS VALIDÉ" size={88} />
+        </div>
+      )}
       <div className="card" style={{ padding: 'var(--sp-5)' }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
@@ -194,7 +217,7 @@ function PermisTab({ permit, onStart }) {
               {new Intl.DateTimeFormat('fr-FR').format(new Date(permit.submittedAt))}
             </div>
           </div>
-          <Badge status={permit.status === 'approved' ? 'approved' : 'pending'}>
+          <Badge status={approved ? 'approved' : 'pending'}>
             {permit.statusLabel}
           </Badge>
         </div>

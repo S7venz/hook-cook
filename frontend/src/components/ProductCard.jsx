@@ -3,6 +3,7 @@ import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
 import { Icon } from './ui/Icon.jsx';
 import { Placeholder } from './ui/Placeholder.jsx';
+import { ProductSticker } from './decor/ProductSticker.jsx';
 import { useAuth } from '../lib/auth.js';
 import { useCart } from '../lib/cart.js';
 import { formatPrice } from '../lib/format.js';
@@ -38,6 +39,13 @@ export function ProductCard({ product }) {
 
   const stock = Number(product.stock) || 0;
   const soldOut = stock <= 0;
+  // Sticker prioritaire : promo > stock limité > coup de cœur. Un seul à la fois
+  // pour ne pas surcharger la carte.
+  const stickerVariant =
+    product.wasPrice ? 'promo'
+    : !soldOut && stock <= 3 ? 'dernier'
+    : Number(product.rating) >= 4.5 ? 'favori'
+    : null;
 
   const open = () => navigate(`/boutique/${product.id}`);
 
@@ -63,7 +71,7 @@ export function ProductCard({ product }) {
       onClick={open}
       onKeyDown={handleKey}
     >
-      <div className="card-media">
+      <div className="card-media" style={{ position: 'relative' }}>
         <Placeholder
           label={product.img}
           src={product.imageUrl}
@@ -71,6 +79,7 @@ export function ProductCard({ product }) {
           width={400}
           height={400}
         />
+        {stickerVariant && <ProductSticker variant={stickerVariant} />}
         <button
           type="button"
           className={`card-favorite ${favorited ? 'active' : ''}`.trim()}

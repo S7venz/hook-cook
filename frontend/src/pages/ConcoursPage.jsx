@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { ContestsMap } from '../components/ui/ContestsMap.jsx';
+import { FishRain } from '../components/decor/FishRain.jsx';
 import { useContestRegistrations } from '../lib/contestRegistrations.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { formatPrice } from '../lib/format.js';
@@ -162,6 +163,7 @@ export function ConcoursPage() {
   const [filter, setFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
   const { push } = useToast();
   const { register, isRegistered } = useContestRegistrations();
 
@@ -186,6 +188,8 @@ export function ConcoursPage() {
       await register(contestId, { category, permitNumber: permit });
       push(`Inscrit à ${selected.title} · ${label}`);
       setShowModal(false);
+      setCelebrate(true);
+      setTimeout(() => setCelebrate(false), 4500);
     } catch (err) {
       push(err?.message ?? 'Inscription impossible.');
     }
@@ -476,6 +480,8 @@ export function ConcoursPage() {
           onConfirm={handleConfirm}
         />
       )}
+
+      <FishRain count={26} duration={3500} active={celebrate} />
     </div>
   );
 }

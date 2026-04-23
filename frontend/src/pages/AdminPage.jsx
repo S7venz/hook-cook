@@ -1580,7 +1580,7 @@ export function AdminPage() {
   };
 
   return (
-    <div className="admin-layout">
+    <div className="admin-layout admin-section">
       <aside className="admin-sidenav">
         <div className="brand-small">
           Hook &amp; Cook{' '}

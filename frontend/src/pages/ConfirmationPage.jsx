@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
+import { FishRain } from '../components/decor/FishRain.jsx';
+import { HookStamp } from '../components/decor/HookStamp.jsx';
 import { api } from '../lib/api.js';
 import { useAuth } from '../lib/auth.js';
 import { downloadInvoice } from '../lib/invoice.js';
@@ -171,9 +173,10 @@ export function ConfirmationPage() {
 
   return (
     <div className="page">
+      <FishRain count={32} duration={3800} />
       <div className="page-container confirm-hero" style={{ maxWidth: 680 }}>
-        <div className="tick">
-          <Icon name="check" size={32} />
+        <div style={{ marginBottom: 'var(--sp-4)' }}>
+          <HookStamp label="COMMANDE VALIDÉE" size={104} />
         </div>
         <h1>Merci — on prépare vos articles.</h1>
         <div className="ref">
