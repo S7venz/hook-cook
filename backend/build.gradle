@@ -16,6 +16,7 @@ group "backend"
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
+apply plugin:"jacoco"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
 
@@ -102,4 +103,18 @@ tasks.withType(GroovyCompile) {
 
 tasks.withType(Test) {
     useJUnitPlatform()
+}
+
+// Couverture JaCoCo. Lancer : `./gradlew test jacocoTestReport`.
+// Rapport HTML dans build/reports/jacoco/test/html/index.html
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

@@ -18,6 +18,11 @@ RUN ./grailsw --stacktrace war
 ########################################
 FROM eclipse-temurin:17-jre-jammy
 
+# curl : strictement pour le HEALTHCHECK Docker (~3 Mo). Pas utilisé au runtime.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
 # Utilisateur non-root dédié — si une CVE/RCE est exploitée dans une
 # dépendance, l'attaquant n'a pas le root du container.
 RUN groupadd --system --gid 10001 app \
@@ -43,4 +48,6 @@ ENV SPRING_PROFILES_ACTIVE=production
 
 USER app:app
 EXPOSE 8080
+HEALTHCHECK --interval=15s --timeout=3s --start-period=60s --retries=5 \
+    CMD curl -fsS http://localhost:8080/actuator/health || exit 1
 ENTRYPOINT ["java", "-jar", "/app/app.war"]

@@ -81,8 +81,18 @@ environments:
                     enabled: true
     production:
         management:
+            # En prod : on n'expose QUE health (Docker healthcheck) — pas
+            # d'/env, pas d'/heapdump qui dumperait les secrets.
             endpoints:
                 enabled-by-default: false
+                web:
+                    base-path: '/actuator'
+                    exposure:
+                        include: 'health'
+            endpoint:
+                health:
+                    enabled: true
+                    show-details: never
 
 ---
 grails:
