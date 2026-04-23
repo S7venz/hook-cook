@@ -262,6 +262,20 @@
   border: 0;
 }
 
+/* ── Masquage du badge "Test mode" flottant injecté par Stripe.js ── */
+
+/* Stripe injecte plusieurs iframes invisibles à la racine du body pour
+   le fingerprinting (Radar) et les métriques. L'une d'elles porte le
+   badge flottant "Test mode" en bas à droite. On les masque visuellement
+   sans empêcher leur fonctionnement (display:none les neutralise tout
+   de même côté JS, mais ça reste accepté en démo : pas de Radar). */
+body > iframe[name^="__privateStripeMetricsController"],
+body > iframe[name^="__privateStripeFraudDetector"],
+body > div.StripeBadge,
+body > div[class*="stripe-badge"] {
+  display: none !important;
+}
+
 /* ── Réduction d'animations si l'utilisateur le demande ────── */
 
 @media (prefers-reduced-motion: reduce) {

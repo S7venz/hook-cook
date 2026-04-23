@@ -34,27 +34,34 @@ function PayForm({ amount, returnUrl, onSuccess, onError, label = 'Payer' }) {
   const stripe = useStripe();
   const elements = useElements();
   const [processing, setProcessing] = useState(false);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
 
   const handlePay = async () => {
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !ready) return;
     setError('');
     setProcessing(true);
-    const { error: payError, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: returnUrl },
-      redirect: 'if_required',
-    });
-    if (payError) {
-      setError(payError.message || 'Paiement refusé.');
+    try {
+      const { error: payError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: returnUrl },
+        redirect: 'if_required',
+      });
+      if (payError) {
+        setError(payError.message || 'Paiement refusé.');
+        setProcessing(false);
+        onError?.(payError);
+        return;
+      }
+      if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+        onSuccess?.(paymentIntent);
+      } else {
+        setProcessing(false);
+      }
+    } catch (e) {
+      setError(e?.message || 'Paiement impossible. Réessayez.');
       setProcessing(false);
-      onError?.(payError);
-      return;
-    }
-    if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
-      onSuccess?.(paymentIntent);
-    } else {
-      setProcessing(false);
+      onError?.(e);
     }
   };
 
@@ -64,7 +71,28 @@ function PayForm({ amount, returnUrl, onSuccess, onError, label = 'Payer' }) {
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
           Carte bancaire · Stripe (mode test)
         </div>
-        <PaymentElement options={{ layout: 'tabs' }} />
+        <div style={{ minHeight: 220, position: 'relative' }}>
+          {!ready && (
+            <div
+              className="soft mono"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 'var(--fs-13)',
+              }}
+            >
+              Chargement du formulaire de paiement…
+            </div>
+          )}
+          <PaymentElement
+            options={{ layout: 'tabs' }}
+            onReady={() => setReady(true)}
+            onLoadError={(e) => setError(e?.error?.message || 'Le formulaire de paiement n\'a pas pu se charger.')}
+          />
+        </div>
       </div>
       {error && <div className="error">{error}</div>}
       <Button
@@ -72,9 +100,13 @@ function PayForm({ amount, returnUrl, onSuccess, onError, label = 'Payer' }) {
         size="lg"
         full
         onClick={handlePay}
-        disabled={processing || !stripe || !elements}
+        disabled={processing || !stripe || !elements || !ready}
       >
-        {processing ? 'Traitement…' : `${label} ${formatPrice(amount)}`}
+        {processing
+          ? 'Traitement…'
+          : !ready
+            ? 'Chargement…'
+            : `${label} ${formatPrice(amount)}`}
       </Button>
       <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
         Carte de test : 4242 4242 4242 4242 — date future quelconque, CVC 3 chiffres.
