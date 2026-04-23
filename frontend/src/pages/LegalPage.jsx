@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 const LEGAL = {
   'mentions-legales': {
     title: 'Mentions légales',
-    updated: '21 avril 2026',
+    updated: '23 avril 2026',
     body: (
       <>
         <h2>Éditeur du site</h2>
@@ -42,8 +42,9 @@ const LEGAL = {
         <p>
           Les contenus du site (textes, visuels, photos de produits, charte
           graphique) sont la propriété de Hook &amp; Cook sauf mention contraire.
-          Les illustrations de poissons et cartes proviennent d'OpenStreetMap
-          France (ODbL) et d'Open-Meteo (données libres).
+          Les fonds de carte proviennent d'OpenStreetMap France (ODbL) ; les
+          données météo affichées sur la page d'accueil sont fournies par
+          Open-Meteo (données libres).
         </p>
 
         <h2>Crédit typographique</h2>
@@ -56,7 +57,7 @@ const LEGAL = {
 
   cgv: {
     title: 'Conditions générales de vente',
-    updated: '21 avril 2026',
+    updated: '23 avril 2026',
     body: (
       <>
         <h2>1. Objet</h2>
@@ -110,9 +111,13 @@ const LEGAL = {
 
         <h2>7. Paiement</h2>
         <p>
-          Paiement par carte bancaire via Stripe ou compte PayPal. Les
-          données bancaires ne transitent pas par Hook &amp; Cook — elles
-          sont traitées directement par le prestataire de paiement.
+          Paiement par carte bancaire (Visa, Mastercard, American Express)
+          via <strong>Stripe</strong>, prestataire conforme PCI-DSS. Les
+          données bancaires ne transitent pas par Hook &amp; Cook&nbsp;: la
+          saisie se fait dans un champ Stripe sécurisé et seul un identifiant
+          de transaction est conservé pour la facturation. La même passerelle
+          est utilisée pour les commandes boutique, les permis et les
+          inscriptions concours payantes.
         </p>
 
         <h2>8. Litiges</h2>
@@ -128,7 +133,7 @@ const LEGAL = {
 
   'politique-confidentialite': {
     title: 'Politique de confidentialité',
-    updated: '21 avril 2026',
+    updated: '23 avril 2026',
     body: (
       <>
         <h2>Données collectées</h2>
@@ -176,10 +181,34 @@ const LEGAL = {
         <p>
           Conformément au RGPD, vous disposez d'un droit d'accès, de
           rectification, d'effacement, de portabilité et d'opposition sur
-          vos données. Demande à adresser à{' '}
-          <a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a>.
-          Réponse sous 30 jours maximum.
+          vos données.
         </p>
+        <ul>
+          <li>
+            <strong>Accès et portabilité&nbsp;:</strong> téléchargez l'export
+            JSON complet de vos données (profil, commandes, permis,
+            inscriptions, carnet, favoris, avis) depuis{' '}
+            <em>Mon compte → Paramètres → Exporter mes données</em>.
+          </li>
+          <li>
+            <strong>Effacement&nbsp;:</strong> la suppression est immédiate
+            depuis <em>Mon compte → Paramètres → Supprimer mon compte</em>.
+            Vos favoris, alertes stock, carnet et avis sont supprimés ;
+            permis et commandes sont anonymisés (tenue 10 ans des données de
+            facturation par obligation légale).
+          </li>
+          <li>
+            <strong>Rectification&nbsp;:</strong> nom, téléphone, adresse,
+            modifiables depuis l'onglet Paramètres. Pour le changement
+            d'adresse email, écrivez à{' '}
+            <a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a>.
+          </li>
+          <li>
+            <strong>Question ou réclamation&nbsp;:</strong>{' '}
+            <a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a>,
+            réponse sous 30 jours maximum.
+          </li>
+        </ul>
 
         <h2>Destinataires</h2>
         <p>
@@ -188,8 +217,15 @@ const LEGAL = {
         </p>
         <ul>
           <li>
-            Des prestataires techniques (hébergeur, passerelle de paiement,
-            service d'envoi d'emails) dans le strict cadre de leur mission.
+            <strong>Stripe</strong> (Stripe Payments Europe Ltd.) pour le
+            traitement des paiements&nbsp;: numéro de carte, détails de
+            transaction. Hook &amp; Cook ne stocke qu'un identifiant de
+            transaction.
+          </li>
+          <li>
+            Notre fournisseur SMTP (envoi des emails transactionnels&nbsp;:
+            confirmation de commande, décision de permis, réinitialisation
+            de mot de passe…).
           </li>
           <li>
             De la Fédération départementale de pêche (Pyrénées-Orientales)
@@ -197,6 +233,15 @@ const LEGAL = {
             requises par la réglementation.
           </li>
         </ul>
+
+        <h2>Sécurité</h2>
+        <p>
+          Les mots de passe sont hashés avec BCrypt (12 rounds) et ne sont
+          jamais stockés en clair. La session est portée par un jeton JWT
+          côté navigateur. Les liens de réinitialisation de mot de passe
+          envoyés par email sont à usage unique et expirent au bout d'une
+          heure. Les webhooks Stripe sont vérifiés par signature HMAC.
+        </p>
 
         <h2>Cookies</h2>
         <p>
@@ -208,7 +253,7 @@ const LEGAL = {
 
   cookies: {
     title: 'Politique cookies',
-    updated: '21 avril 2026',
+    updated: '23 avril 2026',
     body: (
       <>
         <h2>Qu'est-ce qu'un cookie&nbsp;?</h2>

@@ -25,7 +25,7 @@ const SECTIONS = [
           Jean-Marc Peyre, ancien guide sur la Têt.
         </p>
         <p>
-          Seize ans plus tard, la boutique s'est agrandie et le catalogue
+          Dix-huit ans plus tard, la boutique s'est agrandie et le catalogue
           couvre toutes les techniques — mouche, carnassiers, surfcasting,
           carpe — mais l'approche reste la même : sélectionner chaque produit
           comme si c'était nous qui allions pêcher avec. Pas de catalogue

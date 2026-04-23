@@ -15,11 +15,11 @@ const CATEGORIES = [
         q: "J'ai oublié mon mot de passe, comment le récupérer ?",
         a: (
           <p>
-            La fonction de récupération automatique n'est pas encore disponible.
-            Envoyez-nous un email à{' '}
-            <a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a> avec
-            votre adresse de compte, on vous renverra un lien de
-            réinitialisation sous 24h ouvrées.
+            Depuis l'écran de connexion, cliquez sur{' '}
+            <Link to="/mot-de-passe-oublie">Mot de passe oublié</Link>. Saisissez
+            votre adresse, on vous envoie immédiatement un email avec un lien de
+            réinitialisation valable <strong>1 heure</strong>. Pour des raisons
+            de sécurité, on ne précise pas si l'adresse est connue ou non.
           </p>
         ),
       },
@@ -28,8 +28,10 @@ const CATEGORIES = [
         a: (
           <p>
             Depuis votre espace <Link to="/compte">Mon compte</Link>, onglet
-            Paramètres. Vous pouvez y modifier votre nom, téléphone, adresse
-            et email.
+            Paramètres. Vous pouvez y modifier votre nom, téléphone et adresse
+            de livraison. L'adresse email ne peut pas être changée elle-même —
+            écrivez à <a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a>{' '}
+            si vous devez la mettre à jour.
           </p>
         ),
       },
@@ -37,11 +39,13 @@ const CATEGORIES = [
         q: 'Puis-je supprimer mon compte ?',
         a: (
           <p>
-            Oui — conformément au RGPD. Envoyez une demande à
-            {' '}<a href="mailto:contact@hookcook.fr">contact@hookcook.fr</a>,
-            nous anonymisons vos données personnelles sous 30 jours. Les
-            commandes passées sont conservées 10 ans par obligation légale
-            mais ne sont plus rattachées à votre identité.
+            Oui, et c'est immédiat. Depuis <Link to="/compte">Mon compte</Link>{' '}
+            → Paramètres, vous pouvez télécharger l'export RGPD de toutes vos
+            données (JSON) puis supprimer votre compte. Conformément à la
+            réglementation, les commandes passées sont conservées 10 ans à des
+            fins de facturation mais sont anonymisées et ne sont plus rattachées
+            à votre identité (nom, email, adresse). Permis et inscriptions
+            concours sont anonymisés ou supprimés.
           </p>
         ),
       },
@@ -164,12 +168,27 @@ const CATEGORIES = [
         ),
       },
       {
+        q: 'Comment se déroule la demande, étape par étape ?',
+        a: (
+          <ol>
+            <li>Choix du type de permis et du département.</li>
+            <li>Identité (prénom, nom, date de naissance).</li>
+            <li>Téléversement des pièces (pièce d'identité + photo, JPG/PNG/WebP, 8 Mo max).</li>
+            <li>
+              Paiement par carte bancaire via Stripe — la demande passe en
+              instruction dès la confirmation du paiement.
+            </li>
+            <li>Décision de la Fédération sous quelques jours ouvrés.</li>
+          </ol>
+        ),
+      },
+      {
         q: 'Combien de temps pour obtenir mon permis ?',
         a: (
           <p>
-            Généralement <strong>sous 2 jours ouvrés</strong>. La demande passe
-            en instruction à la Fédération départementale qui valide. Le PDF
-            est téléchargeable depuis votre espace dès l'approbation.
+            Généralement <strong>sous 2 jours ouvrés</strong> après instruction
+            par la Fédération départementale. Vous suivez l'historique en
+            temps réel depuis l'onglet <em>Permis</em> de votre compte.
           </p>
         ),
       },
@@ -194,20 +213,24 @@ const CATEGORIES = [
         a: (
           <p>
             Depuis la page <Link to="/concours">Concours</Link>, cliquez sur le
-            concours voulu puis sur « S'inscrire ». Il faut être connecté, avoir
-            un permis valide, et la catégorie du concours doit correspondre à
-            votre profil. Les places sont limitées.
+            concours voulu puis sur « S'inscrire ». Il faut être connecté et
+            choisir une catégorie (hommes amateurs, femmes, jeunes…). Les
+            places sont limitées : l'inscription n'est validée qu'à la
+            confirmation du paiement (ou immédiatement pour les concours
+            gratuits).
           </p>
         ),
       },
       {
-        q: 'Les concours sont-ils payants ?',
+        q: 'Les concours sont-ils payants ? Comment payer ?',
         a: (
           <p>
-            Ça dépend. L'Ouverture truite — Vallée du Tech est gratuite. Les
-            autres (Open de la Têt, Carpe 24h à Vinça, Nocturne Agly) ont un
-            droit d'inscription entre 25 et 45 €, qui couvre les frais
-            d'organisation et les lots.
+            Ça dépend du concours. L'Ouverture truite — Vallée du Tech est
+            gratuite ; les autres (Open de la Têt, Carpe 24h à Vinça, Nocturne
+            silures Agly) ont un droit d'inscription entre 25 et 45 €. Le
+            paiement se fait par carte bancaire via Stripe directement après
+            l'inscription. Vos inscrits ne sont décomptés et le mail de
+            confirmation envoyé qu'une fois le paiement validé.
           </p>
         ),
       },
@@ -231,9 +254,10 @@ const CATEGORIES = [
         q: 'Mes données bancaires sont-elles en sécurité ?',
         a: (
           <p>
-            Oui. Les paiements passent par Stripe et PayPal — les deux plus
-            gros prestataires européens, conformes PCI-DSS. Vos données de
-            carte ne transitent jamais par nos serveurs.
+            Oui. Les paiements (boutique, permis, concours) passent
+            exclusivement par <strong>Stripe</strong>, conforme PCI-DSS. Vos
+            numéros de carte ne transitent ni ne sont stockés sur nos serveurs :
+            seul un identifiant de transaction est conservé pour la facturation.
           </p>
         ),
       },
@@ -241,8 +265,11 @@ const CATEGORIES = [
         q: 'Quels moyens de paiement acceptez-vous ?',
         a: (
           <p>
-            Carte bancaire (Visa, Mastercard, Amex) via Stripe, ou PayPal.
-            Aucun frais supplémentaire quelle que soit la méthode.
+            Carte bancaire (Visa, Mastercard, American Express) via Stripe,
+            sans frais supplémentaires. Le site est aujourd'hui en mode
+            démonstration : utilisez une carte de test Stripe (
+            <span className="mono">4242 4242 4242 4242</span>, date future
+            quelconque, CVC 3 chiffres).
           </p>
         ),
       },
