@@ -114,7 +114,9 @@ CREATE TABLE public.contest_registrations (
     last_updated timestamp without time zone NOT NULL,
     user_id bigint NOT NULL,
     category character varying(40) NOT NULL,
-    contest_id character varying(80) NOT NULL
+    contest_id character varying(80) NOT NULL,
+    status character varying(20) NOT NULL DEFAULT 'paid',
+    stripe_payment_intent_id character varying(80)
 );
 
 
@@ -221,11 +223,14 @@ CREATE TABLE public.permits (
     type_id character varying(40) NOT NULL,
     user_id bigint NOT NULL,
     type_title character varying(80) NOT NULL,
-    status character varying(8) NOT NULL,
+    status character varying(20) NOT NULL,
     birth_date character varying(20) NOT NULL,
     last_name character varying(120) NOT NULL,
     amount numeric(19,2) NOT NULL,
-    reference character varying(40) NOT NULL
+    reference character varying(40) NOT NULL,
+    id_doc_url character varying(500),
+    photo_doc_url character varying(500),
+    stripe_payment_intent_id character varying(80)
 );
 
 
@@ -565,6 +570,13 @@ CREATE INDEX contest_reg_user_idx ON public.contest_registrations USING btree (u
 
 
 --
+-- Name: contest_reg_stripe_pi_idx; Type: INDEX; Schema: public; Owner: hookcook
+--
+
+CREATE INDEX contest_reg_stripe_pi_idx ON public.contest_registrations USING btree (stripe_payment_intent_id);
+
+
+--
 -- Name: orders_reference_idx; Type: INDEX; Schema: public; Owner: hookcook
 --
 
@@ -590,6 +602,13 @@ CREATE INDEX permits_reference_idx ON public.permits USING btree (reference);
 --
 
 CREATE INDEX permits_user_idx ON public.permits USING btree (user_id);
+
+
+--
+-- Name: permits_stripe_pi_idx; Type: INDEX; Schema: public; Owner: hookcook
+--
+
+CREATE INDEX permits_stripe_pi_idx ON public.permits USING btree (stripe_payment_intent_id);
 
 
 --
