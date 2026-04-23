@@ -15,20 +15,9 @@
          sur la première requête (DNS + TCP + TLS handshakes anticipés). -->
     <link rel="preconnect" href="http://localhost:8080" crossorigin />
     <!-- Préchargement de l'image LCP de la home conditionné au chemin :
-         évite le warning "preloaded but not used" sur les autres pages. -->
-    <script>
-      (function () {
-        if (location.pathname === '/' || location.pathname === '/index.html') {
-          var link = document.createElement('link');
-          link.rel = 'preload';
-          link.as = 'image';
-          link.href = 'http://localhost:8080/api/uploads/hero-home.webp';
-          link.fetchPriority = 'high';
-          link.type = 'image/webp';
-          document.head.appendChild(link);
-        }
-      })();
-    </script>
+         évite le warning "preloaded but not used" sur les autres pages.
+         Externalisé pour respecter la CSP `script-src 'self'`. -->
+    <script src="/preload-hero.js"></script>
     <title>Hook &amp; Cook — Boutique, permis et concours de pêche</title>
   </head>
   <body>
