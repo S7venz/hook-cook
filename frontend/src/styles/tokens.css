@@ -329,16 +329,19 @@ img, svg { display: block; max-width: 100%; }
 /* BADGE — statut permis, stock, etc. */
 .badge {
   display: inline-flex; align-items: center; gap: var(--sp-2);
-  min-height: 22px; padding: 3px var(--sp-2);
+  min-height: 22px; padding: 4px 8px;
   font-size: var(--fs-12);
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
-  line-height: 1.2;
+  line-height: 1.25;
   text-transform: uppercase;
   border-radius: var(--r-sm);
   background: var(--bg-sunk); color: var(--ink-soft);
   border: 1px solid var(--hairline);
-  white-space: nowrap;
+  max-width: 100%;
+  /* Pas de white-space:nowrap → si le texte est long le badge grandit
+     en hauteur et la bordure entoure proprement les 2 lignes. */
+  word-break: keep-all;
 }
 .badge-dot::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%;
