@@ -151,3 +151,5 @@ nav:
   - Guides:
     - Utilisateur: GUIDE-UTILISATEUR.md
     - Administrateur: GUIDE-ADMIN.md
+  - Qualité:
+    - Veille technologique et sécurité: VEILLE.md

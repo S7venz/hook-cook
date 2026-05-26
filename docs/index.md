@@ -65,6 +65,15 @@ Application multicouche sécurisée — projet support du Titre Professionnel **
 
     [→ Guide admin](GUIDE-ADMIN.md)
 
+-   :material-shield-search:{ .lg .middle } &nbsp; **Veille & sécurité**
+
+    ---
+
+    Sources surveillées, outils d'automatisation (Dependabot), rituel hebdomadaire,
+    applications concrètes au projet et faille trouvée + corrigée.
+
+    [→ Veille technologique et sécurité](VEILLE.md)
+
 -   :material-github:{ .lg .middle } &nbsp; **Code source**
 
     ---
