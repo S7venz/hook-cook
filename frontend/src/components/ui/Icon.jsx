@@ -20,6 +20,9 @@ const PATHS = {
     'M12 3v12m0 0l-4-4m4 4l4-4M5 21h14',
   heart:
     'M12 21s-7-4.35-9.5-9.5A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 5.5C19 16.65 12 21 12 21z',
+  // Icône globe (langue) — translate-style avec "文 A"
+  language:
+    'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 0 1-6.32-3.1c.92-.59 3.16-1.4 6.32-1.4s5.4.81 6.32 1.4A8 8 0 0 1 12 20zm0-10a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM2.05 11a10 10 0 0 1 19.9 0H2.05z',
 };
 
 export function Icon({ name, size = 20, className = '' }) {

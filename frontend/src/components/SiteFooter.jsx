@@ -1,48 +1,5 @@
 import { Link } from 'react-router-dom';
-
-/**
- * Liens du footer — chaque entrée pointe sur une vraie route. Les
- * catégories produits utilisent le filtre ?category= déjà géré par
- * CataloguePage. Les items "Marque" pointent sur /a-propos avec
- * ancres, "Aide" sur sa propre page FAQ.
- */
-const FOOTER_COLUMNS = [
-  {
-    title: 'Boutique',
-    items: [
-      { label: 'Cannes', to: '/boutique?category=cannes' },
-      { label: 'Moulinets', to: '/boutique?category=moulinets' },
-      { label: 'Leurres', to: '/boutique?category=leurres' },
-      { label: 'Vêtements', to: '/boutique?category=vetements' },
-      { label: 'Par espèce', to: '/' },
-    ],
-  },
-  {
-    title: 'Services',
-    items: [
-      { label: 'Permis 2026', to: '/permis' },
-      { label: 'Concours', to: '/concours' },
-      { label: 'Carnet de prise', to: '/compte#carnet' },
-      { label: 'Challenges', to: '/challenges' },
-    ],
-  },
-  {
-    title: 'Marque',
-    items: [
-      { label: 'Notre histoire', to: '/a-propos#histoire' },
-      { label: 'Ateliers partenaires', to: '/a-propos#ateliers' },
-      { label: 'Engagements', to: '/a-propos#engagements' },
-      { label: 'Aide', to: '/aide' },
-    ],
-  },
-];
-
-const LEGAL_LINKS = [
-  { to: '/legal/mentions-legales', label: 'Mentions légales' },
-  { to: '/legal/cgv', label: 'CGV' },
-  { to: '/legal/politique-confidentialite', label: 'Confidentialité' },
-  { to: '/legal/cookies', label: 'Cookies' },
-];
+import { useTranslation } from 'react-i18next';
 
 const footerStyle = {
   borderTop: '1px solid var(--rule)',
@@ -83,6 +40,45 @@ const columnLinkStyle = {
 };
 
 export function SiteFooter() {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+
+  const columns = [
+    {
+      title: t('footer.shop'),
+      items: [
+        { label: t('footer.categories.rods'), to: '/boutique?category=cannes' },
+        { label: t('footer.categories.reels'), to: '/boutique?category=moulinets' },
+        { label: t('footer.categories.lures'), to: '/boutique?category=leurres' },
+        { label: t('footer.categories.clothing'), to: '/boutique?category=vetements' },
+        { label: t('footer.categories.bySpecies'), to: '/' },
+      ],
+    },
+    {
+      title: t('footer.services'),
+      items: [
+        { label: t('footer.permits2026'), to: '/permis' },
+        { label: t('footer.contests'), to: '/concours' },
+        { label: t('footer.catchLog'), to: '/compte#carnet' },
+        { label: t('footer.challenges'), to: '/challenges' },
+      ],
+    },
+    {
+      title: t('footer.company'),
+      items: [
+        { label: t('footer.about'), to: '/a-propos#histoire' },
+        { label: t('footer.help'), to: '/aide' },
+      ],
+    },
+  ];
+
+  const legalLinks = [
+    { to: '/legal/mentions-legales', label: t('footer.legal') },
+    { to: '/legal/cgv', label: t('footer.terms') },
+    { to: '/legal/politique-confidentialite', label: t('footer.privacy') },
+    { to: '/legal/cookies', label: t('footer.cookies') },
+  ];
+
   return (
     <footer className="net-pattern" style={footerStyle}>
       <div className="page-container">
@@ -92,10 +88,10 @@ export function SiteFooter() {
               Hook &amp; Cook<span className="dot" />
             </Link>
             <p className="soft" style={{ maxWidth: '32ch', marginTop: 'var(--sp-3)' }}>
-              Boutique, permis et concours de pêche — tenus par des pêcheurs. Perpignan, France.
+              {t('footer.tagline')}
             </p>
           </div>
-          {FOOTER_COLUMNS.map((col) => (
+          {columns.map((col) => (
             <div key={col.title}>
               <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
                 {col.title}
@@ -116,15 +112,14 @@ export function SiteFooter() {
           ))}
         </div>
         <div style={legalStyle}>
-          <span>© 2026 Hook &amp; Cook · Perpignan</span>
-          <nav style={legalLinksStyle} aria-label="Liens légaux">
-            {LEGAL_LINKS.map((l) => (
+          <span>{t('footer.copyright', { year })}</span>
+          <nav style={legalLinksStyle} aria-label={t('footer.legalLinks')}>
+            {legalLinks.map((l) => (
               <Link key={l.to} to={l.to} style={{ color: 'inherit' }}>
                 {l.label}
               </Link>
             ))}
           </nav>
-          <span>Paiement sécurisé · Livraison Colissimo</span>
         </div>
       </div>
     </footer>

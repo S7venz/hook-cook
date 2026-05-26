@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { useAuth } from '../lib/auth.js';
 import {
@@ -12,6 +13,7 @@ import {
 export function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,11 +26,11 @@ export function RegisterPage() {
     e.preventDefault();
     setError('');
     const err = firstError(
-      validateName(firstName, { field: 'Le prénom' }),
-      validateName(lastName, { field: 'Le nom' }),
+      validateName(firstName, { field: t('auth.register.firstNameLabel') }),
+      validateName(lastName, { field: t('auth.register.lastNameLabel') }),
       validateEmail(email),
       validatePassword(password),
-      password !== confirm ? 'Les mots de passe ne correspondent pas.' : null,
+      password !== confirm ? t('auth.register.errorMismatch') : null,
     );
     if (err) {
       setError(err);
@@ -49,7 +51,7 @@ export function RegisterPage() {
       <div className="page-container" style={{ maxWidth: 480 }}>
         <div style={{ padding: 'var(--sp-12) 0' }}>
           <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-            Bienvenue chez Hook &amp; Cook
+            {t('auth.register.eyebrow')}
           </div>
           <h1
             style={{
@@ -60,7 +62,7 @@ export function RegisterPage() {
               margin: '0 0 var(--sp-6)',
             }}
           >
-            Créer un compte
+            {t('auth.register.title')}
           </h1>
 
           <form onSubmit={submit} className="stack-md" noValidate>
@@ -68,7 +70,7 @@ export function RegisterPage() {
               style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}
             >
               <div className="field">
-                <label htmlFor="reg-firstname">Prénom</label>
+                <label htmlFor="reg-firstname">{t('auth.register.firstNameLabel')}</label>
                 <input
                   id="reg-firstname"
                   className="input"
@@ -79,7 +81,7 @@ export function RegisterPage() {
                 />
               </div>
               <div className="field">
-                <label htmlFor="reg-lastname">Nom</label>
+                <label htmlFor="reg-lastname">{t('auth.register.lastNameLabel')}</label>
                 <input
                   id="reg-lastname"
                   className="input"
@@ -91,7 +93,7 @@ export function RegisterPage() {
               </div>
             </div>
             <div className="field">
-              <label htmlFor="reg-email">Email</label>
+              <label htmlFor="reg-email">{t('auth.register.emailLabel')}</label>
               <input
                 id="reg-email"
                 className="input"
@@ -103,7 +105,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="field">
-              <label htmlFor="reg-password">Mot de passe</label>
+              <label htmlFor="reg-password">{t('auth.register.passwordLabel')}</label>
               <input
                 id="reg-password"
                 className="input"
@@ -113,10 +115,10 @@ export function RegisterPage() {
                 autoComplete="new-password"
                 required
               />
-              <div className="hint">Minimum 8 caractères.</div>
+              <div className="hint">{t('auth.register.passwordHint')}</div>
             </div>
             <div className="field">
-              <label htmlFor="reg-confirm">Confirmer le mot de passe</label>
+              <label htmlFor="reg-confirm">{t('auth.register.confirmLabel')}</label>
               <input
                 id="reg-confirm"
                 className="input"
@@ -129,7 +131,7 @@ export function RegisterPage() {
             </div>
             {error && <div className="error">{error}</div>}
             <Button variant="primary" size="lg" full type="submit" disabled={submitting}>
-              {submitting ? 'Création…' : 'Créer mon compte'}
+              {submitting ? t('auth.register.submitting') : t('auth.register.submit')}
             </Button>
           </form>
 
@@ -141,12 +143,12 @@ export function RegisterPage() {
               color: 'var(--ink-soft)',
             }}
           >
-            Déjà un compte ?{' '}
+            {t('auth.register.alreadyAccount')}{' '}
             <Link
               to="/connexion"
               style={{ color: 'var(--accent)', borderBottom: '1px solid var(--accent)' }}
             >
-              Se connecter
+              {t('auth.register.login')}
             </Link>
           </div>
         </div>

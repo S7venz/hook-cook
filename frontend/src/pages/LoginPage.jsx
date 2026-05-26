@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { emailValid, useAuth } from '../lib/auth.js';
 
@@ -8,6 +9,7 @@ export function LoginPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login, user, hydrating } = useAuth();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,11 +32,11 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
     if (!emailValid(email)) {
-      setError('Email invalide.');
+      setError(t('auth.login.errorGeneric'));
       return;
     }
     if (!password) {
-      setError('Mot de passe requis.');
+      setError(t('auth.login.errorGeneric'));
       return;
     }
     setSubmitting(true);
@@ -52,7 +54,7 @@ export function LoginPage() {
       <div className="page-container" style={{ maxWidth: 440 }}>
         <div style={{ padding: 'var(--sp-12) 0' }}>
           <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-            Retour parmi les pêcheurs
+            {t('auth.login.eyebrow')}
           </div>
           <h1
             style={{
@@ -63,12 +65,12 @@ export function LoginPage() {
               margin: '0 0 var(--sp-6)',
             }}
           >
-            Connexion
+            {t('auth.login.title')}
           </h1>
 
           <form onSubmit={submit} className="stack-md" noValidate>
             <div className="field">
-              <label htmlFor="login-email">Email</label>
+              <label htmlFor="login-email">{t('auth.login.emailLabel')}</label>
               <input
                 id="login-email"
                 className="input"
@@ -80,7 +82,7 @@ export function LoginPage() {
               />
             </div>
             <div className="field">
-              <label htmlFor="login-password">Mot de passe</label>
+              <label htmlFor="login-password">{t('auth.login.passwordLabel')}</label>
               <input
                 id="login-password"
                 className="input"
@@ -99,13 +101,13 @@ export function LoginPage() {
                     borderBottom: '1px dotted currentColor',
                   }}
                 >
-                  Mot de passe oublié ?
+                  {t('auth.login.forgot')}
                 </Link>
               </div>
             </div>
             {error && <div className="error">{error}</div>}
             <Button variant="primary" size="lg" full type="submit" disabled={submitting}>
-              {submitting ? 'Connexion…' : 'Se connecter'}
+              {submitting ? t('auth.login.submitting') : t('auth.login.submit')}
             </Button>
           </form>
 
@@ -117,12 +119,12 @@ export function LoginPage() {
               color: 'var(--ink-soft)',
             }}
           >
-            Pas encore de compte ?{' '}
+            {t('auth.login.noAccount')}{' '}
             <Link
               to="/inscription"
               style={{ color: 'var(--accent)', borderBottom: '1px solid var(--accent)' }}
             >
-              Créer un compte
+              {t('auth.login.register')}
             </Link>
           </div>
         </div>

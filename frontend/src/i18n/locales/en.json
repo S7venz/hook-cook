@@ -1,0 +1,500 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "send": "Send",
+    "search": "Search",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "error": "Error",
+    "success": "Success",
+    "required": "Required",
+    "optional": "Optional",
+    "from": "from",
+    "to": "to",
+    "of": "of",
+    "or": "or",
+    "and": "and",
+    "all": "All",
+    "none": "None",
+    "previous": "Previous",
+    "next": "Next",
+    "language": "Language",
+    "darkMode": "Switch to dark mode",
+    "lightMode": "Switch to light mode"
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "permits": "Permits",
+    "contests": "Contests",
+    "challenges": "Challenges",
+    "main": "Main navigation",
+    "search": "Search the shop",
+    "account": "{{name}}'s account",
+    "login": "Sign in",
+    "cart": "Cart",
+    "cartWithCount": "Cart · {{count}} item",
+    "cartWithCount_plural": "Cart · {{count}} items",
+    "brand": "Hook & Cook — home"
+  },
+  "footer": {
+    "tagline": "Fishing shop, permits and contests — run by anglers. Perpignan, France.",
+    "shop": "Shop",
+    "categories": {
+      "rods": "Rods",
+      "reels": "Reels",
+      "lures": "Lures",
+      "clothing": "Clothing",
+      "bySpecies": "By species"
+    },
+    "services": "Services",
+    "permits2026": "2026 Permits",
+    "contests": "Contests",
+    "catchLog": "Catch log",
+    "challenges": "Challenges",
+    "company": "Company",
+    "about": "About",
+    "help": "Help",
+    "contact": "Contact",
+    "newsletter": "Get the best catches in your inbox",
+    "newsletterPlaceholder": "Your email",
+    "newsletterSubscribe": "Subscribe",
+    "legalLinks": "Legal links",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "legal": "Legal notice",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} Hook & Cook · Perpignan, France"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Fishing shop · Perpignan",
+      "title": "The gear. The rivers. The season.",
+      "subtitle": "Everything you need for freshwater fishing — tight selection, no-fluff advice, and a workshop that replies in under a day.",
+      "ctaShop": "See the shop",
+      "ctaPermits": "Request my permit",
+      "trustBadge": "Fishing shop run by anglers · Advice in under 24 h"
+    },
+    "topSales": {
+      "title": "Season best-sellers",
+      "subtitle": "The items local anglers keep coming back for.",
+      "viewAll": "See all"
+    },
+    "species": {
+      "title": "By species",
+      "subtitle": "Gear tuned for your favorite catch."
+    },
+    "techniques": {
+      "title": "By technique",
+      "subtitle": "Fly, lure, bottom — every approach has its aisle."
+    },
+    "season": {
+      "title": "Season at a glance",
+      "subtitle": "Which species are open this month?",
+      "openMonths": "Open months"
+    },
+    "permits": {
+      "title": "2026 Permits — 5-minute application",
+      "subtitle": "Three options, from the yearly permit to the trial permit for kids. Paperless submission, fast approval.",
+      "cta": "See the permits"
+    },
+    "contests": {
+      "title": "Upcoming contests",
+      "subtitle": "Têt Open, Trout Cup, predator drifts. Online registration, bib pickup on site.",
+      "cta": "See all contests"
+    },
+    "story": {
+      "title": "A shop run by anglers",
+      "body": "What we sell, we fish. The Hook & Cook team curates the gear season after season, and we share our picks without marketing spin. If we lose interest in something, we pull it off the shelf.",
+      "cta": "Our story"
+    },
+    "newsletter": {
+      "title": "The best catches by email",
+      "subtitle": "Once a month, the new arrivals, the openings and the trips you don't want to miss in dept. 66.",
+      "placeholder": "Your email",
+      "cta": "Sign me up",
+      "consent": "By clicking, you agree to receive our emails. One-click unsubscribe."
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Welcome back, angler",
+      "title": "Sign in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgot": "Forgot your password?",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "No account yet?",
+      "register": "Create an account",
+      "errorGeneric": "Wrong email or password.",
+      "errorTooManyAttempts": "Too many attempts. Try again in 10 minutes."
+    },
+    "register": {
+      "eyebrow": "Welcome to Hook & Cook",
+      "title": "Create an account",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "Minimum 8 characters.",
+      "confirmLabel": "Confirm password",
+      "submit": "Create my account",
+      "submitting": "Creating…",
+      "alreadyAccount": "Already have an account?",
+      "login": "Sign in",
+      "errorMismatch": "Both passwords don't match.",
+      "errorNameInvalid": "First name can only contain letters, spaces, hyphens and apostrophes."
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email. If an account exists, we'll send you a link valid for 1 hour.",
+      "emailLabel": "Email",
+      "submit": "Send the link",
+      "submitting": "Sending…",
+      "success": "If an account exists with this email, a reset link has been sent.",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a new password for your account.",
+      "passwordLabel": "New password",
+      "confirmLabel": "Confirm",
+      "submit": "Update",
+      "submitting": "Updating…",
+      "success": "Password updated. You can sign in again.",
+      "errorExpired": "Invalid or expired link. Request a new one.",
+      "backToLogin": "Go to sign in"
+    }
+  },
+  "catalog": {
+    "title": "Shop",
+    "searchPlaceholder": "Search a product…",
+    "searchAriaLabel": "Search the catalogue",
+    "sortAriaLabel": "Sort the products",
+    "sortOptions": {
+      "relevance": "Relevance",
+      "priceAsc": "Price ascending",
+      "priceDesc": "Price descending",
+      "newest": "Newest",
+      "topRated": "Top rated"
+    },
+    "filters": {
+      "title": "Filters",
+      "category": "Category",
+      "species": "Species",
+      "technique": "Technique",
+      "priceMin": "Minimum price",
+      "priceMax": "Maximum price",
+      "inStock": "In stock only",
+      "clearAll": "Clear all"
+    },
+    "openFilters": "Open filters",
+    "closeFilters": "Close",
+    "noResults": "No product matches your search.",
+    "removeChip": "Remove {{label}}",
+    "resultCount": "{{count}} product",
+    "resultCount_plural": "{{count}} products"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "soldOut": "Sold out",
+    "stockLow": "Stock {{count}}",
+    "promo": "Sale",
+    "favoriteAdd": "Add to favorites",
+    "favoriteRemove": "Remove from favorites",
+    "share": "Share",
+    "notifyMeWhenAvailable": "Notify me when available",
+    "notifyMeSubscribed": "You'll be notified",
+    "addSubscribing": "Subscribing…",
+    "specs": "Specifications",
+    "story": "The story",
+    "reviews": "Reviews",
+    "season": "Seasonality",
+    "frequentlyBoughtWith": "Frequently bought with",
+    "selectVariant": "Choose: {{name}}",
+    "qty": "Quantity"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "emptyCta": "See the shop",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingFree": "Free",
+    "total": "Total",
+    "promoCode": "Promo code",
+    "promoApply": "Apply",
+    "checkout": "Place order",
+    "remove": "Remove",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "outOfStockWarning": "Insufficient stock — quantity adjusted to {{max}}"
+  },
+  "checkout": {
+    "title": "Order",
+    "stepContact": "Contact",
+    "stepShipping": "Shipping",
+    "stepPayment": "Payment",
+    "emailLabel": "Email",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "phoneLabel": "Phone",
+    "addressLine": "Address",
+    "postalCode": "Postal code",
+    "city": "City",
+    "shippingMode": "Shipping method",
+    "shippingModes": {
+      "standard": "Standard 48h — €5.90",
+      "express": "Chronopost 24h — €12.90",
+      "pickup": "Pickup point — €4.50"
+    },
+    "payNow": "Pay {{amount}}",
+    "paying": "Processing payment…",
+    "back": "Back",
+    "continue": "Continue",
+    "termsAccept": "I accept the terms and conditions of sale",
+    "errorPayment": "Payment failed. Try again or change card."
+  },
+  "confirmation": {
+    "title": "Thanks for your order!",
+    "reference": "Reference",
+    "subtitle": "A confirmation email has been sent to {{email}}.",
+    "downloadInvoice": "Download invoice (PDF)",
+    "trackOrder": "Track my order",
+    "continueShopping": "Continue shopping"
+  },
+  "permits": {
+    "title": "2026 Fishing permits",
+    "subtitle": "Three options. Fast approval. Paperless submission.",
+    "startApplication": "Start my application",
+    "types": {
+      "annual": "Yearly permit",
+      "annualLabel": "Most popular",
+      "weekly": "Weekly permit",
+      "weeklyLabel": "Holiday",
+      "trial": "Trial",
+      "trialLabel": "Under 12"
+    },
+    "wizard": {
+      "stepType": "Type",
+      "stepIdentity": "Identity",
+      "stepDocs": "Documents",
+      "stepSummary": "Summary",
+      "stepPayment": "Payment",
+      "selectType": "Pick your option",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "birthDateLabel": "Birth date",
+      "departmentLabel": "Department",
+      "idDocLabel": "ID document",
+      "photoDocLabel": "ID photo",
+      "uploadHint": "JPG, PNG, WebP — max 8 MB",
+      "termsAccept": "I accept the permit conditions",
+      "payNow": "Pay for my permit"
+    },
+    "tracking": {
+      "title": "My current permit",
+      "noPermit": "No active permit.",
+      "timeline": {
+        "submitted": "Request sent",
+        "paid": "Payment confirmed",
+        "reviewing": "Under review (federation)",
+        "decision": "Decision",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    }
+  },
+  "contests": {
+    "title": "Contests",
+    "subtitle": "Têt Open, Trout Cup, predators. Online registration.",
+    "filterAll": "All",
+    "filterTrout": "Trout",
+    "filterPike": "Predator",
+    "filterCarp": "Carp",
+    "registerCta": "Register",
+    "registered": "You are registered",
+    "categoryLabel": "Category",
+    "categories": {
+      "menPro": "Men Pro",
+      "menAmateur": "Men Amateur",
+      "women": "Women",
+      "junior": "Junior"
+    },
+    "permitNumberLabel": "Permit number",
+    "confirmRegistration": "Confirm my registration",
+    "spotsLeft": "{{count}} spot left",
+    "spotsLeft_plural": "{{count}} spots left",
+    "full": "Full",
+    "mapAria": "Contests map"
+  },
+  "leaderboard": {
+    "title": "Monthly challenges",
+    "subtitle": "The biggest catch of the month — per species and global.",
+    "filterMonth": "Month",
+    "filterYear": "Year",
+    "filterSpecies": "Species",
+    "rank": "Rank",
+    "species": "Species",
+    "size": "Size",
+    "weight": "Weight",
+    "angler": "Angler",
+    "date": "Date",
+    "spot": "Spot",
+    "noEntries": "No catches recorded for this period."
+  },
+  "account": {
+    "title": "My account",
+    "tabs": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "permits": "Permits",
+      "contests": "Contests",
+      "log": "Catch log",
+      "favorites": "Favorites",
+      "addresses": "Addresses",
+      "settings": "Settings"
+    },
+    "overview": {
+      "stats": {
+        "permits": "Permits",
+        "catches": "Catches logged",
+        "orders": "Orders",
+        "contests": "Contests"
+      }
+    },
+    "orders": {
+      "empty": "You haven't ordered yet.",
+      "status": {
+        "paid": "Paid",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "pending": "Awaiting payment",
+        "paymentFailed": "Payment failed"
+      },
+      "downloadInvoice": "PDF invoice"
+    },
+    "log": {
+      "addEntry": "+ Add a catch",
+      "speciesLabel": "Species",
+      "sizeLabel": "Size (cm)",
+      "weightLabel": "Weight (g)",
+      "spotLabel": "Spot",
+      "baitLabel": "Bait",
+      "weatherLabel": "Weather",
+      "dateLabel": "Date",
+      "photoLabel": "Photo",
+      "save": "Save the catch",
+      "empty": "No catches recorded yet."
+    },
+    "favorites": {
+      "empty": "No favorites yet.",
+      "remove": "Remove from favorites"
+    },
+    "settings": {
+      "profile": "Profile",
+      "logout": "Sign out",
+      "rgpdTitle": "Personal data · GDPR",
+      "exportData": "Download my data",
+      "exporting": "Preparing…",
+      "deleteAccount": "Delete my account",
+      "deleteConfirm": "Type SUPPRIMER to confirm",
+      "deleteCta": "Delete permanently",
+      "deleteWarning": "This action is irreversible. Your data will be anonymised immediately."
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "sidebar": {
+      "overview": "Overview",
+      "stats": "Statistics",
+      "orders": "Orders",
+      "permits": "Permit requests",
+      "contests": "Contests",
+      "products": "Products",
+      "logout": "Sign out"
+    },
+    "stats": {
+      "title": "Statistics",
+      "revenue": "Total revenue",
+      "avgBasket": "Average basket",
+      "conversionRate": "Conversion rate",
+      "uniqueBuyers": "Unique buyers",
+      "orders": "Orders",
+      "permits": "Permits issued",
+      "registrations": "Contest registrations",
+      "lowStockKpi": "Critical stock",
+      "revenueByMonth": "Revenue per month",
+      "ordersByStatus": "Orders by status",
+      "permitsByStatus": "Permits by status",
+      "topProducts": "Top 5 products sold",
+      "neverSold": "Never sold",
+      "lowStockTitle": "Critical stock",
+      "categoryRevenue": "Revenue per category"
+    },
+    "actions": {
+      "exportCsv": "Export to CSV",
+      "exportRegistrationsCsv": "Export registrations CSV",
+      "addProduct": "+ Add a product",
+      "addContest": "+ Add a contest",
+      "markShipped": "Mark shipped",
+      "markDelivered": "Mark delivered",
+      "approve": "Approve",
+      "reject": "Reject",
+      "cancel": "Cancel",
+      "restock": "+10"
+    },
+    "products": {
+      "id": "Identifier (slug)",
+      "sku": "SKU",
+      "name": "Name",
+      "category": "Category",
+      "technique": "Technique",
+      "brand": "Brand",
+      "price": "Price (€)",
+      "wasPrice": "Strikethrough price",
+      "stock": "Stock",
+      "rating": "Rating",
+      "reviews": "Review count",
+      "water": "Water type",
+      "species": "Species (comma-separated)",
+      "imageUrl": "Photo URL",
+      "description": "Description",
+      "create": "Create product",
+      "update": "Update"
+    }
+  },
+  "legal": {
+    "terms": "Terms of sale",
+    "privacy": "Privacy policy",
+    "mentions": "Legal notice",
+    "cookies": "Cookies",
+    "about": "About",
+    "help": "Help / FAQ"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "subtitle": "The requested page does not exist or has been moved.",
+      "cta": "Back to home"
+    },
+    "forbidden": {
+      "title": "Access denied",
+      "subtitle": "You don't have the rights to access this page.",
+      "cta": "Back to home"
+    },
+    "generic": "Something went wrong. Try again later.",
+    "network": "Cannot reach the server. Check your network.",
+    "unauthorized": "Please sign in to access this page."
+  }
+}

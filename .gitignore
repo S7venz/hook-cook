@@ -66,3 +66,9 @@ frontend/e2e-results/
 frontend/playwright-report/
 frontend/test-results/
 audits/k6/
+
+# Don't commit the raw audit working files (HTML+JSON are too heavy);
+# the published versions live in docs/audits/.
+audits/lighthouse/
+audits/pa11y/
+audits/ecoindex/

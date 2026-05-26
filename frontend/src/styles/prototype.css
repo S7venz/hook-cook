@@ -96,6 +96,41 @@ body { overflow-x: hidden; }
   border: 2px solid var(--bg);
 }
 
+/* Sélecteur de langue (i18n) */
+.lang-switcher { position: relative; display: inline-block; }
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--sp-1));
+  min-width: 140px;
+  background: var(--bg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.18);
+  padding: var(--sp-1);
+  list-style: none;
+  margin: 0;
+  z-index: 60;
+}
+.lang-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-14);
+  color: var(--ink-soft);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.lang-menu-item:hover { background: var(--bg-sunk); color: var(--ink); }
+.lang-menu-item.active {
+  color: var(--ink);
+  font-weight: 600;
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+}
+
 /* Bottom nav (mobile) */
 .bottomnav {
   display: none;

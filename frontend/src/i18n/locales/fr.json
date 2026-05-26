@@ -1,0 +1,500 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "close": "Fermer",
+    "send": "Envoyer",
+    "search": "Rechercher",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "error": "Erreur",
+    "success": "Succès",
+    "required": "Requis",
+    "optional": "Optionnel",
+    "from": "depuis",
+    "to": "vers",
+    "of": "de",
+    "or": "ou",
+    "and": "et",
+    "all": "Tous",
+    "none": "Aucun",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "language": "Langue",
+    "darkMode": "Passer en mode sombre",
+    "lightMode": "Passer en mode clair"
+  },
+  "nav": {
+    "home": "Accueil",
+    "shop": "Boutique",
+    "permits": "Permis",
+    "contests": "Concours",
+    "challenges": "Challenges",
+    "main": "Navigation principale",
+    "search": "Rechercher dans la boutique",
+    "account": "Compte de {{name}}",
+    "login": "Se connecter",
+    "cart": "Panier",
+    "cartWithCount": "Panier · {{count}} article",
+    "cartWithCount_plural": "Panier · {{count}} articles",
+    "brand": "Hook & Cook — accueil"
+  },
+  "footer": {
+    "tagline": "Boutique, permis et concours de pêche — tenus par des pêcheurs. Perpignan, France.",
+    "shop": "Boutique",
+    "categories": {
+      "rods": "Cannes",
+      "reels": "Moulinets",
+      "lures": "Leurres",
+      "clothing": "Vêtements",
+      "bySpecies": "Par espèce"
+    },
+    "services": "Services",
+    "permits2026": "Permis 2026",
+    "contests": "Concours",
+    "catchLog": "Carnet de prise",
+    "challenges": "Challenges",
+    "company": "Maison",
+    "about": "À propos",
+    "help": "Aide",
+    "contact": "Contact",
+    "newsletter": "Recevez nos meilleures pêches",
+    "newsletterPlaceholder": "Votre email",
+    "newsletterSubscribe": "S'inscrire",
+    "legalLinks": "Liens légaux",
+    "terms": "CGV",
+    "privacy": "Confidentialité",
+    "legal": "Mentions légales",
+    "cookies": "Cookies",
+    "copyright": "© {{year}} Hook & Cook · Perpignan, France"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Boutique de pêche · Perpignan",
+      "title": "L'attirail. Les rivières. La saison.",
+      "subtitle": "Tout pour la pêche en eau douce — sélection serrée, conseils sans bla-bla, et un atelier qui répond en moins d'une journée.",
+      "ctaShop": "Voir la boutique",
+      "ctaPermits": "Demander mon permis",
+      "trustBadge": "Boutique pêche tenue par des pêcheurs · Conseils en moins de 24h"
+    },
+    "topSales": {
+      "title": "Best-sellers de la saison",
+      "subtitle": "Les articles que les pêcheurs locaux nous redemandent le plus.",
+      "viewAll": "Voir tout"
+    },
+    "species": {
+      "title": "Par espèce",
+      "subtitle": "Le matériel adapté à votre prise de prédilection."
+    },
+    "techniques": {
+      "title": "Par technique",
+      "subtitle": "Mouche, leurre, fond — chaque approche a son rayon."
+    },
+    "season": {
+      "title": "La saison en un coup d'œil",
+      "subtitle": "Quelles espèces sont ouvertes ce mois-ci ?",
+      "openMonths": "Mois ouverts"
+    },
+    "permits": {
+      "title": "Permis 2026 — démarche en 5 minutes",
+      "subtitle": "Trois formules, du permis annuel au permis découverte pour les jeunes. Envoi dématérialisé, validation rapide.",
+      "cta": "Voir les permis"
+    },
+    "contests": {
+      "title": "Concours à venir",
+      "subtitle": "Open de la Têt, Truite Cup, dérives carnassier. Inscription en ligne, retrait du dossard sur place.",
+      "cta": "Voir tous les concours"
+    },
+    "story": {
+      "title": "Une boutique tenue par des pêcheurs",
+      "body": "Ce qu'on vend, on le pêche. L'équipe Hook & Cook trie le matériel saison après saison, et on partage les sélections sans tour de table marketing. Si quelque chose ne nous plaît plus, on l'enlève du rayon.",
+      "cta": "Notre histoire"
+    },
+    "newsletter": {
+      "title": "Les meilleures pêches reçues par mail",
+      "subtitle": "Une fois par mois, les nouveautés, les ouvertures et les sorties à ne pas manquer dans le 66.",
+      "placeholder": "Votre email",
+      "cta": "Je m'inscris",
+      "consent": "En cliquant, vous acceptez de recevoir nos emails. Désinscription en un clic."
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Retour parmi les pêcheurs",
+      "title": "Connexion",
+      "emailLabel": "Email",
+      "passwordLabel": "Mot de passe",
+      "forgot": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "noAccount": "Pas encore de compte ?",
+      "register": "Créer un compte",
+      "errorGeneric": "Email ou mot de passe incorrect.",
+      "errorTooManyAttempts": "Trop de tentatives. Réessayez dans 10 minutes."
+    },
+    "register": {
+      "eyebrow": "Bienvenue chez Hook & Cook",
+      "title": "Créer un compte",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "emailLabel": "Email",
+      "passwordLabel": "Mot de passe",
+      "passwordHint": "Minimum 8 caractères.",
+      "confirmLabel": "Confirmer le mot de passe",
+      "submit": "Créer mon compte",
+      "submitting": "Création…",
+      "alreadyAccount": "Déjà un compte ?",
+      "login": "Se connecter",
+      "errorMismatch": "Les deux mots de passe ne correspondent pas.",
+      "errorNameInvalid": "Le prénom ne peut contenir que des lettres, espaces, tirets et apostrophes."
+    },
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Saisissez votre email. Si un compte existe, nous vous enverrons un lien valable 1h.",
+      "emailLabel": "Email",
+      "submit": "Recevoir le lien",
+      "submitting": "Envoi…",
+      "success": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+      "passwordLabel": "Nouveau mot de passe",
+      "confirmLabel": "Confirmer",
+      "submit": "Valider",
+      "submitting": "Mise à jour…",
+      "success": "Mot de passe mis à jour. Vous pouvez vous reconnecter.",
+      "errorExpired": "Lien invalide ou expiré. Demandez un nouveau lien.",
+      "backToLogin": "Aller à la connexion"
+    }
+  },
+  "catalog": {
+    "title": "Boutique",
+    "searchPlaceholder": "Rechercher un produit…",
+    "searchAriaLabel": "Rechercher dans le catalogue",
+    "sortAriaLabel": "Trier les produits",
+    "sortOptions": {
+      "relevance": "Pertinence",
+      "priceAsc": "Prix croissant",
+      "priceDesc": "Prix décroissant",
+      "newest": "Nouveautés",
+      "topRated": "Mieux notés"
+    },
+    "filters": {
+      "title": "Filtres",
+      "category": "Catégorie",
+      "species": "Espèce",
+      "technique": "Technique",
+      "priceMin": "Prix minimum",
+      "priceMax": "Prix maximum",
+      "inStock": "En stock uniquement",
+      "clearAll": "Tout effacer"
+    },
+    "openFilters": "Ouvrir les filtres",
+    "closeFilters": "Fermer",
+    "noResults": "Aucun produit ne correspond à votre recherche.",
+    "removeChip": "Retirer {{label}}",
+    "resultCount": "{{count}} produit",
+    "resultCount_plural": "{{count}} produits"
+  },
+  "product": {
+    "addToCart": "Ajouter au panier",
+    "soldOut": "Épuisé",
+    "stockLow": "Stock {{count}}",
+    "promo": "Promo",
+    "favoriteAdd": "Ajouter aux favoris",
+    "favoriteRemove": "Retirer des favoris",
+    "share": "Partager",
+    "notifyMeWhenAvailable": "Me prévenir quand dispo",
+    "notifyMeSubscribed": "Vous serez prévenu·e",
+    "addSubscribing": "Inscription…",
+    "specs": "Caractéristiques",
+    "story": "L'histoire",
+    "reviews": "Avis",
+    "season": "Saisonnalité",
+    "frequentlyBoughtWith": "Souvent acheté avec",
+    "selectVariant": "Choisir : {{name}}",
+    "qty": "Quantité"
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide.",
+    "emptyCta": "Voir la boutique",
+    "subtotal": "Sous-total",
+    "shipping": "Livraison",
+    "shippingFree": "Offerte",
+    "total": "Total",
+    "promoCode": "Code promo",
+    "promoApply": "Appliquer",
+    "checkout": "Passer commande",
+    "remove": "Retirer",
+    "decrease": "Diminuer la quantité",
+    "increase": "Augmenter la quantité",
+    "outOfStockWarning": "Stock insuffisant — quantité ajustée à {{max}}"
+  },
+  "checkout": {
+    "title": "Commande",
+    "stepContact": "Coordonnées",
+    "stepShipping": "Livraison",
+    "stepPayment": "Paiement",
+    "emailLabel": "Email",
+    "firstNameLabel": "Prénom",
+    "lastNameLabel": "Nom",
+    "phoneLabel": "Téléphone",
+    "addressLine": "Adresse",
+    "postalCode": "Code postal",
+    "city": "Ville",
+    "shippingMode": "Mode de livraison",
+    "shippingModes": {
+      "standard": "Standard 48h — 5.90 €",
+      "express": "Chronopost 24h — 12.90 €",
+      "pickup": "Point relais — 4.50 €"
+    },
+    "payNow": "Payer {{amount}}",
+    "paying": "Paiement en cours…",
+    "back": "Retour",
+    "continue": "Continuer",
+    "termsAccept": "J'accepte les conditions générales de vente",
+    "errorPayment": "Le paiement a échoué. Réessayez ou changez de carte."
+  },
+  "confirmation": {
+    "title": "Merci pour votre commande !",
+    "reference": "Référence",
+    "subtitle": "Un email de confirmation vous a été envoyé à {{email}}.",
+    "downloadInvoice": "Télécharger la facture (PDF)",
+    "trackOrder": "Suivre ma commande",
+    "continueShopping": "Continuer mes achats"
+  },
+  "permits": {
+    "title": "Permis de pêche 2026",
+    "subtitle": "Trois formules. Validation rapide. Envoi dématérialisé.",
+    "startApplication": "Commencer ma demande",
+    "types": {
+      "annual": "Permis annuel",
+      "annualLabel": "Le plus choisi",
+      "weekly": "Permis semaine",
+      "weeklyLabel": "Vacances",
+      "trial": "Découverte",
+      "trialLabel": "-12 ans"
+    },
+    "wizard": {
+      "stepType": "Type",
+      "stepIdentity": "Identité",
+      "stepDocs": "Pièces",
+      "stepSummary": "Récapitulatif",
+      "stepPayment": "Paiement",
+      "selectType": "Choisissez votre formule",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "birthDateLabel": "Date de naissance",
+      "departmentLabel": "Département",
+      "idDocLabel": "Pièce d'identité",
+      "photoDocLabel": "Photo d'identité",
+      "uploadHint": "JPG, PNG, WebP — max 8 Mo",
+      "termsAccept": "J'accepte les conditions du permis",
+      "payNow": "Payer mon permis"
+    },
+    "tracking": {
+      "title": "Mon permis en cours",
+      "noPermit": "Aucun permis en cours.",
+      "timeline": {
+        "submitted": "Demande envoyée",
+        "paid": "Paiement confirmé",
+        "reviewing": "En instruction (fédération)",
+        "decision": "Décision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      }
+    }
+  },
+  "contests": {
+    "title": "Concours",
+    "subtitle": "Open de la Têt, Truite Cup, carnassiers. Inscriptions en ligne.",
+    "filterAll": "Tous",
+    "filterTrout": "Truite",
+    "filterPike": "Carnassiers",
+    "filterCarp": "Carpe",
+    "registerCta": "S'inscrire",
+    "registered": "Vous êtes inscrit·e",
+    "categoryLabel": "Catégorie",
+    "categories": {
+      "menPro": "Hommes Expérimenté",
+      "menAmateur": "Hommes Amateur",
+      "women": "Femmes",
+      "junior": "Jeunes"
+    },
+    "permitNumberLabel": "Numéro de permis",
+    "confirmRegistration": "Confirmer mon inscription",
+    "spotsLeft": "{{count}} place restante",
+    "spotsLeft_plural": "{{count}} places restantes",
+    "full": "Complet",
+    "mapAria": "Carte des concours"
+  },
+  "leaderboard": {
+    "title": "Challenges mensuels",
+    "subtitle": "La plus grosse prise du mois — par espèce et global.",
+    "filterMonth": "Mois",
+    "filterYear": "Année",
+    "filterSpecies": "Espèce",
+    "rank": "Rang",
+    "species": "Espèce",
+    "size": "Taille",
+    "weight": "Poids",
+    "angler": "Pêcheur·euse",
+    "date": "Date",
+    "spot": "Lieu",
+    "noEntries": "Aucune prise enregistrée pour cette période."
+  },
+  "account": {
+    "title": "Mon compte",
+    "tabs": {
+      "overview": "Aperçu",
+      "orders": "Commandes",
+      "permits": "Permis",
+      "contests": "Concours",
+      "log": "Carnet de prise",
+      "favorites": "Favoris",
+      "addresses": "Adresses",
+      "settings": "Paramètres"
+    },
+    "overview": {
+      "stats": {
+        "permits": "Permis",
+        "catches": "Prises saisies",
+        "orders": "Commandes",
+        "contests": "Concours"
+      }
+    },
+    "orders": {
+      "empty": "Vous n'avez pas encore commandé.",
+      "status": {
+        "paid": "Payée",
+        "shipped": "Expédiée",
+        "delivered": "Livrée",
+        "cancelled": "Annulée",
+        "pending": "En attente de paiement",
+        "paymentFailed": "Paiement échoué"
+      },
+      "downloadInvoice": "Facture PDF"
+    },
+    "log": {
+      "addEntry": "+ Ajouter une prise",
+      "speciesLabel": "Espèce",
+      "sizeLabel": "Taille (cm)",
+      "weightLabel": "Poids (g)",
+      "spotLabel": "Lieu",
+      "baitLabel": "Appât",
+      "weatherLabel": "Météo",
+      "dateLabel": "Date",
+      "photoLabel": "Photo",
+      "save": "Enregistrer la prise",
+      "empty": "Aucune prise enregistrée pour le moment."
+    },
+    "favorites": {
+      "empty": "Aucun favori pour l'instant.",
+      "remove": "Retirer des favoris"
+    },
+    "settings": {
+      "profile": "Profil",
+      "logout": "Se déconnecter",
+      "rgpdTitle": "Données personnelles · RGPD",
+      "exportData": "Télécharger mes données",
+      "exporting": "Préparation…",
+      "deleteAccount": "Supprimer mon compte",
+      "deleteConfirm": "Tapez SUPPRIMER pour confirmer",
+      "deleteCta": "Supprimer définitivement",
+      "deleteWarning": "Cette action est irréversible. Vos données seront anonymisées immédiatement."
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "sidebar": {
+      "overview": "Vue d'ensemble",
+      "stats": "Statistiques",
+      "orders": "Commandes",
+      "permits": "Demandes de permis",
+      "contests": "Concours",
+      "products": "Produits",
+      "logout": "Se déconnecter"
+    },
+    "stats": {
+      "title": "Statistiques",
+      "revenue": "CA total",
+      "avgBasket": "Panier moyen",
+      "conversionRate": "Taux de conversion",
+      "uniqueBuyers": "Acheteurs uniques",
+      "orders": "Commandes",
+      "permits": "Permis émis",
+      "registrations": "Inscriptions concours",
+      "lowStockKpi": "Stocks critiques",
+      "revenueByMonth": "CA par mois",
+      "ordersByStatus": "Commandes par statut",
+      "permitsByStatus": "Permis par statut",
+      "topProducts": "Top 5 produits vendus",
+      "neverSold": "Jamais vendus",
+      "lowStockTitle": "Stocks critiques",
+      "categoryRevenue": "CA par catégorie"
+    },
+    "actions": {
+      "exportCsv": "Exporter en CSV",
+      "exportRegistrationsCsv": "Exporter inscriptions CSV",
+      "addProduct": "+ Ajouter un produit",
+      "addContest": "+ Ajouter un concours",
+      "markShipped": "Marquer expédiée",
+      "markDelivered": "Marquer livrée",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "cancel": "Annuler",
+      "restock": "+10"
+    },
+    "products": {
+      "id": "Identifiant (slug)",
+      "sku": "SKU",
+      "name": "Nom",
+      "category": "Catégorie",
+      "technique": "Technique",
+      "brand": "Marque",
+      "price": "Prix (€)",
+      "wasPrice": "Prix barré",
+      "stock": "Stock",
+      "rating": "Note",
+      "reviews": "Nombre d'avis",
+      "water": "Type d'eau",
+      "species": "Espèces (séparées par des virgules)",
+      "imageUrl": "URL de la photo",
+      "description": "Description",
+      "create": "Créer le produit",
+      "update": "Mettre à jour"
+    }
+  },
+  "legal": {
+    "terms": "CGV",
+    "privacy": "Politique de confidentialité",
+    "mentions": "Mentions légales",
+    "cookies": "Cookies",
+    "about": "À propos",
+    "help": "Aide / FAQ"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page introuvable",
+      "subtitle": "La page demandée n'existe pas ou a été déplacée.",
+      "cta": "Retour à l'accueil"
+    },
+    "forbidden": {
+      "title": "Accès refusé",
+      "subtitle": "Vous n'avez pas les droits pour accéder à cette page.",
+      "cta": "Retour à l'accueil"
+    },
+    "generic": "Une erreur est survenue. Réessayez plus tard.",
+    "network": "Connexion au serveur impossible. Vérifiez votre réseau.",
+    "unauthorized": "Veuillez vous connecter pour accéder à cette page."
+  }
+}
