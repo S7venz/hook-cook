@@ -18,7 +18,10 @@ Projet développé dans le cadre d'un module de développement web.
 | Paiement | Stripe / PayPal (mocké pour l'instant) |
 | Conteneurisation | Docker + docker-compose |
 
-Justification du choix SQL + NoSQL et de l'architecture multicouche : voir [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+**Documentation complète** : [hook-cook docs](https://s7venz.github.io/hook-cook/) (déployée automatiquement via MkDocs Material + GitHub Pages).
+Sources dans [`docs/`](docs/) — architecture, API REST, modèle de données, guides utilisateur/admin.
+
+> Build local : `mkdocs serve` (après `pip install mkdocs-material`).
 
 ## Démarrage rapide (tout-en-un via Docker)
 

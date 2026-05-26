@@ -1,0 +1,153 @@
+site_name: Hook & Cook — Documentation
+site_description: >-
+  Documentation technique et fonctionnelle de Hook & Cook : architecture,
+  API REST, modèle de données, guides utilisateur et administrateur.
+site_author: Cengizhan Özbek
+site_url: https://s7venz.github.io/hook-cook/
+repo_name: S7venz/hook-cook
+repo_url: https://github.com/S7venz/hook-cook
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Hook &amp; Cook — Projet CDA TP-01281
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: fr
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/fish
+    edit: material/pencil
+    view: material/eye
+  favicon: assets/favicon.png
+  palette:
+    # Mode clair par défaut, basculable
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+  features:
+    # Navigation
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.footer
+    # Table des matières
+    - toc.follow
+    # Recherche
+    - search.suggest
+    - search.highlight
+    - search.share
+    # Code
+    - content.code.copy
+    - content.code.annotate
+    - content.code.select
+    # Tabs et actions
+    - content.tabs.link
+    - content.action.edit
+    - content.action.view
+    - content.tooltips
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/S7venz/hook-cook
+      name: Repo GitHub
+  generator: false
+
+extra_css:
+  - assets/extra.css
+
+plugins:
+  - search:
+      lang:
+        - fr
+        - en
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      slide_effect: slide
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: true
+  - tags
+
+markdown_extensions:
+  # Standards
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Lien permanent
+      title: Sur cette page
+      # Slugify qui préserve les accents (compatible avec les liens
+      # ancres écrits à la main dans les sommaires des fichiers .md).
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  # PyMdown
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Accueil: index.md
+  - Architecture:
+    - Vue d'ensemble: ARCHITECTURE.md
+  - API REST:
+    - Référence: API.md
+  - Données:
+    - Modèle relationnel: ERD.md
+  - Guides:
+    - Utilisateur: GUIDE-UTILISATEUR.md
+    - Administrateur: GUIDE-ADMIN.md

@@ -49,3 +49,8 @@ AGENTS.md
 
 design-ref/
 *.pdf
+
+# MkDocs : site généré (rebuild auto via GitHub Actions)
+site/
+.venv/
+.cache/

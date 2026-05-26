@@ -1,32 +1,45 @@
-# Architecture Hook & Cook
+# Architecture
 
-## Vue d'ensemble
+Application web monolithique modulaire, organisée en **architecture multicouche répartie** conformément aux recommandations ANSSI pour les applications sécurisées.
 
-Application web monolithique modulaire, organisée en architecture **multicouche répartie** conformément aux recommandations ANSSI pour les applications sécurisées.
+```mermaid
+flowchart LR
+    User([Utilisateur])
+    Stripe([Stripe API])
 
-```
-┌──────────────────┐
-│  Frontend React  │  HTTPS                                                   
-│  (nginx + Vite)  │ ────────────┐                                            
-└──────────────────┘             ▼                                            
-                       ┌──────────────────────┐                               
-                       │     Backend Grails   │                               
-                       │  (REST API, JWT)     │                               
-                       │                      │                               
-                       │  ┌────────────────┐  │                               
-                       │  │  Couche web    │  │ controllers, interceptors, CORS
-                       │  │  Couche métier │  │ services, AuthService, OrderService…
-                       │  │  Couche data   │  │ GORM/Hibernate, domaines       
-                       │  └────────────────┘  │                               
-                       └──────┬─────────┬─────┘                               
-                              │         │                                     
-                  ┌───────────▼──┐   ┌──▼─────────────┐                       
-                  │  PostgreSQL  │   │     Redis      │     ────► Stripe API  
-                  │ (relationnel)│   │   (NoSQL K/V)  │           (webhooks)  
-                  └──────────────┘   └────────────────┘                       
+    subgraph FE[Frontend]
+        Nginx[nginx + React 19 + Vite]
+    end
+
+    subgraph BE[Backend Grails 6]
+        Web[Couche web<br/>controllers · interceptors · CORS]
+        Biz[Couche métier<br/>services · auth · domaine]
+        Data[Couche data<br/>GORM · Hibernate]
+    end
+
+    PG[(PostgreSQL 16<br/>Relationnel)]
+    Redis[(Redis 7<br/>NoSQL clé/valeur)]
+
+    User -- HTTPS --> Nginx
+    Nginx -- REST · JWT --> Web
+    Web --> Biz
+    Biz --> Data
+    Data --> PG
+    Biz <--> Redis
+    Biz <-- Webhook signé --> Stripe
+
+    classDef store fill:#0d7377,stroke:#06545b,color:#fff
+    classDef ext fill:#635bff,stroke:#3c3aa6,color:#fff
+    class PG,Redis store
+    class Stripe ext
 ```
 
 ## Choix monolithe modulaire vs microservices
+
+!!! tip "Décision d'architecture"
+    Pour le périmètre fonctionnel et l'équipe (1 développeur), un **monolithe modulaire**
+    est préférable aux microservices. Cohérence transactionnelle directe, déploiement unique,
+    zéro latence inter-modules.
 
 Pour le périmètre fonctionnel (boutique, permis, concours, carnet, leaderboard, admin) et l'équipe (1 développeur), un **monolithe modulaire** est préférable :
 
@@ -38,7 +51,10 @@ Le code reste organisé par **domaine fonctionnel** (catalogue, commande, paieme
 
 ## Stratégie de stockage : SQL + NoSQL
 
-Le référentiel CDA exige la maîtrise des **deux paradigmes**. Le choix se fait par nature de la donnée, pas par mode.
+!!! abstract "Principe directeur"
+    Le choix entre SQL et NoSQL se fait **par nature de la donnée**, pas par mode.
+    On ne remplace pas Postgres par Redis : on les fait coexister, chacun sur son
+    terrain de prédilection.
 
 | Donnée | Volume | Cohérence requise | Latence cible | TTL | → Choix |
 |---|---|---|---|---|---|
@@ -63,6 +79,11 @@ Le référentiel CDA exige la maîtrise des **deux paradigmes**. Le choix se fai
 
 ### 1. Rate-limit anti-brute-force partagé — `RateLimitService`
 
+!!! danger "Trou de sécurité corrigé"
+    Avec un rate-limit en **mémoire locale**, déployer le backend en 2 instances
+    derrière un load balancer permet à un attaquant d'**alterner les instances pour
+    doubler son quota**. Redis partagé corrige ce trou en globalisant le compteur.
+
 **Pourquoi** : OWASP Top 10 A07:2021 *Identification and Authentication Failures* recommande des compteurs **globaux** sur les endpoints d'auth. Sans ça, un attaquant peut tenter ~10⁴ couples login/password à la minute.
 
 **Algorithme** : fixed-window counter.
@@ -83,7 +104,10 @@ allow ⇔ N <= maxRequests
 
 ### 2. Idempotence des webhooks Stripe — `WebhookIdempotencyService`
 
-**Pourquoi** : Stripe garantit une livraison **at-least-once** des events. En cas de 5xx ou timeout chez nous, Stripe **rejoue** le même `event.id`. Sans déduplication explicite, on risque de re-traiter le paiement (double email, etc.).
+!!! warning "Livraison at-least-once"
+    Stripe garantit une livraison **at-least-once** des events. En cas de 5xx ou de
+    timeout chez nous, Stripe **rejoue le même `event.id`**. Sans déduplication
+    explicite, on risque de re-traiter le paiement (double email, etc.).
 
 **Algorithme** :
 
