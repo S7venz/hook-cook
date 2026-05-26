@@ -81,6 +81,37 @@ plugins:
       lang:
         - fr
         - en
+  # i18n : FR par défaut, EN en alternate via suffixes .en.md.
+  # Sélecteur de langue ajouté automatiquement dans la nav Material.
+  - i18n:
+      docs_structure: suffix
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: fr
+          default: true
+          name: Français
+          build: true
+          site_name: Hook & Cook — Documentation
+        - locale: en
+          name: English
+          build: true
+          site_name: Hook & Cook — Documentation
+          nav_translations:
+            Accueil: Home
+            Architecture: Architecture
+            Vue d'ensemble: Overview
+            API REST: REST API
+            Référence: Reference
+            Données: Data
+            Modèle relationnel: Relational model
+            Guides: Guides
+            Utilisateur: User
+            Administrateur: Administrator
+            Qualité: Quality
+            Plan de tests: Test plan
+            Veille technologique et sécurité: Tech watch and security
+            "Audits (RGAA + perf + éco-conception)": "Audits (a11y + perf + eco-design)"
   - glightbox:
       touchNavigation: true
       loop: false
