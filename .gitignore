@@ -54,3 +54,9 @@ design-ref/
 site/
 .venv/
 .cache/
+
+# Audits : on garde le script + les rapports HTML dans docs/audits/
+# (servis par MkDocs). On exclut juste les dumps JSON volumineux et
+# les copies de travail.
+audits/lighthouse/*.json
+audits/pa11y/*.json

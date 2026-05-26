@@ -74,6 +74,15 @@ Application multicouche sécurisée — projet support du Titre Professionnel **
 
     [→ Veille technologique et sécurité](VEILLE.md)
 
+-   :material-chart-line:{ .lg .middle } &nbsp; **Audits RGAA + perf + éco**
+
+    ---
+
+    Audits Lighthouse, Pa11y (WCAG 2.0 AA) et Ecoindex sur 5 pages clés.
+    Scores, plan d'action priorisé, rapports HTML interactifs.
+
+    [→ Voir les audits](AUDITS.md)
+
 -   :material-github:{ .lg .middle } &nbsp; **Code source**
 
     ---

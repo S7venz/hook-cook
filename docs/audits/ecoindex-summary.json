@@ -1,0 +1,52 @@
+[
+  {
+    "page": "boutique",
+    "dom": 453,
+    "requests": 58,
+    "size_kb": 1829.9,
+    "score": 70.0,
+    "grade": "B",
+    "gco2_per_view": 1.96,
+    "water_l_per_view": 0.0075
+  },
+  {
+    "page": "concours",
+    "dom": 223,
+    "requests": 54,
+    "size_kb": 1212.8,
+    "score": 85.0,
+    "grade": "A",
+    "gco2_per_view": 1.86,
+    "water_l_per_view": 0.006
+  },
+  {
+    "page": "connexion",
+    "dom": 84,
+    "requests": 45,
+    "size_kb": 966.6,
+    "score": 85.0,
+    "grade": "A",
+    "gco2_per_view": 1.86,
+    "water_l_per_view": 0.006
+  },
+  {
+    "page": "home",
+    "dom": 515,
+    "requests": 60,
+    "size_kb": 1619.4,
+    "score": 70.0,
+    "grade": "B",
+    "gco2_per_view": 1.96,
+    "water_l_per_view": 0.0075
+  },
+  {
+    "page": "permis",
+    "dom": 122,
+    "requests": 50,
+    "size_kb": 993.3,
+    "score": 85.0,
+    "grade": "A",
+    "gco2_per_view": 1.86,
+    "water_l_per_view": 0.006
+  }
+]
