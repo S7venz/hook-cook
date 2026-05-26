@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -11,30 +12,31 @@ import { useReferenceData } from '../lib/referenceData.js';
 import { formatPrice } from '../lib/format.js';
 import { useToast } from '../lib/toast.js';
 
-const CATEGORIES = [
-  { id: 'hommes-exp', label: 'Hommes — Expérimenté' },
-  { id: 'hommes-am', label: 'Hommes — Amateur' },
-  { id: 'femmes', label: 'Femmes' },
-  { id: 'jeunes', label: 'Jeunes (-18)' },
+const CATEGORY_KEYS = [
+  { id: 'hommes-exp', key: 'contests.categories.menPro' },
+  { id: 'hommes-am', key: 'contests.categories.menAmateur' },
+  { id: 'femmes', key: 'contests.categories.women' },
+  { id: 'jeunes', key: 'contests.categories.junior' },
 ];
 
-const FILTERS = [
-  { id: 'all', label: 'Tous', match: () => true },
-  { id: 'truite', label: 'Truite', match: (c) => c.species.includes('truite') },
+const FILTER_KEYS = [
+  { id: 'all', key: 'contests.filterAll', match: () => true },
+  { id: 'truite', key: 'contests.filterTrout', match: (c) => c.species.includes('truite') },
   {
     id: 'carnassiers',
-    label: 'Carnassiers',
+    key: 'contests.filterPike',
     match: (c) =>
       c.species.some((s) => ['brochet', 'sandre', 'silure', 'perche'].includes(s)),
   },
-  { id: 'carpe', label: 'Carpe', match: (c) => c.species.includes('carpe') },
+  { id: 'carpe', key: 'contests.filterCarp', match: (c) => c.species.includes('carpe') },
 ];
 
 function ContestStatusBadge({ contest }) {
-  if (contest.inscrits >= contest.max) return <Badge status="rejected">Complet</Badge>;
+  const { t } = useTranslation();
+  if (contest.inscrits >= contest.max) return <Badge status="rejected">{t('contests.statusFull')}</Badge>;
   if (contest.inscrits / contest.max > 0.85)
-    return <Badge status="pending">Bientôt complet</Badge>;
-  return <Badge status="approved">Places disponibles</Badge>;
+    return <Badge status="pending">{t('contests.statusAlmost')}</Badge>;
+  return <Badge status="approved">{t('contests.statusOpen')}</Badge>;
 }
 
 function ContestCountBadge({ contest }) {
@@ -52,7 +54,8 @@ function ContestCountBadge({ contest }) {
 }
 
 function RegistrationModal({ contest, onClose, onConfirm }) {
-  const [category, setCategory] = useState(CATEGORIES[0].id);
+  const { t } = useTranslation();
+  const [category, setCategory] = useState(CATEGORY_KEYS[0].id);
   const [permit, setPermit] = useState('FR-2026-48291');
   const [touched, setTouched] = useState(false);
   const permitValid = /^[A-Z]{2}-\d{4}-\d{5}$/.test(permit.trim());
@@ -98,35 +101,33 @@ function RegistrationModal({ contest, onClose, onConfirm }) {
               fontWeight: 500,
             }}
           >
-            Inscription au concours
+            {t('contests.modalTitle')}
           </h3>
           <button
             type="button"
             className="icon-btn"
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             <Icon name="close" />
           </button>
         </div>
         <div className="stack-md">
           <div className="field">
-            <label htmlFor="contest-category">Catégorie</label>
+            <label htmlFor="contest-category">{t('contests.categoryLabel')}</label>
             <select
               id="contest-category"
               className="select"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
+              {CATEGORY_KEYS.map((c) => (
+                <option key={c.id} value={c.id}>{t(c.key)}</option>
               ))}
             </select>
           </div>
           <div className="field">
-            <label htmlFor="contest-permit">Numéro de permis</label>
+            <label htmlFor="contest-permit">{t('contests.permitNumberLabel')}</label>
             <input
               id="contest-permit"
               className="input mono"
@@ -137,21 +138,21 @@ function RegistrationModal({ contest, onClose, onConfirm }) {
               aria-describedby="permit-hint"
             />
             {touched && !permitValid ? (
-              <div className="error">Format attendu : FR-AAAA-NNNNN</div>
+              <div className="error">{t('contests.permitFormatHint')}</div>
             ) : (
               <div id="permit-hint" className="hint">
-                Un permis en cours de validité est requis.
+                {t('contests.permitRequiredHint')}
               </div>
             )}
           </div>
           <div className="soft" style={{ fontSize: 'var(--fs-13)' }}>
-            Montant :{' '}
+            {t('contests.amount')} :{' '}
             <span className="mono">
-              {contest.prix === 0 ? 'Gratuit' : formatPrice(contest.prix)}
+              {contest.prix === 0 ? t('contests.free') : formatPrice(contest.prix)}
             </span>
           </div>
           <Button variant="accent" size="lg" full onClick={submit}>
-            Confirmer mon inscription
+            {t('contests.confirmRegistration')}
           </Button>
         </div>
       </div>
@@ -167,8 +168,9 @@ export function ConcoursPage() {
   const [celebrate, setCelebrate] = useState(false);
   const { push } = useToast();
   const { register, isRegistered } = useContestRegistrations();
+  const { t } = useTranslation();
 
-  const activeFilter = FILTERS.find((f) => f.id === filter);
+  const activeFilter = FILTER_KEYS.find((f) => f.id === filter);
   const visibleContests = useMemo(
     () => contests.filter((c) => (activeFilter ? activeFilter.match(c) : true)),
     [activeFilter, contests],
@@ -188,11 +190,11 @@ export function ConcoursPage() {
   const [paymentSetup, setPaymentSetup] = useState(null);
 
   const handleConfirm = async ({ contestId, category, permit }) => {
-    const label = CATEGORIES.find((c) => c.id === category)?.label ?? '';
+    const catKey = CATEGORY_KEYS.find((c) => c.id === category)?.key ?? '';
+    const label = catKey ? t(catKey) : '';
     try {
       const result = await register(contestId, { category, permitNumber: permit });
       if (result.clientSecret) {
-        // Concours payant + Stripe configuré : on bascule le modal en paiement
         setPaymentSetup({
           clientSecret: result.clientSecret,
           publishableKey: result.publishableKey || import.meta.env.VITE_STRIPE_PUBLIC_KEY,
@@ -203,18 +205,17 @@ export function ConcoursPage() {
         });
         return;
       }
-      // Concours gratuit : déjà validé côté backend
-      push(`Inscrit à ${selected.title} · ${label}`);
+      push(t('contests.registeredToast', { title: selected.title, category: label }));
       setShowModal(false);
       setCelebrate(true);
       setTimeout(() => setCelebrate(false), 4500);
     } catch (err) {
-      push(err?.message ?? 'Inscription impossible.');
+      push(err?.message ?? t('contests.registrationImpossible'));
     }
   };
 
   const handlePaymentSuccess = () => {
-    push(`Inscrit à ${paymentSetup.contestTitle} · ${paymentSetup.categoryLabel}`);
+    push(t('contests.registeredToast', { title: paymentSetup.contestTitle, category: paymentSetup.categoryLabel }));
     setShowModal(false);
     setPaymentSetup(null);
     setCelebrate(true);
@@ -228,7 +229,7 @@ export function ConcoursPage() {
           className="page-container"
           style={{ padding: 'var(--sp-16) 0', textAlign: 'center' }}
         >
-          <p className="soft">Chargement des concours…</p>
+          <p className="soft">{t('contests.loading')}</p>
         </div>
       </div>
     );
@@ -249,9 +250,9 @@ export function ConcoursPage() {
               margin: '0 0 var(--sp-4)',
             }}
           >
-            Aucun concours pour l'instant.
+            {t('contests.noneTitle')}
           </h1>
-          <p className="soft">Les prochains concours seront annoncés ici.</p>
+          <p className="soft">{t('contests.noneSubtitle')}</p>
         </div>
       </div>
     );
@@ -268,7 +269,7 @@ export function ConcoursPage() {
           <div>
             <div className="eyebrow">
               <SectionIcon name="trophy" />
-              Calendrier local · {contests.length} concours ouverts
+              {t('contests.openCalendar', { count: contests.length })}
             </div>
             <h1
               style={{
@@ -279,11 +280,11 @@ export function ConcoursPage() {
                 margin: 'var(--sp-2) 0 0',
               }}
             >
-              Concours à venir
+              {t('contests.title')}
             </h1>
           </div>
           <div className="row" style={{ gap: 'var(--sp-2)' }}>
-            {FILTERS.map((f) => (
+            {FILTER_KEYS.map((f) => (
               <button
                 key={f.id}
                 type="button"
@@ -291,7 +292,7 @@ export function ConcoursPage() {
                 aria-pressed={filter === f.id}
                 onClick={() => setFilter(f.id)}
               >
-                {f.label}
+                {t(f.key)}
               </button>
             ))}
           </div>
@@ -337,7 +338,7 @@ export function ConcoursPage() {
                   color: 'var(--ink-soft)',
                 }}
               >
-                Aucun concours ne correspond à ce filtre.
+                {t('contests.filterNoMatch')}
               </div>
             )}
           </div>
@@ -389,12 +390,12 @@ export function ConcoursPage() {
                 <span>{selected.lieu}</span>
                 <span>·</span>
                 <span>
-                  {selected.prix === 0 ? 'Gratuit' : formatPrice(selected.prix)}
+                  {selected.prix === 0 ? t('contests.free') : formatPrice(selected.prix)}
                 </span>
               </div>
               <div className="card" style={{ padding: 'var(--sp-5)', marginBottom: 'var(--sp-4)' }}>
                 <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                  <SectionIcon name="permit" />Règlement
+                  <SectionIcon name="permit" />{t('contests.rules')}
                 </div>
                 <p className="soft" style={{ fontSize: 'var(--fs-14)' }}>
                   {selected.reglement}
@@ -402,7 +403,7 @@ export function ConcoursPage() {
               </div>
               <div className="card" style={{ padding: 'var(--sp-5)' }}>
                 <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                  <SectionIcon name="trophy" />Inscrits
+                  <SectionIcon name="trophy" />{t('contests.registeredHeader')}
                 </div>
                 <div
                   className="row"
@@ -458,17 +459,17 @@ export function ConcoursPage() {
                 <div className="rule-double" aria-hidden="true" />
                 <div className="stack-sm" style={{ textAlign: 'left', fontSize: 'var(--fs-14)' }}>
                   <div className="row" style={{ justifyContent: 'space-between' }}>
-                    <span className="soft">Lieu</span>
+                    <span className="soft">{t('contests.placeLabel')}</span>
                     <span>{selected.lieu.split('(')[0].trim()}</span>
                   </div>
                   <div className="row" style={{ justifyContent: 'space-between' }}>
-                    <span className="soft">Format</span>
+                    <span className="soft">{t('contests.formatLabel')}</span>
                     <span>{selected.format}</span>
                   </div>
                   <div className="row" style={{ justifyContent: 'space-between' }}>
-                    <span className="soft">Inscription</span>
+                    <span className="soft">{t('contests.registrationLabel')}</span>
                     <span className="mono">
-                      {selected.prix === 0 ? 'Gratuit' : formatPrice(selected.prix)}
+                      {selected.prix === 0 ? t('contests.free') : formatPrice(selected.prix)}
                     </span>
                   </div>
                 </div>
@@ -481,10 +482,10 @@ export function ConcoursPage() {
                     onClick={() => setShowModal(true)}
                   >
                     {alreadyIn
-                      ? '✓ Déjà inscrit'
+                      ? t('contests.alreadyIn')
                       : full
-                        ? 'Concours complet'
-                        : "S'inscrire"}
+                        ? t('contests.alreadyFull')
+                        : t('contests.registerSimple')}
                   </Button>
                 </div>
                 <div
