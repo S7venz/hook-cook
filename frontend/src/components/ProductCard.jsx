@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
 import { Icon } from './ui/Icon.jsx';
@@ -18,6 +19,7 @@ export function ProductCard({ product }) {
   const { user } = useAuth();
   const { has, toggle } = useWishlist();
   const { categories, species: speciesList } = useReferenceData();
+  const { t } = useTranslation();
   const category = categories.find((c) => c.id === product.category);
   const favorited = has(product.id);
 
@@ -84,17 +86,17 @@ export function ProductCard({ product }) {
           type="button"
           className={`card-favorite ${favorited ? 'active' : ''}`.trim()}
           onClick={handleFavorite}
-          aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          aria-label={favorited ? t('product.favoriteRemove') : t('product.favoriteAdd')}
           aria-pressed={favorited}
         >
           <Icon name="heart" size={18} />
         </button>
         <div className="tag-row">
-          {product.wasPrice && <Badge accent>Promo</Badge>}
+          {product.wasPrice && <Badge accent>{t('product.promo')}</Badge>}
           {soldOut ? (
-            <Badge status="rejected">Épuisé</Badge>
+            <Badge status="rejected">{t('product.soldOut')}</Badge>
           ) : (
-            stock < 10 && <Badge status="pending">Stock {stock}</Badge>
+            stock < 10 && <Badge status="pending">{t('product.stockLow', { count: stock })}</Badge>
           )}
         </div>
         <div className="add-overlay">
@@ -105,7 +107,7 @@ export function ProductCard({ product }) {
             full
             disabled={soldOut}
           >
-            {soldOut ? 'Épuisé' : 'Ajouter au panier'}
+            {soldOut ? t('product.soldOut') : t('product.addToCart')}
           </Button>
         </div>
       </div>

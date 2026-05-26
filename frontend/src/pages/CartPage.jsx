@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { EmptyState } from '../components/ui/EmptyState.jsx';
 import { Placeholder } from '../components/ui/Placeholder.jsx';
@@ -10,18 +11,15 @@ export function CartPage() {
   const navigate = useNavigate();
   const { items, remove, updateQty } = useCart();
   const { subtotal, shipping, total } = cartTotals(items);
+  const { t } = useTranslation();
 
   if (items.length === 0) {
     return (
       <div className="page">
         <div className="page-container">
-          <EmptyState
-            illus="cart"
-            title="Votre panier attend."
-            description="Rien à préparer pour l'instant. Commencez par une espèce."
-          >
+          <EmptyState illus="cart" title={t('cart.empty')} description="">
             <Button variant="primary" size="lg" onClick={() => navigate('/boutique')}>
-              Parcourir la boutique
+              {t('cart.emptyCta')}
             </Button>
           </EmptyState>
         </div>
@@ -41,7 +39,7 @@ export function CartPage() {
             margin: '0 0 var(--sp-6)',
           }}
         >
-          Votre panier
+          {t('cart.title')}
         </h1>
         <div className="cart-layout">
           <div className="cart-items">
@@ -69,7 +67,7 @@ export function CartPage() {
                     className="remove"
                     onClick={() => remove(index)}
                   >
-                    Retirer
+                    {t('cart.remove')}
                   </button>
                 </div>
                 <div className="price">
@@ -80,32 +78,32 @@ export function CartPage() {
           </div>
 
           <aside className="summary">
-            <h3>Récapitulatif</h3>
+            <h3>{t('cart.title')}</h3>
             <div className="summary-row">
-              <span>Sous-total</span>
+              <span>{t('cart.subtotal')}</span>
               <span className="val">{formatPrice(subtotal)}</span>
             </div>
             <div className="summary-row">
               <span>
-                Livraison{' '}
+                {t('cart.shipping')}{' '}
                 {subtotal >= 120 && (
                   <span className="mono soft" style={{ fontSize: 11 }}>
-                    offerte
+                    {t('cart.shippingFree').toLowerCase()}
                   </span>
                 )}
               </span>
               <span className="val">
-                {shipping === 0 ? 'Offerte' : formatPrice(shipping)}
+                {shipping === 0 ? t('cart.shippingFree') : formatPrice(shipping)}
               </span>
             </div>
             <div className="promo-row">
-              <input className="input" placeholder="Code promo" />
+              <input className="input" placeholder={t('cart.promoCode')} />
               <Button variant="ghost" size="sm">
-                Appliquer
+                {t('cart.promoApply')}
               </Button>
             </div>
             <div className="summary-row total">
-              <span>Total</span>
+              <span>{t('cart.total')}</span>
               <span className="val">{formatPrice(total)}</span>
             </div>
             <div style={{ marginTop: 'var(--sp-4)' }}>
@@ -115,18 +113,8 @@ export function CartPage() {
                 full
                 onClick={() => navigate('/checkout')}
               >
-                Passer commande
+                {t('cart.checkout')}
               </Button>
-            </div>
-            <div
-              className="mono soft"
-              style={{
-                fontSize: 'var(--fs-12)',
-                textAlign: 'center',
-                marginTop: 'var(--sp-3)',
-              }}
-            >
-              Paiement sécurisé Stripe · Retour gratuit 30 j
             </div>
           </aside>
         </div>

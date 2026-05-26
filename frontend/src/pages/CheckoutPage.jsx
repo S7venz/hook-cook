@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Button } from '../components/ui/Button.jsx';
@@ -16,33 +17,33 @@ import {
   validatePostalCode,
 } from '../lib/validation.js';
 
-const STEPS = ['Coordonnées', 'Livraison', 'Paiement'];
-
 const SHIPPING_MODES = [
   {
     id: 'standard',
-    title: 'Standard Colissimo',
-    desc: 'Livraison 48h',
+    titleKey: 'checkout.shippingTitles.standard',
+    descKey: 'checkout.shippingTitles.standardDesc',
     getPrice: (subtotal) => (subtotal >= 120 ? 0 : 5.9),
   },
   {
     id: 'express',
-    title: 'Chronopost 24h',
-    desc: 'Livraison le lendemain avant 13h',
+    titleKey: 'checkout.shippingTitles.express',
+    descKey: 'checkout.shippingTitles.expressDesc',
     getPrice: () => 12.9,
   },
   {
     id: 'relay',
-    title: 'Point relais',
-    desc: 'À 5 min de chez vous',
+    titleKey: 'checkout.shippingTitles.relay',
+    descKey: 'checkout.shippingTitles.relayDesc',
     getPrice: () => 3.9,
   },
 ];
 
 function Stepper({ step }) {
+  const { t } = useTranslation();
+  const labels = [t('checkout.stepContact'), t('checkout.stepShipping'), t('checkout.stepPayment')];
   return (
     <div className="stepper">
-      {STEPS.map((label, i) => {
+      {labels.map((label, i) => {
         const n = i + 1;
         const cls = `step ${step === n ? 'current' : step > n ? 'done' : ''}`.trim();
         return (
@@ -127,6 +128,7 @@ export function CheckoutPage() {
   const navigate = useNavigate();
   const { items, clear } = useCart();
   const { createOrder } = useOrders();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
 
@@ -177,13 +179,10 @@ export function CheckoutPage() {
               margin: '0 0 var(--sp-4)',
             }}
           >
-            Votre panier est vide.
+            {t('cart.empty')}
           </h1>
-          <p className="soft" style={{ marginBottom: 'var(--sp-6)' }}>
-            Ajoutez au moins un article avant de passer commande.
-          </p>
           <Button variant="primary" size="lg" onClick={() => navigate('/boutique')}>
-            Parcourir la boutique
+            {t('cart.emptyCta')}
           </Button>
         </div>
       </div>
@@ -194,8 +193,8 @@ export function CheckoutPage() {
     if (n === 1) {
       return firstError(
         validateEmail(email),
-        validateName(firstName, { field: 'Le prénom' }),
-        validateName(lastName, { field: 'Le nom' }),
+        validateName(firstName, { field: t('checkout.firstNameLabel') }),
+        validateName(lastName, { field: t('checkout.lastNameLabel') }),
         validatePhone(phone),
       );
     }
@@ -293,11 +292,11 @@ export function CheckoutPage() {
                     margin: 0,
                   }}
                 >
-                  Vos coordonnées
+                  {t('checkout.stepContact')}
                 </h2>
                 <div className="field">
                   <label>
-                    Email<span className="req">*</span>
+                    {t('checkout.emailLabel')}<span className="req">*</span>
                   </label>
                   <input
                     className="input"
@@ -312,31 +311,31 @@ export function CheckoutPage() {
                   style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}
                 >
                   <div className="field">
-                    <label>Prénom</label>
+                    <label>{t('checkout.firstNameLabel')}</label>
                     <input
                       className="input"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="Prénom"
+                      placeholder={t('checkout.firstNameLabel')}
                       autoComplete="given-name"
                     />
                   </div>
                   <div className="field">
-                    <label>Nom</label>
+                    <label>{t('checkout.lastNameLabel')}</label>
                     <input
                       className="input"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Nom"
+                      placeholder={t('checkout.lastNameLabel')}
                       autoComplete="family-name"
                     />
                   </div>
                 </div>
                 <div className="field">
                   <label>
-                    Téléphone{' '}
+                    {t('checkout.phoneLabel')}{' '}
                     <span className="soft mono" style={{ fontSize: 11 }}>
-                      (pour le livreur)
+                      {t('checkout.phoneHint')}
                     </span>
                   </label>
                   <input
@@ -350,7 +349,7 @@ export function CheckoutPage() {
                 </div>
                 {error && <div className="error">{error}</div>}
                 <Button variant="primary" size="lg" onClick={() => goNext(2)}>
-                  Continuer vers la livraison →
+                  {t('checkout.continueShipping')}
                 </Button>
               </div>
             )}
@@ -366,10 +365,10 @@ export function CheckoutPage() {
                     margin: 0,
                   }}
                 >
-                  Livraison
+                  {t('checkout.stepShipping')}
                 </h2>
                 <div className="field">
-                  <label>Adresse</label>
+                  <label>{t('checkout.addressLine')}</label>
                   <input
                     className="input"
                     value={address}
@@ -382,7 +381,7 @@ export function CheckoutPage() {
                   style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 'var(--sp-3)' }}
                 >
                   <div className="field">
-                    <label>Code postal</label>
+                    <label>{t('checkout.postalCode')}</label>
                     <input
                       className="input"
                       value={postal}
@@ -392,7 +391,7 @@ export function CheckoutPage() {
                     />
                   </div>
                   <div className="field">
-                    <label>Ville</label>
+                    <label>{t('checkout.city')}</label>
                     <input
                       className="input"
                       value={city}
@@ -404,7 +403,7 @@ export function CheckoutPage() {
                 </div>
                 <div style={{ marginTop: 'var(--sp-4)' }}>
                   <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-                    Mode de livraison
+                    {t('checkout.shippingMode')}
                   </div>
                   <div className="radio-card-group">
                     {SHIPPING_MODES.map((mode) => {
@@ -425,11 +424,11 @@ export function CheckoutPage() {
                         >
                           <div className="check" />
                           <div className="label-stack">
-                            <div className="t">{mode.title}</div>
-                            <div className="s">{mode.desc}</div>
+                            <div className="t">{t(mode.titleKey)}</div>
+                            <div className="s">{t(mode.descKey)}</div>
                           </div>
                           <div className="price">
-                            {price === 0 ? 'Offerte' : formatPrice(price)}
+                            {price === 0 ? t('checkout.shippingFree') : formatPrice(price)}
                           </div>
                         </div>
                       );
@@ -439,7 +438,7 @@ export function CheckoutPage() {
                 {error && <div className="error">{error}</div>}
                 <div className="row">
                   <Button variant="ghost" onClick={() => setStep(1)}>
-                    ← Retour
+                    {t('checkout.backStep')}
                   </Button>
                   <Button
                     variant="primary"
@@ -447,7 +446,7 @@ export function CheckoutPage() {
                     onClick={startPayment}
                     disabled={preparing}
                   >
-                    {preparing ? 'Préparation…' : 'Continuer vers le paiement →'}
+                    {preparing ? t('checkout.preparing') : t('checkout.continuePayment')}
                   </Button>
                 </div>
               </div>
@@ -464,7 +463,7 @@ export function CheckoutPage() {
                     margin: 0,
                   }}
                 >
-                  Paiement
+                  {t('checkout.stepPayment')}
                 </h2>
                 {stripePromise ? (
                   <Elements
@@ -485,7 +484,7 @@ export function CheckoutPage() {
                   </Elements>
                 ) : (
                   <div className="error">
-                    Stripe n'a pas pu être initialisé (clé publique manquante).
+                    {t('checkout.stripeUnavailable')}
                   </div>
                 )}
                 {error && <div className="error">{error}</div>}
@@ -494,7 +493,7 @@ export function CheckoutPage() {
           </div>
 
           <aside className="summary" style={{ position: 'sticky', top: 88 }}>
-            <h3>Récap</h3>
+            <h3>{t('checkout.summary')}</h3>
             <div className="stack-sm" style={{ marginBottom: 'var(--sp-3)' }}>
               {items.map((it) => (
                 <div
@@ -516,17 +515,17 @@ export function CheckoutPage() {
               ))}
             </div>
             <div className="summary-row">
-              <span>Sous-total</span>
+              <span>{t('cart.subtotal')}</span>
               <span className="val">{formatPrice(subtotal)}</span>
             </div>
             <div className="summary-row">
-              <span>Livraison</span>
+              <span>{t('cart.shipping')}</span>
               <span className="val">
-                {shippingPrice === 0 ? 'Offerte' : formatPrice(shippingPrice)}
+                {shippingPrice === 0 ? t('checkout.shippingFree') : formatPrice(shippingPrice)}
               </span>
             </div>
             <div className="summary-row total">
-              <span>Total</span>
+              <span>{t('cart.total')}</span>
               <span className="val">{formatPrice(total)}</span>
             </div>
           </aside>

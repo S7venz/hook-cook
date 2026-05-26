@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -17,11 +18,11 @@ import { useProduct, useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
 import { useToast } from '../lib/toast.js';
 
-const TABS = [
-  { id: 'specs', label: 'Caractéristiques' },
-  { id: 'entretien', label: 'Entretien' },
-  { id: 'livraison', label: 'Livraison & retours' },
-  { id: 'avis', label: 'Avis' },
+const TAB_KEYS = [
+  { id: 'specs', key: 'product.tabs.specs' },
+  { id: 'entretien', key: 'product.tabs.maintenance' },
+  { id: 'livraison', key: 'product.tabs.shipping' },
+  { id: 'avis', key: 'product.tabs.reviews' },
 ];
 
 const CURRENT_MONTH = 4;
@@ -38,6 +39,7 @@ function RatingStars({ value }) {
 }
 
 function BreadcrumbNav({ category, productName }) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -50,7 +52,7 @@ function BreadcrumbNav({ category, productName }) {
       }}
     >
       <Link to="/boutique" style={{ cursor: 'pointer' }}>
-        Boutique
+        {t('product.breadcrumb')}
       </Link>
       {category && <> / {category.name}</>} / {productName}
     </div>
@@ -93,6 +95,7 @@ export function ProductPage() {
   const { push } = useToast();
   const { add } = useCart();
   const { token, user } = useAuth();
+  const { t } = useTranslation();
   const [tab, setTab] = useState('specs');
   const [qty, setQty] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({});
@@ -101,16 +104,16 @@ export function ProductPage() {
 
   const handleStockAlert = async () => {
     if (!user) {
-      push('Connectez-vous pour être prévenu du retour en stock.');
+      push(t('errors.unauthorized'));
       return;
     }
     setSubscribing(true);
     try {
       await subscribeStockAlert(product.id, token);
       setAlertSubscribed(true);
-      push('Vous serez prévenu par mail dès que le produit revient.');
+      push(t('product.notifyMeSubscribed'));
     } catch (err) {
-      push(err?.message ?? 'Inscription impossible.');
+      push(err?.message ?? t('errors.generic'));
     } finally {
       setSubscribing(false);
     }
@@ -225,7 +228,7 @@ export function ProductPage() {
               {product.wasPrice && (
                 <span className="was">{formatPrice(product.wasPrice)}</span>
               )}
-              {product.wasPrice && <Badge accent>Promo</Badge>}
+              {product.wasPrice && <Badge accent>{t('product.promo')}</Badge>}
             </div>
 
             {product.variants && (
@@ -263,14 +266,14 @@ export function ProductPage() {
                   disabled={subscribing || alertSubscribed}
                 >
                   {alertSubscribed
-                    ? '✓ Inscrit à l\'alerte'
+                    ? t('product.alertSubscribed')
                     : subscribing
-                      ? 'Inscription…'
-                      : 'Me prévenir quand dispo'}
+                      ? t('product.addSubscribing')
+                      : t('product.notifyMeWhenAvailable')}
                 </Button>
               ) : (
                 <Button variant="primary" size="lg" onClick={addToCart}>
-                  Ajouter au panier
+                  {t('product.addToCart')}
                 </Button>
               )}
             </div>
@@ -283,8 +286,8 @@ export function ProductPage() {
               }}
             >
               {soldOut
-                ? 'Rupture de stock — vous serez prévenu dès qu\'il revient.'
-                : `Stock : ${stock} en magasin · Livraison estimée sous 48h`}
+                ? t('product.stockOut')
+                : t('product.stockOk', { count: stock })}
             </div>
 
             <div className="adapted-for">
@@ -296,12 +299,12 @@ export function ProductPage() {
                   margin: '0 0 var(--sp-4)',
                 }}
               >
-                Adaptée pour
+                {t('product.adaptedFor')}
               </h3>
               <div className="adapted-grid">
                 {product.species.length > 0 && (
                   <div className="adapted-block">
-                    <h4>Espèces</h4>
+                    <h4>{t('product.speciesLabel')}</h4>
                     <div style={{ display: 'flex', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
                       {product.species.map((sid) => {
                         const sp = speciesList.find((s) => s.id === sid);
@@ -315,14 +318,14 @@ export function ProductPage() {
                   </div>
                 )}
                 <div className="adapted-block">
-                  <h4>Eau</h4>
+                  <h4>{t('product.waterLabel')}</h4>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-14)' }}>
                     {product.water}
                   </div>
                 </div>
                 {product.months?.length > 0 && (
                   <div className="adapted-block" style={{ gridColumn: '1 / -1' }}>
-                    <h4>Saison</h4>
+                    <h4>{t('product.seasonLabel')}</h4>
                     <SeasonCalendar months={product.months} currentMonth={CURRENT_MONTH} />
                   </div>
                 )}
@@ -331,7 +334,7 @@ export function ProductPage() {
 
             {product.story && (
               <div className="adapted-for">
-                <div className="eyebrow">L'histoire</div>
+                <div className="eyebrow">{t('product.storyEyebrow')}</div>
                 <h3
                   style={{
                     fontFamily: 'var(--font-display)',
@@ -340,7 +343,7 @@ export function ProductPage() {
                     margin: 'var(--sp-2) 0 var(--sp-4)',
                   }}
                 >
-                  Montée à la main
+                  {t('product.storyTitle')}
                 </h3>
                 <div
                   style={{
@@ -358,7 +361,7 @@ export function ProductPage() {
                       border: '1px solid var(--hairline)',
                     }}
                   >
-                    <Placeholder label="atelier — montage à la main" />
+                    <Placeholder label={t('product.storyAtelier')} />
                   </div>
                   <div
                     style={{
@@ -375,16 +378,18 @@ export function ProductPage() {
             )}
 
             <div className="tabs" role="tablist">
-              {TABS.map((t) => (
+              {TAB_KEYS.map((tk) => (
                 <button
-                  key={t.id}
+                  key={tk.id}
                   type="button"
                   role="tab"
-                  aria-selected={tab === t.id}
-                  className={tab === t.id ? 'active' : ''}
-                  onClick={() => setTab(t.id)}
+                  aria-selected={tab === tk.id}
+                  className={tab === tk.id ? 'active' : ''}
+                  onClick={() => setTab(tk.id)}
                 >
-                  {t.id === 'avis' ? `${t.label} (${product.reviews ?? 0})` : t.label}
+                  {tk.id === 'avis'
+                    ? `${t(tk.key)} (${product.reviews ?? 0})`
+                    : t(tk.key)}
                 </button>
               ))}
             </div>

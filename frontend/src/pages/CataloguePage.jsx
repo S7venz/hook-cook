@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Fuse from 'fuse.js';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -8,13 +9,6 @@ import { ProductCardSkeleton } from '../components/ui/Skeleton.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { useProducts } from '../lib/products.js';
 import { useReferenceData } from '../lib/referenceData.js';
-
-const SORT_OPTIONS = [
-  { value: 'pertinence', label: 'Tri : pertinence' },
-  { value: 'price-asc', label: 'Prix croissant' },
-  { value: 'price-desc', label: 'Prix décroissant' },
-  { value: 'rating', label: 'Mieux notés' },
-];
 
 function useCatalogFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -84,11 +78,12 @@ function FiltersPanel({
   species,
   techniques,
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <div>
         <h3>
-          <SectionIcon name="cart" />Catégorie
+          <SectionIcon name="cart" />{t('catalog.filters.category')}
         </h3>
         <div className="filter-group">
           {categories.map((c) => (
@@ -106,7 +101,7 @@ function FiltersPanel({
       </div>
       <div>
         <h3>
-          <SectionIcon name="fish" />Espèce ciblée
+          <SectionIcon name="fish" />{t('catalog.filters.species')}
         </h3>
         <div className="filter-group">
           {species.map((s) => (
@@ -123,29 +118,26 @@ function FiltersPanel({
       </div>
       <div>
         <h3>
-          <SectionIcon name="rod" />Technique
+          <SectionIcon name="rod" />{t('catalog.filters.technique')}
         </h3>
         <div className="filter-group">
-          {techniques.map((t) => (
-            <label key={t.id}>
+          {techniques.map((tk) => (
+            <label key={tk.id}>
               <input
                 type="checkbox"
-                checked={filters.techniques.includes(t.id)}
-                onChange={() => onToggle('technique', t.id)}
+                checked={filters.techniques.includes(tk.id)}
+                onChange={() => onToggle('technique', tk.id)}
               />
-              <span>{t.name}</span>
+              <span>{tk.name}</span>
             </label>
           ))}
         </div>
       </div>
       <div>
         <h3>
-          <SectionIcon name="cart" />Prix (€)
+          <SectionIcon name="cart" />{t('catalog.filters.priceMin')} / {t('catalog.filters.priceMax')} (€)
         </h3>
-        <div
-          className="row"
-          style={{ gap: 'var(--sp-2)', alignItems: 'center' }}
-        >
+        <div className="row" style={{ gap: 'var(--sp-2)', alignItems: 'center' }}>
           <input
             type="number"
             inputMode="decimal"
@@ -153,7 +145,7 @@ function FiltersPanel({
             step="1"
             className="input mono"
             placeholder="Min"
-            aria-label="Prix minimum"
+            aria-label={t('catalog.filters.priceMin')}
             value={filters.priceMin}
             onChange={(e) => onSetPrice('priceMin', e.target.value)}
             style={{ width: '50%' }}
@@ -166,7 +158,7 @@ function FiltersPanel({
             step="1"
             className="input mono"
             placeholder="Max"
-            aria-label="Prix maximum"
+            aria-label={t('catalog.filters.priceMax')}
             value={filters.priceMax}
             onChange={(e) => onSetPrice('priceMax', e.target.value)}
             style={{ width: '50%' }}
@@ -175,12 +167,12 @@ function FiltersPanel({
       </div>
       <div>
         <h3>
-          <SectionIcon name="drop" />Disponibilité
+          <SectionIcon name="drop" />{t('catalog.filters.inStock')}
         </h3>
         <div className="filter-group">
           <label>
             <input type="checkbox" checked={filters.inStock} onChange={onToggleStock} />
-            <span>En stock uniquement</span>
+            <span>{t('catalog.filters.inStock')}</span>
           </label>
         </div>
       </div>
@@ -188,10 +180,6 @@ function FiltersPanel({
   );
 }
 
-/**
- * Config Fuse.js — tolérance aux fautes de frappe, pondération par champ.
- * threshold 0.4 laisse passer 1-2 typos par mot de 6-8 chars.
- */
 const FUSE_OPTIONS = {
   keys: [
     { name: 'name', weight: 0.5 },
@@ -241,8 +229,6 @@ function filterProducts(items, filters, sort, fuse) {
     }
   }
 
-  // Si on a trié par pertinence via Fuse, on garde l'ordre des scores.
-  // Sinon on trie par la clé demandée.
   if (!usedFuzzy || sort !== 'pertinence') {
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
@@ -255,8 +241,16 @@ export function CataloguePage() {
   const { filters, toggle, toggleInStock, setQuery, setPrice, reset } = useCatalogFilters();
   const { products, loading } = useProducts();
   const { categories, species, techniques } = useReferenceData();
+  const { t, i18n } = useTranslation();
   const [sort, setSort] = useState('pertinence');
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const sortOptions = [
+    { value: 'pertinence', label: t('catalog.sortOptions.relevance') },
+    { value: 'price-asc', label: t('catalog.sortOptions.priceAsc') },
+    { value: 'price-desc', label: t('catalog.sortOptions.priceDesc') },
+    { value: 'rating', label: t('catalog.sortOptions.topRated') },
+  ];
 
   const fuse = useMemo(
     () => (products.length ? new Fuse(products, FUSE_OPTIONS) : null),
@@ -290,8 +284,8 @@ export function CataloguePage() {
       return { id: `sp-${id}`, label: sp?.name, onRemove: () => toggle('species', id) };
     }),
     ...filters.techniques.map((id) => {
-      const t = techniques.find((x) => x.id === id);
-      return { id: `tech-${id}`, label: t?.name, onRemove: () => toggle('technique', id) };
+      const tk = techniques.find((x) => x.id === id);
+      return { id: `tech-${id}`, label: tk?.name, onRemove: () => toggle('technique', id) };
     }),
     ...(priceActive
       ? [
@@ -316,7 +310,7 @@ export function CataloguePage() {
     <div className="page">
       <div className="page-container">
         <div className="catalog-layout">
-          <aside className="filters-sidebar" aria-label="Filtres">
+          <aside className="filters-sidebar" aria-label={t('catalog.filters.title')}>
             <FiltersPanel
               filters={filters}
               onToggle={toggle}
@@ -331,11 +325,11 @@ export function CataloguePage() {
           <main className="catalog-main">
             <div className="catalog-header">
               <div>
-                <h1>La boutique</h1>
+                <h1>{t('catalog.title')}</h1>
                 <div className="count">
-                  {visible.length} produit{visible.length > 1 ? 's' : ''} · mise à jour
-                  {' '}
-                  {new Intl.DateTimeFormat('fr-FR').format(new Date())}
+                  {t('catalog.resultCount', { count: visible.length })}
+                  {' · '}
+                  {new Intl.DateTimeFormat(i18n.language).format(new Date())}
                 </div>
               </div>
               <div
@@ -345,10 +339,10 @@ export function CataloguePage() {
                 <input
                   type="search"
                   className="input"
-                  placeholder="Rechercher un produit…"
+                  placeholder={t('catalog.searchPlaceholder')}
                   value={filters.query}
                   onChange={(e) => setQuery(e.target.value)}
-                  aria-label="Rechercher dans le catalogue"
+                  aria-label={t('catalog.searchAriaLabel')}
                   style={{ height: 40, width: 220 }}
                 />
                 <select
@@ -356,9 +350,9 @@ export function CataloguePage() {
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
                   style={{ height: 40 }}
-                  aria-label="Trier les produits"
+                  aria-label={t('catalog.sortAriaLabel')}
                 >
-                  {SORT_OPTIONS.map((opt) => (
+                  {sortOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
@@ -369,7 +363,7 @@ export function CataloguePage() {
 
             <div className="mobile-filter-bar">
               <Button variant="ghost" size="sm" onClick={() => setMobileOpen(true)}>
-                <Icon name="filter" size={16} /> Filtrer
+                <Icon name="filter" size={16} /> {t('catalog.openFilters')}
                 {activeCount > 0 ? ` (${activeCount})` : ''}
               </Button>
             </div>
@@ -381,7 +375,7 @@ export function CataloguePage() {
                     {chip.label}
                     <button
                       onClick={chip.onRemove}
-                      aria-label={`Retirer ${chip.label}`}
+                      aria-label={t('catalog.removeChip', { label: chip.label })}
                       type="button"
                     >
                       ×
@@ -394,7 +388,7 @@ export function CataloguePage() {
                   onClick={reset}
                   type="button"
                 >
-                  Réinitialiser
+                  {t('catalog.filters.clearAll')}
                 </button>
               </div>
             )}
@@ -415,19 +409,10 @@ export function CataloguePage() {
                     marginBottom: 'var(--sp-4)',
                   }}
                 >
-                  Aucune touche.
+                  {t('catalog.noResults')}
                 </div>
-                <p
-                  style={{
-                    color: 'var(--ink-soft)',
-                    maxWidth: '40ch',
-                    margin: '0 auto var(--sp-5)',
-                  }}
-                >
-                  Essayez moins de filtres, ou laissez-nous vous guider vers l'espèce.
-                </p>
                 <Button variant="ghost" onClick={reset}>
-                  Repartir des espèces
+                  {t('catalog.filters.clearAll')}
                 </Button>
               </div>
             ) : (
@@ -444,13 +429,13 @@ export function CataloguePage() {
       {mobileOpen && (
         <>
           <div className="drawer-backdrop" onClick={() => setMobileOpen(false)} />
-          <aside className="drawer" aria-label="Filtres">
+          <aside className="drawer" aria-label={t('catalog.filters.title')}>
             <div className="drawer-header">
-              <h3>Filtrer</h3>
+              <h3>{t('catalog.filters.title')}</h3>
               <button
                 className="icon-btn"
                 onClick={() => setMobileOpen(false)}
-                aria-label="Fermer"
+                aria-label={t('common.close')}
                 type="button"
               >
                 <Icon name="close" />
@@ -464,6 +449,7 @@ export function CataloguePage() {
                 filters={filters}
                 onToggle={toggle}
                 onToggleStock={toggleInStock}
+                onSetPrice={setPrice}
                 categories={categories}
                 species={species}
                 techniques={techniques}
@@ -476,7 +462,7 @@ export function CataloguePage() {
                 full
                 onClick={() => setMobileOpen(false)}
               >
-                Voir {visible.length} produit{visible.length > 1 ? 's' : ''}
+                {t('catalog.resultCount', { count: visible.length })}
               </Button>
             </div>
           </aside>
