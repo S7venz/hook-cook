@@ -33,11 +33,12 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
+          cache-dependency-path: requirements-docs.txt
 
       - name: Install MkDocs Material
         run: |
           python -m pip install --upgrade pip
-          pip install 'mkdocs-material' 'mkdocs-glightbox' 'pymdown-extensions>=10.0'
+          pip install -r requirements-docs.txt
 
       - name: Build site
         run: mkdocs build --strict
