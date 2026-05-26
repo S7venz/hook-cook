@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 
 /**
@@ -8,6 +9,7 @@ import { Button } from '../components/ui/Button.jsx';
 export function NotFoundPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { t } = useTranslation();
 
   return (
     <div className="page">
@@ -80,7 +82,7 @@ export function NotFoundPage() {
           </svg>
         </div>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-4)' }}>
-          Erreur 404
+          404
         </div>
         <div
           style={{
@@ -91,11 +93,10 @@ export function NotFoundPage() {
             marginBottom: 'var(--sp-5)',
           }}
         >
-          Page <em style={{ color: 'var(--accent)', fontWeight: 300 }}>introuvable</em>.
+          {t('errors.notFound.title')}
         </div>
         <p className="soft" style={{ margin: '0 auto var(--sp-2)', maxWidth: '44ch' }}>
-          Ça mord pas par ici. La page <span className="mono">{pathname}</span> n'existe pas,
-          ou a été retirée du catalogue. On reprend depuis la première ligne ?
+          {t('errors.notFound.subtitle')} <span className="mono">{pathname}</span>
         </p>
         <div
           style={{
@@ -106,10 +107,10 @@ export function NotFoundPage() {
           }}
         >
           <Button variant="primary" size="lg" onClick={() => navigate('/')}>
-            Retour à l'accueil
+            {t('errors.notFound.cta')}
           </Button>
           <Button variant="ghost" size="lg" onClick={() => navigate('/boutique')}>
-            Parcourir la boutique
+            {t('nav.shop')}
           </Button>
         </div>
         <div
@@ -120,33 +121,16 @@ export function NotFoundPage() {
             color: 'var(--ink-mute)',
           }}
         >
-          Pages utiles :{' '}
-          <Link
-            to="/permis"
-            style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
-          >
-            Permis
+          <Link to="/permis" style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}>
+            {t('nav.permits')}
           </Link>
           {' · '}
-          <Link
-            to="/concours"
-            style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
-          >
-            Concours
+          <Link to="/concours" style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}>
+            {t('nav.contests')}
           </Link>
           {' · '}
-          <Link
-            to="/challenges"
-            style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
-          >
-            Challenges
-          </Link>
-          {' · '}
-          <Link
-            to="/compte"
-            style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
-          >
-            Mon compte
+          <Link to="/challenges" style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}>
+            {t('nav.challenges')}
           </Link>
         </div>
       </div>

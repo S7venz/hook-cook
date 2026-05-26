@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { useAuth } from '../lib/auth.js';
 
@@ -9,6 +10,7 @@ import { useAuth } from '../lib/auth.js';
 export function ForbiddenPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="page">
@@ -61,7 +63,7 @@ export function ForbiddenPage() {
           </svg>
         </div>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-4)' }}>
-          Erreur 403
+          403
         </div>
         <div
           style={{
@@ -72,12 +74,10 @@ export function ForbiddenPage() {
             marginBottom: 'var(--sp-5)',
           }}
         >
-          Accès <em style={{ color: 'var(--accent)', fontWeight: 300 }}>refusé</em>.
+          {t('errors.forbidden.title')}
         </div>
         <p className="soft" style={{ margin: '0 auto var(--sp-6)', maxWidth: '44ch' }}>
-          {user
-            ? `Connecté en tant que ${user.email}, mais votre compte n'a pas les droits administrateur requis pour cette section.`
-            : 'Vous devez être connecté pour accéder à cette section.'}
+          {user ? `${user.email} — ${t('errors.forbidden.subtitle')}` : t('errors.unauthorized')}
         </p>
         <div
           style={{
@@ -88,11 +88,11 @@ export function ForbiddenPage() {
           }}
         >
           <Button variant="primary" size="lg" onClick={() => navigate('/')}>
-            Retour à l'accueil
+            {t('errors.forbidden.cta')}
           </Button>
           {user && (
             <Button variant="ghost" size="lg" onClick={() => navigate('/compte')}>
-              Mon compte
+              {t('account.title')}
             </Button>
           )}
         </div>
