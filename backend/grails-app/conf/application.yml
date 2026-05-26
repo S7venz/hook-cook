@@ -48,6 +48,18 @@ spring:
                     auth: true
                     starttls:
                         enable: true
+    data:
+        redis:
+            # NoSQL utilisé pour le rate-limit anti-brute-force partagé
+            # entre instances et l'idempotence des webhooks Stripe.
+            # En docker-compose : host=redis (DNS interne). En local hors
+            # docker : exporter REDIS_HOST=localhost.
+            host: ${REDIS_HOST:redis}
+            port: ${REDIS_PORT:6379}
+            # Timeout court : si Redis ne répond pas vite, on bascule sur
+            # le fallback in-memory plutôt que de bloquer une requête HTTP.
+            timeout: 500ms
+            connect-timeout: 500ms
 hc:
     frontend:
         # URL publique du frontend, utilisée dans les liens des emails.

@@ -10,12 +10,15 @@ Projet développé dans le cadre d'un module de développement web.
 | Couche | Technologie |
 |---|---|
 | Backend | Grails 6 (Groovy) — API REST |
-| Base de données | PostgreSQL 16 |
+| Base de données relationnelle | PostgreSQL 16 |
+| Base de données NoSQL | Redis 7 — rate-limit partagé + idempotence webhooks Stripe |
 | Auth | JWT + BCrypt (rôles `ROLE_USER` / `ROLE_ADMIN`) |
 | Frontend | React 19 + Vite |
 | Routing | react-router-dom |
 | Paiement | Stripe / PayPal (mocké pour l'instant) |
 | Conteneurisation | Docker + docker-compose |
+
+Justification du choix SQL + NoSQL et de l'architecture multicouche : voir [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Démarrage rapide (tout-en-un via Docker)
 

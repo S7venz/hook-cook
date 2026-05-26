@@ -28,6 +28,7 @@ class PaymentController {
     OrderService orderService
     PermitService permitService
     ContestRegistrationService contestRegistrationService
+    WebhookIdempotencyService webhookIdempotencyService
 
     def webhook() {
         String sigHeader = request.getHeader('Stripe-Signature')
@@ -53,6 +54,16 @@ class PaymentController {
             log.error('Webhook Stripe : exception inattendue — {}', e.message)
             response.status = 400
             render([error: 'Webhook invalide.'] as JSON)
+            return
+        }
+
+        // Idempotence : Stripe peut renvoyer le même event id en cas de
+        // 5xx ou de timeout côté receveur. On marque l'id dans Redis
+        // pour court-circuiter le re-traitement (defense in depth, en
+        // plus de l'idempotence DB d'OrderService).
+        if (!webhookIdempotencyService.acquire(event.id)) {
+            log.info('Webhook Stripe doublon ignoré (déjà traité) : id={} type={}', event.id, event.type)
+            render([received: true, duplicate: true] as JSON)
             return
         }
 

@@ -12,6 +12,7 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
         given:
         controller.stripeService = Mock(StripeService)
         controller.orderService = Mock(OrderService)
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire(_) >> true }
         request.method = 'POST'
         request.contentType = 'application/json'
         request.content = '{}'.bytes
@@ -32,6 +33,7 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
             }
         }
         controller.orderService = Mock(OrderService)
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire(_) >> true }
         request.method = 'POST'
         request.contentType = 'application/json'
         request.addHeader('Stripe-Signature', 't=123,v1=fake')
@@ -56,6 +58,7 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
         OrderService orders = Mock(OrderService)
         controller.stripeService = stripe
         controller.orderService = orders
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire('evt_1') >> true }
 
         request.method = 'POST'
         request.contentType = 'application/json'
@@ -82,6 +85,7 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
         OrderService orders = Mock(OrderService)
         controller.stripeService = stripe
         controller.orderService = orders
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire('evt_2') >> true }
 
         request.method = 'POST'
         request.contentType = 'application/json'
@@ -104,6 +108,7 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
         OrderService orders = Mock(OrderService)
         controller.stripeService = stripe
         controller.orderService = orders
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire('evt_3') >> true }
 
         request.method = 'POST'
         request.contentType = 'application/json'
@@ -118,5 +123,31 @@ class PaymentControllerSpec extends Specification implements ControllerUnitTest<
         0 * orders.markFailedByPaymentIntent(_)
         response.status == 200
         response.json.received == true
+    }
+
+    void "webhook ignore un event déjà traité (idempotence Redis)"() {
+        given: 'un event id qui a déjà été marqué comme vu côté Redis'
+        Event event = Mock(Event) { getType() >> 'payment_intent.succeeded'; getId() >> 'evt_dup' }
+        StripeService stripe = Mock(StripeService) { verifyWebhook(_, _) >> event }
+        OrderService orders = Mock(OrderService)
+        controller.stripeService = stripe
+        controller.orderService = orders
+        controller.webhookIdempotencyService = Mock(WebhookIdempotencyService) { acquire('evt_dup') >> false }
+
+        request.method = 'POST'
+        request.contentType = 'application/json'
+        request.addHeader('Stripe-Signature', 't=123,v1=valid')
+        request.content = '{}'.bytes
+
+        when:
+        controller.webhook()
+
+        then: 'aucun re-traitement et 200 retourné avec drapeau duplicate'
+        0 * stripe.extractPaymentIntent(_)
+        0 * orders.markPaidByPaymentIntent(_)
+        0 * orders.markFailedByPaymentIntent(_)
+        response.status == 200
+        response.json.received == true
+        response.json.duplicate == true
     }
 }
