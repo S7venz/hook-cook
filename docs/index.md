@@ -65,6 +65,15 @@ Application multicouche sécurisée — projet support du Titre Professionnel **
 
     [→ Guide admin](GUIDE-ADMIN.md)
 
+-   :material-flask-outline:{ .lg .middle } &nbsp; **Plan de tests**
+
+    ---
+
+    Les 7 types de tests en place : unitaires, intégration, non-régression,
+    E2E Playwright, charge k6, sécurité OWASP ZAP, recette utilisateur.
+
+    [→ Plan de tests](PLAN-TESTS.md)
+
 -   :material-shield-search:{ .lg .middle } &nbsp; **Veille & sécurité**
 
     ---

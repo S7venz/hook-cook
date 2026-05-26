@@ -60,3 +60,9 @@ site/
 # les copies de travail.
 audits/lighthouse/*.json
 audits/pa11y/*.json
+
+# Tests E2E + load test outputs
+frontend/e2e-results/
+frontend/playwright-report/
+frontend/test-results/
+audits/k6/

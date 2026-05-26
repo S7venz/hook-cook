@@ -1,0 +1,51 @@
+name: security
+
+on:
+  # Scan hebdomadaire automatique le lundi à 4h UTC.
+  schedule:
+    - cron: '0 4 * * 1'
+  # Et déclenchable manuellement depuis l'onglet Actions.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  zap-baseline:
+    name: OWASP ZAP baseline scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Compose
+        run: |
+          docker compose version
+          cp .env.example .env
+
+      - name: Démarrer l'app
+        run: |
+          docker compose up -d --wait postgres redis backend frontend
+          # Attendre que le frontend réponde même si backend healthcheck flaky
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:5173/ >/dev/null && break
+            sleep 2
+          done
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: 'http://localhost:5173'
+          rules_file_name: '.zap/rules.tsv'
+          fail_action: false  # On ne fail pas le job sur trouvailles, on archive
+          cmd_options: '-a -j -T 5'  # -a alerts inclusives, -j Ajax spider, -T timeout 5min
+
+      - name: Logs backend si quelque chose plante
+        if: always()
+        run: docker compose logs backend --tail=80 || true
+
+      - name: Stopper la stack
+        if: always()
+        run: docker compose down -v || true

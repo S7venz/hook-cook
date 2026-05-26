@@ -152,5 +152,6 @@ nav:
     - Utilisateur: GUIDE-UTILISATEUR.md
     - Administrateur: GUIDE-ADMIN.md
   - Qualité:
+    - Plan de tests: PLAN-TESTS.md
     - Veille technologique et sécurité: VEILLE.md
     - Audits (RGAA + perf + éco-conception): AUDITS.md

@@ -1,0 +1,20 @@
+# Règles d'exception du scan OWASP ZAP baseline.
+# Format : ID<TAB>Action<TAB>Description
+#
+# Actions possibles :
+#   IGNORE     — l'alerte ne fera PAS échouer le scan (mais reste dans le rapport)
+#   FAIL       — fait échouer le scan (par défaut pour les High/Medium)
+#   WARN       — warning au lieu de fail
+#
+# Documentation : https://www.zaproxy.org/docs/docker/baseline-scan/
+#
+# On démarre permissif : tout en WARN. À durcir au fur et à mesure qu'on
+# corrige les findings réels.
+
+10015	WARN	Re-examine Cache-control Directives
+10027	WARN	Information Disclosure - Suspicious Comments
+10038	WARN	Content Security Policy (CSP) Header Not Set
+10063	WARN	Permissions Policy Header Not Set
+10096	WARN	Timestamp Disclosure
+10109	WARN	Modern Web Application
+10110	WARN	Dangerous JS Functions
