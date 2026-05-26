@@ -106,6 +106,16 @@ environments:
                 health:
                     enabled: true
                     show-details: never
+            health:
+                # Désactivation des indicateurs auto qui retournent DOWN pour
+                # de mauvaises raisons :
+                #  - mail : ping SMTP qui échoue si SMTP_HOST est vide (CI / démo)
+                #  - ping : ping localhost qui ne vaut rien comme signal
+                # On garde db + redis (les vrais SPOF du backend).
+                mail:
+                    enabled: false
+                ping:
+                    enabled: false
 
 ---
 grails:

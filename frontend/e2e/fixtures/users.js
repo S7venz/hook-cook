@@ -5,7 +5,7 @@
  */
 export const ADMIN = {
   email: process.env.HC_E2E_ADMIN_EMAIL || 'admin@hookcook.fr',
-  password: process.env.HC_E2E_ADMIN_PASSWORD || 'admin1234',
+  password: process.env.HC_E2E_ADMIN_PASSWORD || 'admin1234demo',
 }
 
 /**

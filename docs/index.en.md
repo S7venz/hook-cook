@@ -133,7 +133,7 @@ Once containers are up:
 | REST API | <http://localhost:8080> |
 | Healthcheck | <http://localhost:8080/actuator/health> |
 
-**Default admin account**: `admin@hookcook.fr` / `admin1234`
+**Default admin account**: `admin@hookcook.fr` / `admin1234demo`
 
 ## Feature scope
 

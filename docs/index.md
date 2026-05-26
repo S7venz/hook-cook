@@ -125,7 +125,7 @@ Une fois les conteneurs prêts :
 | API REST | <http://localhost:8080> |
 | Healthcheck | <http://localhost:8080/actuator/health> |
 
-**Compte admin par défaut** : `admin@hookcook.fr` / `admin1234`
+**Compte admin par défaut** : `admin@hookcook.fr` / `admin1234demo`
 
 ## Périmètre fonctionnel
 

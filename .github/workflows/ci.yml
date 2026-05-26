@@ -117,7 +117,7 @@ jobs:
         working-directory: frontend
         env:
           # Mot de passe admin = celui du seed (.env.example)
-          HC_E2E_ADMIN_PASSWORD: admin1234
+          HC_E2E_ADMIN_PASSWORD: admin1234demo
         run: npx playwright test
 
       - name: Upload Playwright report
