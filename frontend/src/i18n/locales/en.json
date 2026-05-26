@@ -76,12 +76,74 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Fishing shop · Perpignan",
-      "title": "The gear. The rivers. The season.",
-      "subtitle": "Everything you need for freshwater fishing — tight selection, no-fluff advice, and a workshop that replies in under a day.",
+      "eyebrow": "2026 season · Trout opening · March 14",
+      "title": "Get ready to {{em}}.",
+      "titleEm": "cast",
+      "subtitle": "From the permit to the first cast — in four steps. A shop run by anglers, not by algorithms.",
+      "ctaPermits": "Get my permit →",
       "ctaShop": "See the shop",
-      "ctaPermits": "Request my permit",
-      "trustBadge": "Fishing shop run by anglers · Advice in under 24 h"
+      "imageAlt": "Fly angler at dawn on a misty river",
+      "imageLabel": "Morning on the Têt — mist, angler in the distance"
+    },
+    "strip": {
+      "permit": "Your permit",
+      "permitValue": "Expires in 284 days",
+      "contest": "Next contest",
+      "contestValue": "Têt Open · May 4",
+      "opening": "Upcoming opening",
+      "openingValue": "Carp · in 12 days"
+    },
+    "permisCard": {
+      "eyebrow": "2026 Permits",
+      "title": "4 steps · 2 working days",
+      "steps": ["Type", "Identity", "Documents", "Payment"],
+      "cta": "Get started"
+    },
+    "seasonsCard": {
+      "eyebrow": "Open seasons",
+      "title": "Trout, grayling, perch, bass",
+      "footnote": "April · brown trout · closes September 21"
+    },
+    "conditionsCard": {
+      "eyebrow": "Live conditions",
+      "loading": "updating…",
+      "errorPartial": "partial data",
+      "title": "Têt river — Olette",
+      "air": "air",
+      "hpa": "hPa",
+      "moon": "moon",
+      "source": "Source: Open-Meteo",
+      "noWeather": "Weather data unavailable.",
+      "pressureLow": "Low pressure — perfect for the morning dry-fly.",
+      "pressureStable": "Stable pressure — classic fishing day.",
+      "pressureHigh": "High pressure — favor early morning / late afternoon.",
+      "pressureVeryHigh": "Strong anticyclone — technical conditions."
+    },
+    "speciesSection": {
+      "eyebrow": "Gear me by",
+      "title": "Target species",
+      "viewAll": "See all →"
+    },
+    "prepSection": {
+      "eyebrow": "Before the cast",
+      "title": "I prepare"
+    },
+    "productsSection": {
+      "eyebrow": "April pick · river trout gear",
+      "title": "Featured gear",
+      "viewAll": "Full catalogue →"
+    },
+    "contestsSection": {
+      "eyebrow": "Local calendar",
+      "title": "Upcoming contests",
+      "viewAll": "All contests →",
+      "full": "Full",
+      "free": "Free"
+    },
+    "carnetSection": {
+      "eyebrow": "Your log",
+      "title": "Your latest catches",
+      "viewAll": "See all →"
     },
     "topSales": {
       "title": "Season best-sellers",

@@ -76,12 +76,74 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Boutique de pêche · Perpignan",
-      "title": "L'attirail. Les rivières. La saison.",
-      "subtitle": "Tout pour la pêche en eau douce — sélection serrée, conseils sans bla-bla, et un atelier qui répond en moins d'une journée.",
+      "eyebrow": "Saison 2026 · Ouverture truite · 14 mars",
+      "title": "Préparez le {{em}}.",
+      "titleEm": "geste",
+      "subtitle": "Du permis au premier lancer — en quatre gestes. Une boutique tenue par des pêcheurs, pas par des algorithmes.",
+      "ctaPermits": "Obtenir mon permis →",
       "ctaShop": "Voir la boutique",
-      "ctaPermits": "Demander mon permis",
-      "trustBadge": "Boutique pêche tenue par des pêcheurs · Conseils en moins de 24h"
+      "imageAlt": "Pêcheur à la mouche au lever du jour sur une rivière embrumée",
+      "imageLabel": "Matin sur la Têt — brume, pêcheur au loin"
+    },
+    "strip": {
+      "permit": "Votre permis",
+      "permitValue": "Expire dans 284 jours",
+      "contest": "Prochain concours",
+      "contestValue": "Open de la Têt · 04 mai",
+      "opening": "Ouverture à venir",
+      "openingValue": "Carpe · dans 12 jours"
+    },
+    "permisCard": {
+      "eyebrow": "Permis 2026",
+      "title": "En 4 gestes · 2 jours ouvrés",
+      "steps": ["Type", "Identité", "Pièces", "Paiement"],
+      "cta": "Commencer"
+    },
+    "seasonsCard": {
+      "eyebrow": "Saisons en cours",
+      "title": "Truite, ombre, perche, bar",
+      "footnote": "Avril · truite fario · fermée le 21 septembre"
+    },
+    "conditionsCard": {
+      "eyebrow": "Conditions en direct",
+      "loading": "màj…",
+      "errorPartial": "données partielles",
+      "title": "La Têt — Olette",
+      "air": "air",
+      "hpa": "hPa",
+      "moon": "lune",
+      "source": "Source : Open-Meteo",
+      "noWeather": "Données météo indisponibles.",
+      "pressureLow": "Basses pressions — idéal pour la sèche matinale.",
+      "pressureStable": "Pressions stables — journée classique de pêche.",
+      "pressureHigh": "Hautes pressions — privilégier le début / fin de journée.",
+      "pressureVeryHigh": "Anticyclone marqué — conditions techniques."
+    },
+    "speciesSection": {
+      "eyebrow": "Je m'équipe par",
+      "title": "Espèce ciblée",
+      "viewAll": "Voir toutes →"
+    },
+    "prepSection": {
+      "eyebrow": "Avant le geste",
+      "title": "Je prépare"
+    },
+    "productsSection": {
+      "eyebrow": "Curation d'avril · matériel truite rivière",
+      "title": "Équipement du moment",
+      "viewAll": "Tout le catalogue →"
+    },
+    "contestsSection": {
+      "eyebrow": "Calendrier local",
+      "title": "Concours à venir",
+      "viewAll": "Tous les concours →",
+      "full": "Complet",
+      "free": "Gratuit"
+    },
+    "carnetSection": {
+      "eyebrow": "Votre carnet",
+      "title": "Vos dernières prises",
+      "viewAll": "Voir tout →"
     },
     "topSales": {
       "title": "Best-sellers de la saison",

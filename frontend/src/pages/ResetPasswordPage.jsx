@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { confirmPasswordReset } from '../lib/gdpr.js';
 import { validatePassword } from '../lib/validation.js';
@@ -13,6 +14,7 @@ import { validatePassword } from '../lib/validation.js';
 export function ResetPasswordPage() {
   const { token } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +29,7 @@ export function ResetPasswordPage() {
       return;
     }
     if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.');
+      setError(t('auth.register.errorMismatch'));
       return;
     }
     setError('');
@@ -35,10 +37,9 @@ export function ResetPasswordPage() {
     try {
       await confirmPasswordReset(token, password);
       setDone(true);
-      // Auto-redirect sur /connexion après 3s
       setTimeout(() => navigate('/connexion', { replace: true }), 3000);
     } catch (err2) {
-      setError(err2?.message ?? 'Erreur lors de la réinitialisation.');
+      setError(err2?.message ?? t('errors.generic'));
     } finally {
       setSubmitting(false);
     }
@@ -49,21 +50,11 @@ export function ResetPasswordPage() {
       <div className="page">
         <div className="page-container" style={{ maxWidth: 480 }}>
           <div style={{ padding: 'var(--sp-12) 0', textAlign: 'center' }}>
-            <div
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'var(--fs-44)',
-                fontWeight: 400,
-                margin: '0 0 var(--sp-4)',
-              }}
-            >
-              Mot de passe mis à jour.
-            </div>
             <p className="soft" style={{ marginBottom: 'var(--sp-6)' }}>
-              Vous allez être redirigé vers la page de connexion…
+              {t('auth.reset.success')}
             </p>
             <Link to="/connexion">
-              <Button variant="primary">Se connecter maintenant</Button>
+              <Button variant="primary">{t('auth.reset.backToLogin')}</Button>
             </Link>
           </div>
         </div>
@@ -75,9 +66,6 @@ export function ResetPasswordPage() {
     <div className="page">
       <div className="page-container" style={{ maxWidth: 440 }}>
         <div style={{ padding: 'var(--sp-12) 0' }}>
-          <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-            Nouveau mot de passe
-          </div>
           <h1
             style={{
               fontFamily: 'var(--font-display)',
@@ -87,16 +75,15 @@ export function ResetPasswordPage() {
               margin: '0 0 var(--sp-4)',
             }}
           >
-            Réinitialisation
+            {t('auth.reset.title')}
           </h1>
           <p className="soft" style={{ marginBottom: 'var(--sp-6)' }}>
-            Choisissez un nouveau mot de passe pour votre compte. Il doit faire
-            au moins 8 caractères.
+            {t('auth.reset.subtitle')}
           </p>
 
           <form onSubmit={submit} className="stack-md" noValidate>
             <div className="field">
-              <label htmlFor="new-password">Nouveau mot de passe</label>
+              <label htmlFor="new-password">{t('auth.reset.passwordLabel')}</label>
               <input
                 id="new-password"
                 className="input"
@@ -109,7 +96,7 @@ export function ResetPasswordPage() {
               />
             </div>
             <div className="field">
-              <label htmlFor="confirm-password">Confirmer le mot de passe</label>
+              <label htmlFor="confirm-password">{t('auth.reset.confirmLabel')}</label>
               <input
                 id="confirm-password"
                 className="input"
@@ -122,28 +109,9 @@ export function ResetPasswordPage() {
             </div>
             {error && <div className="error">{error}</div>}
             <Button variant="primary" size="lg" full type="submit" disabled={submitting}>
-              {submitting ? 'Mise à jour…' : 'Définir mon mot de passe'}
+              {submitting ? t('auth.reset.submitting') : t('auth.reset.submit')}
             </Button>
           </form>
-
-          {error?.toLowerCase().includes('expiré') && (
-            <div
-              style={{
-                marginTop: 'var(--sp-4)',
-                padding: 'var(--sp-3)',
-                background: 'var(--bg-sunk)',
-                borderRadius: 'var(--r-md)',
-                fontSize: 'var(--fs-13)',
-              }}
-            >
-              <Link
-                to="/mot-de-passe-oublie"
-                style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
-              >
-                Demander un nouveau lien
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>

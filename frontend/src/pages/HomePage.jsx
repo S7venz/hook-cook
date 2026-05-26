@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import {
@@ -12,7 +13,6 @@ import { PondJump } from '../components/ui/PondJump.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 import { Bubbles } from '../components/decor/Bubbles.jsx';
 import { SwimmingFish } from '../components/decor/SwimmingFish.jsx';
-import { Doodle } from '../components/decor/Doodle.jsx';
 import { SpeciesIllus } from '../components/ui/SpeciesIllus.jsx';
 import { SeasonCalendar } from '../components/ui/SeasonCalendar.jsx';
 import { ProductCard } from '../components/ProductCard.jsx';
@@ -35,13 +35,14 @@ const cardTitleStyle = {
 };
 
 function PermisCard({ onStart }) {
-  const steps = ['Type', 'Identité', 'Pièces', 'Paiement'];
+  const { t } = useTranslation();
+  const steps = t('home.permisCard.steps', { returnObjects: true });
   return (
     <div className="card" style={cardStyle}>
       <div className="eyebrow">
-        <SectionIcon name="permit" />Permis 2026
+        <SectionIcon name="permit" />{t('home.permisCard.eyebrow')}
       </div>
-      <h3 style={cardTitleStyle}>En 4 gestes · 2 jours ouvrés</h3>
+      <h3 style={cardTitleStyle}>{t('home.permisCard.title')}</h3>
       <div style={{ display: 'flex', gap: 'var(--sp-2)', marginBottom: 'var(--sp-4)' }}>
         {steps.map((label, i) => (
           <div
@@ -72,19 +73,20 @@ function PermisCard({ onStart }) {
         ))}
       </div>
       <Button variant="ghost" size="sm" onClick={onStart}>
-        Commencer
+        {t('home.permisCard.cta')}
       </Button>
     </div>
   );
 }
 
 function SeasonsCard() {
+  const { t } = useTranslation();
   return (
     <div className="card" style={cardStyle}>
       <div className="eyebrow">
-        <SectionIcon name="leaf" />Saisons en cours
+        <SectionIcon name="leaf" />{t('home.seasonsCard.eyebrow')}
       </div>
-      <h3 style={cardTitleStyle}>Truite, ombre, perche, bar</h3>
+      <h3 style={cardTitleStyle}>{t('home.seasonsCard.title')}</h3>
       <SeasonCalendar months={[3, 4, 5, 6, 7, 8, 9]} currentMonth={CURRENT_MONTH} />
       <div
         style={{
@@ -94,23 +96,20 @@ function SeasonsCard() {
           marginTop: 'var(--sp-3)',
         }}
       >
-        Avril · truite fario · fermée le 21 septembre
+        {t('home.seasonsCard.footnote')}
       </div>
     </div>
   );
 }
 
-function pressureTrend(hpa) {
-  if (hpa == null) return 'Données météo indisponibles.';
-  if (hpa < 1005) return 'Basses pressions — idéal pour la sèche matinale.';
-  if (hpa < 1015) return 'Pressions stables — journée classique de pêche.';
-  if (hpa < 1025) return 'Hautes pressions — privilégier le début / fin de journée.';
-  return 'Anticyclone marqué — conditions techniques.';
+function pressureTrend(hpa, t) {
+  if (hpa == null) return t('home.conditionsCard.noWeather');
+  if (hpa < 1005) return t('home.conditionsCard.pressureLow');
+  if (hpa < 1015) return t('home.conditionsCard.pressureStable');
+  if (hpa < 1025) return t('home.conditionsCard.pressureHigh');
+  return t('home.conditionsCard.pressureVeryHigh');
 }
 
-// Petit pictogramme météo déduit de la pression + température.
-// Principe : basse pression → probable couvert/pluie ; haute pression →
-// ciel dégagé. C'est une heuristique d'indication, pas une prévision.
 function MeteoIcon({ pressure, temp }) {
   if (pressure == null) return null;
   let kind;
@@ -163,6 +162,7 @@ function MeteoIcon({ pressure, temp }) {
 }
 
 function ConditionsCard() {
+  const { t } = useTranslation();
   const { temp, pressure, moon, loading, error } = useLiveConditions();
 
   const tempDisplay = temp != null ? `${Math.round(temp)}°` : '—';
@@ -170,19 +170,20 @@ function ConditionsCard() {
   const moonDisplay = moon.short;
 
   const metrics = [
-    { value: tempDisplay, label: 'air' },
-    { value: pressureDisplay, label: 'hPa' },
-    { value: moonDisplay, label: 'lune' },
+    { value: tempDisplay, label: t('home.conditionsCard.air') },
+    { value: pressureDisplay, label: t('home.conditionsCard.hpa') },
+    { value: moonDisplay, label: t('home.conditionsCard.moon') },
   ];
 
   return (
     <div className="card" style={{ ...cardStyle, position: 'relative' }}>
       <MeteoIcon pressure={pressure} temp={temp} />
       <div className="eyebrow">
-        <SectionIcon name="wave" />Conditions en direct {loading && ' · màj…'}
-        {error && ' · données partielles'}
+        <SectionIcon name="wave" />{t('home.conditionsCard.eyebrow')}
+        {loading && ` · ${t('home.conditionsCard.loading')}`}
+        {error && ` · ${t('home.conditionsCard.errorPartial')}`}
       </div>
-      <h3 style={cardTitleStyle}>La Têt — Olette</h3>
+      <h3 style={cardTitleStyle}>{t('home.conditionsCard.title')}</h3>
       <div
         style={{
           display: 'grid',
@@ -214,7 +215,7 @@ function ConditionsCard() {
           color: 'var(--ink-soft)',
         }}
       >
-        {pressureTrend(pressure)} {moon.label} · J{moon.daysSinceNew}.
+        {pressureTrend(pressure, t)} {moon.label} · J{moon.daysSinceNew}.
       </div>
       <div
         style={{
@@ -224,7 +225,7 @@ function ConditionsCard() {
           color: 'var(--ink-mute)',
         }}
       >
-        Source : Open-Meteo
+        {t('home.conditionsCard.source')}
       </div>
     </div>
   );
@@ -236,13 +237,9 @@ function contestStatus(contest) {
   return 'approved';
 }
 
-function contestLabel(contest) {
-  if (contest.inscrits >= contest.max) return 'Complet';
-  return `${contest.inscrits}/${contest.max}`;
-}
-
 export function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { products } = useProducts();
   const { contests, species } = useReferenceData();
   const { user } = useAuth();
@@ -257,6 +254,11 @@ export function HomePage() {
   const openContests = () => navigate('/concours');
   const openAccount = () => navigate('/compte');
 
+  function contestLabel(contest) {
+    if (contest.inscrits >= contest.max) return t('home.contestsSection.full');
+    return `${contest.inscrits}/${contest.max}`;
+  }
+
   return (
     <div className="page">
       <section className="hero cursor-rod" style={{ position: 'relative', overflow: 'hidden' }}>
@@ -269,76 +271,45 @@ export function HomePage() {
           preserveAspectRatio="xMaxYMid slice"
           aria-hidden="true"
         >
-          {/* Lignes de pêche — courbes décoratives évoquant un lancer */}
-          <path
-            d="M 800 120 Q 600 180 400 240 T 0 360"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-          />
-          <path
-            d="M 800 180 Q 550 260 350 320 T 0 440"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            opacity="0.6"
-          />
-          <path
-            d="M 800 60 Q 650 120 500 170 T 200 260"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            opacity="0.4"
-          />
-          {/* Petites mouches / hameçons ponctuant les lignes */}
+          <path d="M 800 120 Q 600 180 400 240 T 0 360" fill="none" stroke="currentColor" strokeWidth="1" />
+          <path d="M 800 180 Q 550 260 350 320 T 0 440" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6" />
+          <path d="M 800 60 Q 650 120 500 170 T 200 260" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.4" />
           <circle cx="400" cy="240" r="3" fill="currentColor" opacity="0.8" />
           <circle cx="350" cy="320" r="2.5" fill="currentColor" opacity="0.6" />
           <circle cx="500" cy="170" r="2" fill="currentColor" opacity="0.5" />
-          {/* Ondulations / rides d'eau en bas à droite */}
-          <path
-            d="M 500 500 Q 560 490 620 500 T 740 500"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            opacity="0.5"
-          />
-          <path
-            d="M 520 530 Q 580 520 640 530 T 760 530"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            opacity="0.3"
-          />
+          <path d="M 500 500 Q 560 490 620 500 T 740 500" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
+          <path d="M 520 530 Q 580 520 640 530 T 760 530" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
         </svg>
         <div className="page-container">
           <div className="hero-grid">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="calendar" />Saison 2026 · Ouverture truite · 14 mars
+                <SectionIcon name="calendar" />{t('home.hero.eyebrow')}
               </div>
               <h1>
-                Préparez
-                <br />
-                le <em>geste</em>.
+                <Trans
+                  i18nKey="home.hero.title"
+                  values={{ em: t('home.hero.titleEm') }}
+                  components={{ 1: <br />, 3: <em /> }}
+                >
+                  Préparez<br />le <em>geste</em>.
+                </Trans>
               </h1>
-              <p className="lede">
-                Du permis au premier lancer — en quatre gestes. Une boutique tenue par des
-                pêcheurs, pas par des algorithmes.
-              </p>
+              <p className="lede">{t('home.hero.subtitle')}</p>
               <div className="hero-actions">
                 <Button variant="accent" size="lg" onClick={openPermis}>
-                  Obtenir mon permis →
+                  {t('home.hero.ctaPermits')}
                 </Button>
                 <Button variant="ghost" size="lg" onClick={openShop}>
-                  Voir la boutique
+                  {t('home.hero.ctaShop')}
                 </Button>
               </div>
             </div>
             <div className="hero-illus">
               <Placeholder
                 src="http://localhost:8080/api/uploads/hero-home.webp"
-                label="Matin sur la Têt — brume, pêcheur au loin"
-                alt="Pêcheur à la mouche au lever du jour sur une rivière embrumée"
+                label={t('home.hero.imageLabel')}
+                alt={t('home.hero.imageAlt')}
                 width={1200}
                 height={900}
                 fetchpriority="high"
@@ -355,21 +326,21 @@ export function HomePage() {
         <div className="saison-inner">
           <div className="saison-item">
             <span className="lbl">
-              <SectionIcon name="permit" />Votre permis
+              <SectionIcon name="permit" />{t('home.strip.permit')}
             </span>
-            <span className="val">Expire dans 284 jours</span>
+            <span className="val">{t('home.strip.permitValue')}</span>
           </div>
           <div className="saison-item">
             <span className="lbl">
-              <SectionIcon name="trophy" />Prochain concours
+              <SectionIcon name="trophy" />{t('home.strip.contest')}
             </span>
-            <span className="val">Open de la Têt · 04 mai</span>
+            <span className="val">{t('home.strip.contestValue')}</span>
           </div>
           <div className="saison-item">
             <span className="lbl">
-              <SectionIcon name="fish" />Ouverture à venir
+              <SectionIcon name="fish" />{t('home.strip.opening')}
             </span>
-            <span className="val">Carpe · dans 12 jours</span>
+            <span className="val">{t('home.strip.openingValue')}</span>
           </div>
         </div>
       </section>
@@ -379,15 +350,15 @@ export function HomePage() {
           <div className="section-header">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="fish" />Je m'équipe par
+                <SectionIcon name="fish" />{t('home.speciesSection.eyebrow')}
               </div>
               <h2>
-                Espèce ciblée
+                {t('home.speciesSection.title')}
                 <SchoolScene />
               </h2>
             </div>
             <a className="more" onClick={openShop}>
-              Voir toutes →
+              {t('home.speciesSection.viewAll')}
             </a>
           </div>
 
@@ -422,10 +393,10 @@ export function HomePage() {
           <div className="section-header">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="compass" />Avant le geste
+                <SectionIcon name="compass" />{t('home.prepSection.eyebrow')}
               </div>
               <h2>
-                Je prépare
+                {t('home.prepSection.title')}
                 <FlyScene />
               </h2>
             </div>
@@ -451,15 +422,15 @@ export function HomePage() {
           <div className="section-header">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="rod" />Curation d'avril · matériel truite rivière
+                <SectionIcon name="rod" />{t('home.productsSection.eyebrow')}
               </div>
               <h2>
-                Équipement du moment
+                {t('home.productsSection.title')}
                 <CastScene />
               </h2>
             </div>
             <a className="more" onClick={openShop}>
-              Tout le catalogue →
+              {t('home.productsSection.viewAll')}
             </a>
           </div>
           <div className="products-grid">
@@ -475,15 +446,15 @@ export function HomePage() {
           <div className="section-header">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="trophy" />Calendrier local
+                <SectionIcon name="trophy" />{t('home.contestsSection.eyebrow')}
               </div>
               <h2>
-                Concours à venir
+                {t('home.contestsSection.title')}
                 <TrophyScene />
               </h2>
             </div>
             <a className="more" onClick={openContests}>
-              Tous les concours →
+              {t('home.contestsSection.viewAll')}
             </a>
           </div>
           <div className="concours-grid">
@@ -511,7 +482,7 @@ export function HomePage() {
                       className="mono"
                       style={{ fontSize: 'var(--fs-12)', color: 'var(--ink-mute)' }}
                     >
-                      {contest.prix === 0 ? 'Gratuit' : formatPrice(contest.prix)}
+                      {contest.prix === 0 ? t('home.contestsSection.free') : formatPrice(contest.prix)}
                     </span>
                   </div>
                 </div>
@@ -527,12 +498,12 @@ export function HomePage() {
             <div className="section-header">
               <div>
                 <div className="eyebrow">
-                  <SectionIcon name="carnet" />Votre carnet
+                  <SectionIcon name="carnet" />{t('home.carnetSection.eyebrow')}
                 </div>
-                <h2>Vos dernières prises</h2>
+                <h2>{t('home.carnetSection.title')}</h2>
               </div>
               <a className="more" onClick={openAccount}>
-                Voir tout →
+                {t('home.carnetSection.viewAll')}
               </a>
             </div>
             <div className="carnet-feed">
@@ -552,7 +523,7 @@ export function HomePage() {
                         <small>cm</small>
                       </div>
                       <div className="entry-meta">
-                        <span>{new Date(entry.date).toLocaleDateString('fr-FR')}</span>
+                        <span>{new Date(entry.date).toLocaleDateString()}</span>
                         <span>·</span>
                         <span>{entry.bait}</span>
                       </div>
