@@ -28,7 +28,6 @@ function renderArray(items, kind = 'p') {
     return (
       <ul>
         {items.map((html, i) => (
-          // eslint-disable-next-line react/no-danger
           <li key={i} dangerouslySetInnerHTML={{ __html: html }} />
         ))}
       </ul>
@@ -38,7 +37,6 @@ function renderArray(items, kind = 'p') {
     <p
       key={i}
       className={i === 0 ? 'hc-dropcap' : undefined}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: html }}
     />
   ));
