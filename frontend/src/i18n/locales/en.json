@@ -385,6 +385,68 @@
     "failedSubtitle": "Your order {{id}} could not be processed. You can try again from your cart.",
     "backToCart": "Back to cart"
   },
+  "permis": {
+    "loadingPrices": "Loading pricing…",
+    "taxIncl": "incl. tax",
+    "startApplication": "Start my application",
+    "trackApplication": "Track my application",
+    "landing": {
+      "eyebrow": "2026 season",
+      "title": "Your permit<br />in 4 steps.",
+      "subtitle": "Online application, uploaded ID documents, decision within 2 working days, downloadable PDF on approval.",
+      "pricingEyebrow": "2026 pricing",
+      "pricingTitle": "Pick your permit"
+    },
+    "upload": {
+      "replace": "Replace",
+      "uploading": "Uploading…",
+      "hint": "or click to browse · JPG / PNG / WebP · max 8 MB"
+    },
+    "tracking": {
+      "eyebrow": "Track your application",
+      "permitNumber": "Permit {{id}}",
+      "documents": "Uploaded documents"
+    },
+    "wizard": {
+      "stepType": "Type",
+      "stepIdentity": "Identity",
+      "stepDocs": "Documents",
+      "stepSummary": "Summary",
+      "stepPayment": "Payment",
+      "selectType": "Which permit type?",
+      "identityTitle": "Your identity",
+      "docsTitle": "Supporting documents",
+      "summaryTitle": "Summary",
+      "paymentTitle": "Payment",
+      "paymentNotice": "The amount includes the French aquatic environments fishing fee (CPMA).",
+      "needSignIn": "Sign in to continue your permit application.",
+      "signInNotice": "The next step requires a Hook & Cook account. You'll be invited to sign in.",
+      "rgpdNotice": "The data you provide is forwarded to your departmental federation. It is never resold.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "birthDateLabel": "Birth date",
+      "departmentLabel": "Department",
+      "idDocLabel": "ID document",
+      "photoDocLabel": "ID photo",
+      "idDocDropHint": "Drop your ID document here",
+      "photoDocDropHint": "Drop an ID photo",
+      "uploadHint": "JPG, PNG or WebP · max 8 MB per file.",
+      "typeLabel": "Type",
+      "docsLabel": "Documents",
+      "fileCount_one": "{{count}} file",
+      "fileCount_other": "{{count}} files",
+      "totalIncl": "Total incl. tax",
+      "termsAccept": "I certify that the information is accurate and accept the federation's terms and conditions.",
+      "proceedToPayment": "Proceed to payment",
+      "preparing": "Preparing…",
+      "payCta": "Pay"
+    },
+    "toasts": {
+      "paymentConfirmed": "Payment confirmed — application under review",
+      "applicationSent": "Application sent — under review",
+      "submitFailed": "Could not submit the application."
+    }
+  },
   "permits": {
     "title": "2026 Fishing permits",
     "subtitle": "Three options. Fast approval. Paperless submission.",

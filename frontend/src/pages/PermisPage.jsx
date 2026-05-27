@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -21,12 +22,18 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
-const STEP_LABELS = ['Type', 'Identité', 'Pièces', 'Récap', 'Paiement'];
-
 function Stepper({ current }) {
+  const { t } = useTranslation();
+  const stepLabels = [
+    t('permis.wizard.stepType'),
+    t('permis.wizard.stepIdentity'),
+    t('permis.wizard.stepDocs'),
+    t('permis.wizard.stepSummary'),
+    t('permis.wizard.stepPayment'),
+  ];
   return (
     <div className="stepper">
-      {STEP_LABELS.map((label, i) => {
+      {stepLabels.map((label, i) => {
         const n = i + 1;
         const className = `step ${current === n ? 'current' : current > n ? 'done' : ''}`.trim();
         return (
@@ -49,6 +56,7 @@ function formatSize(bytes) {
 }
 
 function UploadZone({ file, onUpload, onRemove, label, initials, uploading, error }) {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const openPicker = () => inputRef.current?.click();
   const handleChange = (event) => {
@@ -93,20 +101,20 @@ function UploadZone({ file, onUpload, onRemove, label, initials, uploading, erro
                 onRemove();
               }}
             >
-              Remplacer
+              {t('permis.upload.replace')}
             </button>
           </>
         ) : (
           <div>
             <Icon name="upload" size={24} />
             <div style={{ marginTop: 'var(--sp-2)' }}>
-              {uploading ? 'Envoi en cours…' : label}
+              {uploading ? t('permis.upload.uploading') : label}
             </div>
             <div
               className="mono soft"
               style={{ fontSize: 'var(--fs-12)', marginTop: 4 }}
             >
-              ou cliquez pour parcourir · JPG / PNG / WebP · max 8 Mo
+              {t('permis.upload.hint')}
             </div>
           </div>
         )}
@@ -128,11 +136,12 @@ function UploadZone({ file, onUpload, onRemove, label, initials, uploading, erro
 }
 
 function TrackingView({ permit, onBack }) {
+  const { t } = useTranslation();
   return (
     <div className="page">
       <div className="page-container" style={{ maxWidth: 720 }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          <SectionIcon name="permit" />Suivi de votre demande
+          <SectionIcon name="permit" />{t('permis.tracking.eyebrow')}
         </div>
         <h1
           style={{
@@ -143,7 +152,7 @@ function TrackingView({ permit, onBack }) {
             margin: '0 0 var(--sp-3)',
           }}
         >
-          Permis {permit.id}
+          {t('permis.tracking.permitNumber', { id: permit.id })}
         </h1>
         <div className="row" style={{ marginBottom: 'var(--sp-6)' }}>
           <Badge status={permit.status}>{permit.statusLabel}</Badge>
@@ -174,7 +183,7 @@ function TrackingView({ permit, onBack }) {
         {(permit.idDocUrl || permit.photoDocUrl) && (
           <div className="card" style={{ marginTop: 'var(--sp-4)', padding: 'var(--sp-5)' }}>
             <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-              <SectionIcon name="carnet" />Pièces déposées
+              <SectionIcon name="carnet" />{t('permis.tracking.documents')}
             </div>
             <div className="row" style={{ gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
               {permit.idDocUrl && (
@@ -184,7 +193,7 @@ function TrackingView({ permit, onBack }) {
                   rel="noreferrer"
                   className="btn btn-ghost btn-sm"
                 >
-                  Pièce d'identité ↗
+                  {t('permis.wizard.idDocLabel')} ↗
                 </a>
               )}
               {permit.photoDocUrl && (
@@ -194,7 +203,7 @@ function TrackingView({ permit, onBack }) {
                   rel="noreferrer"
                   className="btn btn-ghost btn-sm"
                 >
-                  Photo d'identité ↗
+                  {t('permis.wizard.photoDocLabel')} ↗
                 </a>
               )}
             </div>
@@ -203,7 +212,7 @@ function TrackingView({ permit, onBack }) {
 
         <div style={{ marginTop: 'var(--sp-6)' }}>
           <Button variant="ghost" onClick={onBack}>
-            ← Retour
+            ← {t('common.back')}
           </Button>
         </div>
       </div>
@@ -213,6 +222,7 @@ function TrackingView({ permit, onBack }) {
 
 function ApplyView({ onSubmit, onBack, types, departments }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { token, user } = useAuth();
   const { push } = useToast();
   const [step, setStep] = useState(1);
@@ -235,7 +245,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
   const [paymentSetup, setPaymentSetup] = useState(null);
   const [preparingPayment, setPreparingPayment] = useState(false);
 
-  const type = types.find((t) => t.id === typeId) ?? types[0];
+  const type = types.find((pt) => pt.id === typeId) ?? types[0];
 
   const validateIdentityStep = () =>
     firstError(
@@ -249,7 +259,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
   // /connexion avec next=/permis, il revient ici après login.
   const goToIdentityStep = () => {
     if (!user) {
-      push('Connectez-vous pour continuer votre demande de permis.');
+      push(t('permis.wizard.needSignIn'));
       navigate('/connexion', { state: { from: '/permis' } });
       return;
     }
@@ -363,7 +373,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
     return (
       <div className="page">
         <div className="page-container">
-          <p>Chargement des tarifs…</p>
+          <p>{t('permis.loadingPrices')}</p>
         </div>
       </div>
     );
@@ -385,32 +395,32 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 margin: 0,
               }}
             >
-              Quel type de permis ?
+              {t('permis.wizard.selectType')}
             </h2>
             <div className="permis-types">
-              {types.map((t) => (
+              {types.map((pt) => (
                 <div
-                  key={t.id}
-                  className={`permis-type-card ${typeId === t.id ? 'selected' : ''}`}
-                  onClick={() => setTypeId(t.id)}
+                  key={pt.id}
+                  className={`permis-type-card ${typeId === pt.id ? 'selected' : ''}`}
+                  onClick={() => setTypeId(pt.id)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setTypeId(t.id);
+                      setTypeId(pt.id);
                     }
                   }}
                 >
-                  {t.label && <div className="lbl">{t.label}</div>}
-                  <div className="t">{t.title}</div>
+                  {pt.label && <div className="lbl">{pt.label}</div>}
+                  <div className="t">{pt.title}</div>
                   <ul>
-                    {(t.items ?? []).map((item) => (
+                    {(pt.items ?? []).map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
                   <div className="pp">
-                    {formatPrice(t.price)} <small>TTC</small>
+                    {formatPrice(pt.price)} <small>{t('permis.taxIncl')}</small>
                   </div>
                 </div>
               ))}
@@ -428,16 +438,15 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                   color: 'var(--ink-soft)',
                 }}
               >
-                La suite nécessite un compte Hook &amp; Cook. Vous serez invité·e à
-                vous connecter à l'étape suivante.
+                {t('permis.wizard.signInNotice')}
               </div>
             )}
             <div className="row">
               <Button variant="ghost" onClick={onBack}>
-                ← Annuler
+                ← {t('common.cancel')}
               </Button>
               <Button variant="primary" size="lg" onClick={goToIdentityStep}>
-                Continuer →
+                {t('common.next')} →
               </Button>
             </div>
           </div>
@@ -454,7 +463,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 margin: 0,
               }}
             >
-              Votre identité
+              {t('permis.wizard.identityTitle')}
             </h2>
             <div
               className="card"
@@ -479,8 +488,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 RGPD
               </div>
               <div className="soft" style={{ fontSize: 'var(--fs-13)' }}>
-                Les données saisies sont transmises à votre fédération départementale.
-                Elles ne sont jamais revendues.
+                {t('permis.wizard.rgpdNotice')}
               </div>
             </div>
             <div
@@ -488,25 +496,25 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
             >
               <div className="field">
                 <label>
-                  Prénom<span className="req">*</span>
+                  {t('permis.wizard.firstNameLabel')}<span className="req">*</span>
                 </label>
                 <input
                   className="input"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Prénom"
+                  placeholder={t('permis.wizard.firstNameLabel')}
                   autoComplete="given-name"
                 />
               </div>
               <div className="field">
                 <label>
-                  Nom<span className="req">*</span>
+                  {t('permis.wizard.lastNameLabel')}<span className="req">*</span>
                 </label>
                 <input
                   className="input"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Nom"
+                  placeholder={t('permis.wizard.lastNameLabel')}
                   autoComplete="family-name"
                 />
               </div>
@@ -516,7 +524,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
             >
               <div className="field">
                 <label>
-                  Date de naissance<span className="req">*</span>
+                  {t('permis.wizard.birthDateLabel')}<span className="req">*</span>
                 </label>
                 <input
                   className="input"
@@ -528,7 +536,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
               </div>
               <div className="field">
                 <label>
-                  Département<span className="req">*</span>
+                  {t('permis.wizard.departmentLabel')}<span className="req">*</span>
                 </label>
                 <select
                   className="select"
@@ -546,7 +554,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
             {stepError && <div className="error">{stepError}</div>}
             <div className="row">
               <Button variant="ghost" onClick={() => setStep(1)}>
-                ← Retour
+                ← {t('common.back')}
               </Button>
               <Button
                 variant="primary"
@@ -554,7 +562,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 onClick={() => goToStep(3)}
                 disabled={!firstName || !lastName || !birthDate}
               >
-                Continuer →
+                {t('common.next')} →
               </Button>
             </div>
           </div>
@@ -571,19 +579,19 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 margin: 0,
               }}
             >
-              Pièces justificatives
+              {t('permis.wizard.docsTitle')}
             </h2>
-            <p className="soft">JPG, PNG ou WebP · max 8 Mo par fichier.</p>
+            <p className="soft">{t('permis.wizard.uploadHint')}</p>
 
             <div className="field">
               <label>
-                Pièce d'identité<span className="req">*</span>
+                {t('permis.wizard.idDocLabel')}<span className="req">*</span>
               </label>
               <UploadZone
                 file={idDocFile}
                 onUpload={(f) => uploadDoc(f, 'id')}
                 onRemove={() => removeDoc('id')}
-                label="Déposez votre pièce d'identité ici"
+                label={t('permis.wizard.idDocDropHint')}
                 initials={['ID', 'RECTO']}
                 uploading={idDocUploading}
                 error={idDocError}
@@ -592,13 +600,13 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
 
             <div className="field">
               <label>
-                Photo d'identité<span className="req">*</span>
+                {t('permis.wizard.photoDocLabel')}<span className="req">*</span>
               </label>
               <UploadZone
                 file={photoDocFile}
                 onUpload={(f) => uploadDoc(f, 'photo')}
                 onRemove={() => removeDoc('photo')}
-                label="Déposez une photo d'identité"
+                label={t('permis.wizard.photoDocDropHint')}
                 initials={['PH', 'OTO']}
                 uploading={photoDocUploading}
                 error={photoDocError}
@@ -607,7 +615,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
 
             <div className="row">
               <Button variant="ghost" onClick={() => setStep(2)}>
-                ← Retour
+                ← {t('common.back')}
               </Button>
               <Button
                 variant="primary"
@@ -615,7 +623,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 onClick={() => setStep(4)}
                 disabled={!idDocUrl || !photoDocUrl}
               >
-                Continuer →
+                {t('common.next')} →
               </Button>
             </div>
           </div>
@@ -632,25 +640,25 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 margin: 0,
               }}
             >
-              Récapitulatif
+              {t('permis.wizard.summaryTitle')}
             </h2>
             <div className="card" style={{ padding: 'var(--sp-5)' }}>
               <div className="summary-row">
-                <span>Type</span>
+                <span>{t('permis.wizard.typeLabel')}</span>
                 <span className="val">{type.title}</span>
               </div>
               <div className="summary-row">
-                <span>Département</span>
+                <span>{t('permis.wizard.departmentLabel')}</span>
                 <span className="val">{department}</span>
               </div>
               <div className="summary-row">
-                <span>Pièces</span>
+                <span>{t('permis.wizard.docsLabel')}</span>
                 <span className="val">
-                  {uploadedCount} fichier{uploadedCount > 1 ? 's' : ''}
+                  {t('permis.wizard.fileCount', { count: uploadedCount })}
                 </span>
               </div>
               <div className="summary-row total">
-                <span>Total TTC</span>
+                <span>{t('permis.wizard.totalIncl')}</span>
                 <span className="val">{formatPrice(type.price)}</span>
               </div>
             </div>
@@ -663,14 +671,11 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 checked={accepted}
                 onChange={(e) => setAccepted(e.target.checked)}
               />
-              <span>
-                Je certifie l'exactitude des informations et accepte les conditions générales
-                de la fédération.
-              </span>
+              <span>{t('permis.wizard.termsAccept')}</span>
             </label>
             <div className="row">
               <Button variant="ghost" onClick={() => setStep(3)}>
-                ← Retour
+                ← {t('common.back')}
               </Button>
               <Button
                 variant="accent"
@@ -678,7 +683,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 disabled={!accepted || preparingPayment}
                 onClick={startPayment}
               >
-                {preparingPayment ? 'Préparation…' : 'Procéder au paiement →'}
+                {preparingPayment ? t('permis.wizard.preparing') : `${t('permis.wizard.proceedToPayment')} →`}
               </Button>
             </div>
           </div>
@@ -695,18 +700,16 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
                 margin: 0,
               }}
             >
-              Paiement
+              {t('permis.wizard.paymentTitle')}
             </h2>
-            <p className="soft">
-              Le montant inclut la Cotisation Pêche Milieux Aquatiques (CPMA).
-            </p>
+            <p className="soft">{t('permis.wizard.paymentNotice')}</p>
             <StripePaymentBlock
               clientSecret={paymentSetup.clientSecret}
               publishableKey={paymentSetup.publishableKey}
               amount={type.price}
               returnUrl={`${window.location.origin}/permis`}
               onSuccess={handlePaymentSuccess}
-              label="Payer"
+              label={t('permis.wizard.payCta')}
             />
             {stepError && <div className="error">{stepError}</div>}
           </div>
@@ -717,6 +720,7 @@ function ApplyView({ onSubmit, onBack, types, departments }) {
 }
 
 function LandingView({ onApply, onTrack, hasPermit, types }) {
+  const { t } = useTranslation();
   return (
     <div className="page" style={{ padding: 0 }}>
       <section className="permis-hero">
@@ -728,20 +732,17 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
               marginBottom: 'var(--sp-4)',
             }}
           >
-            <SectionIcon name="calendar" />Saison 2026
+            <SectionIcon name="calendar" />{t('permis.landing.eyebrow')}
           </div>
           <h1>
-            Votre permis
-            <br />
-            en 4 gestes.
+            <Trans i18nKey="permis.landing.title" components={{ br: <br /> }} />
           </h1>
           <p style={{ fontSize: 'var(--fs-18)', maxWidth: '50ch', margin: 'var(--sp-5) 0' }}>
-            Demande en ligne, pièces justificatives uploadées, instruction sous 2 jours
-            ouvrés, PDF téléchargeable dès l'approbation.
+            {t('permis.landing.subtitle')}
           </p>
           <div style={{ display: 'flex', gap: 'var(--sp-3)', flexWrap: 'wrap' }}>
             <Button variant="accent" size="lg" onClick={onApply}>
-              Commencer ma demande →
+              {t('permis.startApplication')} →
             </Button>
             {hasPermit && (
               <Button
@@ -753,7 +754,7 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
                   borderColor: 'color-mix(in oklch, var(--bg) 40%, transparent)',
                 }}
               >
-                Suivre ma demande
+                {t('permis.trackApplication')}
               </Button>
             )}
           </div>
@@ -765,23 +766,23 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
           <div className="section-header">
             <div>
               <div className="eyebrow">
-                <SectionIcon name="permit" />Tarifs 2026
+                <SectionIcon name="permit" />{t('permis.landing.pricingEyebrow')}
               </div>
-              <h2>Choisir son permis</h2>
+              <h2>{t('permis.landing.pricingTitle')}</h2>
             </div>
           </div>
           <div className="permis-types">
-            {types.map((t) => (
-              <div key={t.id} className="permis-type-card">
-                {t.label && <div className="lbl">{t.label}</div>}
-                <div className="t">{t.title}</div>
+            {types.map((pt) => (
+              <div key={pt.id} className="permis-type-card">
+                {pt.label && <div className="lbl">{pt.label}</div>}
+                <div className="t">{pt.title}</div>
                 <ul>
-                  {(t.items ?? []).map((item) => (
+                  {(pt.items ?? []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
                 <div className="pp">
-                  {formatPrice(t.price)} <small>TTC</small>
+                  {formatPrice(pt.price)} <small>{t('permis.taxIncl')}</small>
                 </div>
               </div>
             ))}
@@ -793,6 +794,7 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
 }
 
 export function PermisPage() {
+  const { t } = useTranslation();
   const { permit, submit } = useSubmittedPermit();
   const { types, loading: typesLoading } = usePermitTypes();
   const { departments, loading: depLoading } = useDepartments();
@@ -809,7 +811,7 @@ export function PermisPage() {
   //    bascule le statut côté serveur, le polling AccountPage le verra).
   const handleSubmit = async (input) => {
     if (input?.__paymentDone) {
-      push('Paiement confirmé — demande en instruction');
+      push(t('permis.toasts.paymentConfirmed'));
       setView('track');
       return null;
     }
@@ -817,12 +819,12 @@ export function PermisPage() {
       const result = await submit(input);
       if (!result.clientSecret) {
         // Mode mock / gratuit : permit déjà en instruction → tracking direct
-        push('Demande envoyée — en instruction');
+        push(t('permis.toasts.applicationSent'));
         setView('track');
       }
       return result;
     } catch (err) {
-      push(err?.message ?? 'Impossible de soumettre la demande.');
+      push(err?.message ?? t('permis.toasts.submitFailed'));
       throw err;
     }
   };
@@ -831,7 +833,7 @@ export function PermisPage() {
     return (
       <div className="page">
         <div className="page-container">
-          <p>Chargement…</p>
+          <p>{t('common.loading')}</p>
         </div>
       </div>
     );

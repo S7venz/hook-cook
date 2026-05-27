@@ -385,6 +385,68 @@
     "failedSubtitle": "Votre commande {{id}} n'a pas pu être réglée. Vous pouvez retenter depuis votre panier.",
     "backToCart": "Retour au panier"
   },
+  "permis": {
+    "loadingPrices": "Chargement des tarifs…",
+    "taxIncl": "TTC",
+    "startApplication": "Commencer ma demande",
+    "trackApplication": "Suivre ma demande",
+    "landing": {
+      "eyebrow": "Saison 2026",
+      "title": "Votre permis<br />en 4 gestes.",
+      "subtitle": "Demande en ligne, pièces justificatives uploadées, instruction sous 2 jours ouvrés, PDF téléchargeable dès l'approbation.",
+      "pricingEyebrow": "Tarifs 2026",
+      "pricingTitle": "Choisir son permis"
+    },
+    "upload": {
+      "replace": "Remplacer",
+      "uploading": "Envoi en cours…",
+      "hint": "ou cliquez pour parcourir · JPG / PNG / WebP · max 8 Mo"
+    },
+    "tracking": {
+      "eyebrow": "Suivi de votre demande",
+      "permitNumber": "Permis {{id}}",
+      "documents": "Pièces déposées"
+    },
+    "wizard": {
+      "stepType": "Type",
+      "stepIdentity": "Identité",
+      "stepDocs": "Pièces",
+      "stepSummary": "Récap",
+      "stepPayment": "Paiement",
+      "selectType": "Quel type de permis ?",
+      "identityTitle": "Votre identité",
+      "docsTitle": "Pièces justificatives",
+      "summaryTitle": "Récapitulatif",
+      "paymentTitle": "Paiement",
+      "paymentNotice": "Le montant inclut la Cotisation Pêche Milieux Aquatiques (CPMA).",
+      "needSignIn": "Connectez-vous pour continuer votre demande de permis.",
+      "signInNotice": "La suite nécessite un compte Hook & Cook. Vous serez invité·e à vous connecter à l'étape suivante.",
+      "rgpdNotice": "Les données saisies sont transmises à votre fédération départementale. Elles ne sont jamais revendues.",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
+      "birthDateLabel": "Date de naissance",
+      "departmentLabel": "Département",
+      "idDocLabel": "Pièce d'identité",
+      "photoDocLabel": "Photo d'identité",
+      "idDocDropHint": "Déposez votre pièce d'identité ici",
+      "photoDocDropHint": "Déposez une photo d'identité",
+      "uploadHint": "JPG, PNG ou WebP · max 8 Mo par fichier.",
+      "typeLabel": "Type",
+      "docsLabel": "Pièces",
+      "fileCount_one": "{{count}} fichier",
+      "fileCount_other": "{{count}} fichiers",
+      "totalIncl": "Total TTC",
+      "termsAccept": "Je certifie l'exactitude des informations et accepte les conditions générales de la fédération.",
+      "proceedToPayment": "Procéder au paiement",
+      "preparing": "Préparation…",
+      "payCta": "Payer"
+    },
+    "toasts": {
+      "paymentConfirmed": "Paiement confirmé — demande en instruction",
+      "applicationSent": "Demande envoyée — en instruction",
+      "submitFailed": "Impossible de soumettre la demande."
+    }
+  },
   "permits": {
     "title": "Permis de pêche 2026",
     "subtitle": "Trois formules. Validation rapide. Envoi dématérialisé.",
