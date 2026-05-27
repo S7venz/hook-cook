@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -17,16 +18,16 @@ import { formatPrice } from '../lib/format.js';
 import { useAdminPermits } from '../lib/permitApplication.js';
 import { useToast } from '../lib/toast.js';
 
-const SECTIONS = [
-  { id: 'overview', label: "Vue d'ensemble", group: 'Activité', icon: 'compass' },
-  { id: 'stats', label: 'Statistiques', group: 'Activité', icon: 'calendar' },
-  { id: 'orders', label: 'Commandes', group: 'Activité', icon: 'cart' },
-  { id: 'permis', label: 'Permis', group: 'Pêche', icon: 'permit' },
-  { id: 'concours', label: 'Concours', group: 'Pêche', icon: 'trophy' },
-  { id: 'products', label: 'Produits', group: 'Catalogue', icon: 'fish' },
+const SECTION_DEFS = [
+  { id: 'overview', i18nKey: 'overview', groupKey: 'activity', icon: 'compass' },
+  { id: 'stats', i18nKey: 'stats', groupKey: 'activity', icon: 'calendar' },
+  { id: 'orders', i18nKey: 'orders', groupKey: 'activity', icon: 'cart' },
+  { id: 'permis', i18nKey: 'permits', groupKey: 'fishing', icon: 'permit' },
+  { id: 'concours', i18nKey: 'contests', groupKey: 'fishing', icon: 'trophy' },
+  { id: 'products', i18nKey: 'products', groupKey: 'catalogue', icon: 'fish' },
 ];
 
-const GROUPS = ['Activité', 'Pêche', 'Catalogue'];
+const GROUP_KEYS = ['activity', 'fishing', 'catalogue'];
 
 function KpiCard({ label, value, delta, deltaTone }) {
   return (
@@ -203,39 +204,40 @@ function StatusBreakdown({ title, breakdown, labels }) {
 }
 
 function StatsSection({ stats, loading }) {
+  const { t } = useTranslation();
   if (loading || !stats) {
     return (
       <>
-        <h1>Statistiques</h1>
-        <p className="soft">Chargement…</p>
+        <h1>{t('admin.stats.title')}</h1>
+        <p className="soft">{t('common.loading')}</p>
       </>
     );
   }
   return (
     <>
-      <h1>Statistiques</h1>
+      <h1>{t('admin.stats.title')}</h1>
       <div className="kpi-row">
         <div className="kpi">
-          <div className="lbl">CA total</div>
+          <div className="lbl">{t('admin.stats.revenue')}</div>
           <div className="val">
             <CountUpPrice value={stats.totalRevenue} />
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Panier moyen</div>
+          <div className="lbl">{t('admin.stats.avgBasket')}</div>
           <div className="val">
             <CountUpPrice value={stats.avgBasket} />
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Taux de conversion</div>
+          <div className="lbl">{t('admin.stats.conversionRate')}</div>
           <div className="val">
             <CountUpNumber value={stats.conversionRate} decimals={1} />
             <small>%</small>
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Acheteurs uniques</div>
+          <div className="lbl">{t('admin.stats.uniqueBuyers')}</div>
           <div className="val">
             <CountUpNumber value={stats.totalBuyers} />
             <small> / {stats.totalUsers ?? 0}</small>
@@ -245,25 +247,25 @@ function StatsSection({ stats, loading }) {
 
       <div className="kpi-row" style={{ marginTop: 'var(--sp-3)' }}>
         <div className="kpi">
-          <div className="lbl">Commandes</div>
+          <div className="lbl">{t('admin.stats.orders')}</div>
           <div className="val">
             <CountUpNumber value={stats.totalOrders} />
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Permis émis</div>
+          <div className="lbl">{t('admin.stats.permits')}</div>
           <div className="val">
             <CountUpNumber value={stats.totalPermits} />
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Inscriptions concours</div>
+          <div className="lbl">{t('admin.stats.registrations')}</div>
           <div className="val">
             <CountUpNumber value={stats.totalRegistrations} />
           </div>
         </div>
         <div className="kpi">
-          <div className="lbl">Stocks critiques</div>
+          <div className="lbl">{t('admin.stats.lowStockKpi')}</div>
           <div className="val">
             <CountUpNumber value={(stats.lowStock ?? []).length} />
           </div>
@@ -273,7 +275,7 @@ function StatsSection({ stats, loading }) {
       <Reveal>
         <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
           <div className="panel-header">
-            <h3>CA par mois (6 derniers)</h3>
+            <h3>{t('admin.stats.revenueByMonth')}</h3>
           </div>
           <div className="panel-body" style={{ padding: 'var(--sp-5)' }}>
             <RevenueBarChart data={stats.revenueByMonth ?? []} />
@@ -291,22 +293,22 @@ function StatsSection({ stats, loading }) {
           }}
         >
           <StatusBreakdown
-            title="Commandes par statut"
+            title={t('admin.stats.ordersByStatus')}
             breakdown={stats.ordersByStatus}
             labels={{
-              paid: 'Payées',
-              shipped: 'Expédiées',
-              delivered: 'Livrées',
-              cancelled: 'Annulées',
+              paid: t('admin.stats.orderStatusLabels.paid'),
+              shipped: t('admin.stats.orderStatusLabels.shipped'),
+              delivered: t('admin.stats.orderStatusLabels.delivered'),
+              cancelled: t('admin.stats.orderStatusLabels.cancelled'),
             }}
           />
           <StatusBreakdown
-            title="Permis par statut"
+            title={t('admin.stats.permitsByStatus')}
             breakdown={stats.permitsByStatus}
             labels={{
-              pending: 'En instruction',
-              approved: 'Approuvés',
-              rejected: 'Rejetés',
+              pending: t('admin.stats.permitStatusLabels.pending'),
+              approved: t('admin.stats.permitStatusLabels.approved'),
+              rejected: t('admin.stats.permitStatusLabels.rejected'),
             }}
           />
         </div>
@@ -315,22 +317,22 @@ function StatsSection({ stats, loading }) {
       <Reveal>
         <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
           <div className="panel-header">
-            <h3>Top 5 produits vendus</h3>
+            <h3>{t('admin.stats.topProducts')}</h3>
           </div>
           <table className="table">
             <thead>
               <tr>
-                <th>Produit</th>
-                <th>SKU</th>
-                <th>Quantité</th>
-                <th>CA généré</th>
+                <th>{t('admin.tableHeaders.product')}</th>
+                <th>{t('admin.tableHeaders.sku')}</th>
+                <th>{t('admin.tableHeaders.qty')}</th>
+                <th>{t('admin.tableHeaders.revenue')}</th>
               </tr>
             </thead>
             <tbody>
               {(stats.topProducts ?? []).length === 0 ? (
                 <tr>
                   <td colSpan={4} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                    Aucune vente enregistrée pour l'instant.
+                    {t('admin.stats.noSalesYet')}
                   </td>
                 </tr>
               ) : (
@@ -359,21 +361,21 @@ function StatsSection({ stats, loading }) {
         >
           <div className="panel">
             <div className="panel-header">
-              <h3>Stocks critiques</h3>
+              <h3>{t('admin.stats.lowStockTitle')}</h3>
             </div>
           <table className="table">
             <thead>
               <tr>
-                <th>Produit</th>
-                <th>Stock</th>
-                <th>Seuil</th>
+                <th>{t('admin.tableHeaders.product')}</th>
+                <th>{t('admin.tableHeaders.stock')}</th>
+                <th>{t('admin.tableHeaders.threshold')}</th>
               </tr>
             </thead>
             <tbody>
               {(stats.lowStock ?? []).length === 0 ? (
                 <tr>
                   <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                    Aucun produit sous le seuil.
+                    {t('admin.stats.noLowStock')}
                   </td>
                 </tr>
               ) : (
@@ -399,21 +401,21 @@ function StatsSection({ stats, loading }) {
 
         <div className="panel">
           <div className="panel-header">
-            <h3>Jamais vendus</h3>
+            <h3>{t('admin.stats.neverSold')}</h3>
           </div>
           <table className="table">
             <thead>
               <tr>
-                <th>Produit</th>
-                <th>Stock</th>
-                <th>Prix</th>
+                <th>{t('admin.tableHeaders.product')}</th>
+                <th>{t('admin.tableHeaders.stock')}</th>
+                <th>{t('admin.tableHeaders.price')}</th>
               </tr>
             </thead>
             <tbody>
               {(stats.neverSold ?? []).length === 0 ? (
                 <tr>
                   <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                    Tous les produits ont été vendus au moins une fois.
+                    {t('admin.stats.allProductsSold')}
                   </td>
                 </tr>
               ) : (
@@ -434,14 +436,14 @@ function StatsSection({ stats, loading }) {
       <Reveal>
       <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
         <div className="panel-header">
-          <h3>CA par catégorie</h3>
+          <h3>{t('admin.stats.categoryRevenue')}</h3>
         </div>
         <table className="table">
           <thead>
             <tr>
-              <th>Catégorie</th>
-              <th>CA généré</th>
-              <th>Part</th>
+              <th>{t('admin.tableHeaders.category')}</th>
+              <th>{t('admin.tableHeaders.revenue')}</th>
+              <th>{t('admin.tableHeaders.share')}</th>
             </tr>
           </thead>
           <tbody>
@@ -452,7 +454,7 @@ function StatsSection({ stats, loading }) {
                 return (
                   <tr>
                     <td colSpan={3} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                      Pas encore de ventes.
+                      {t('admin.stats.noSalesShort')}
                     </td>
                   </tr>
                 );
@@ -477,6 +479,7 @@ function StatsSection({ stats, loading }) {
 }
 
 function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo, onReplenish }) {
+  const { t } = useTranslation();
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
   const ordersToShip = orders.filter((o) => o.status === 'paid').length;
 
@@ -486,7 +489,7 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
         className="row"
         style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-2)' }}
       >
-        <h1>Vue d'ensemble</h1>
+        <h1>{t('admin.overview.title')}</h1>
         <span className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
           {new Intl.DateTimeFormat('fr-FR', {
             weekday: 'long',
@@ -497,28 +500,28 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
         </span>
       </div>
       <div className="kpi-row">
-        <KpiCard label="CA cumulé" value={<CountUpPrice value={totalRevenue} />} />
+        <KpiCard label={t('admin.overview.totalRevenue')} value={<CountUpPrice value={totalRevenue} />} />
         <KpiCard
-          label="Commandes à expédier"
+          label={t('admin.overview.ordersToShip')}
           value={<CountUpNumber value={ordersToShip} />}
-          delta={`${orders.length} au total`}
+          delta={t('admin.overview.totalCount', { count: orders.length })}
           deltaTone="soft"
         />
-        <KpiCard label="Permis en attente" value={<CountUpNumber value={pendingPermits ?? 0} />} />
-        <KpiCard label="Inscriptions concours" value={<CountUpNumber value={contestCount} />} />
+        <KpiCard label={t('admin.overview.pendingPermits')} value={<CountUpNumber value={pendingPermits ?? 0} />} />
+        <KpiCard label={t('admin.overview.contestRegistrations')} value={<CountUpNumber value={contestCount} />} />
       </div>
 
       <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
         <div className="panel-header">
-          <h3>Commandes récentes</h3>
+          <h3>{t('admin.overview.recentOrders')}</h3>
           <Button variant="ghost" size="sm" onClick={() => onGo('orders')}>
-            Tout voir
+            {t('admin.overview.seeAll')}
           </Button>
         </div>
         <div className="panel-body">
           {orders.length === 0 ? (
             <p className="soft" style={{ padding: 'var(--sp-4) 0' }}>
-              Aucune commande enregistrée pour l'instant.
+              {t('admin.overview.noOrdersYet')}
             </p>
           ) : (
             orders.slice(0, 4).map((order) => (
@@ -548,14 +551,14 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
 
       <div className="panel" style={{ marginTop: 'var(--sp-5)' }}>
         <div className="panel-header">
-          <h3>Stock critique</h3>
+          <h3>{t('admin.overview.criticalStock')}</h3>
         </div>
         <table className="table">
           <thead>
             <tr>
-              <th>Ref</th>
-              <th>Produit</th>
-              <th>Stock</th>
+              <th>{t('admin.tableHeaders.ref')}</th>
+              <th>{t('admin.tableHeaders.product')}</th>
+              <th>{t('admin.tableHeaders.stock')}</th>
               <th />
             </tr>
           </thead>
@@ -563,7 +566,7 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
             {lowStock.length === 0 ? (
               <tr>
                 <td colSpan={4} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucun produit en stock critique.
+                  {t('admin.overview.noCriticalStock')}
                 </td>
               </tr>
             ) : (
@@ -575,10 +578,10 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
                   <td>
                     <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
                       <Button variant="ghost" size="sm" onClick={() => onReplenish?.(p)}>
-                        + stock
+                        {t('admin.overview.addStock')}
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => onGo('products')}>
-                        Ouvrir
+                        {t('admin.overview.open')}
                       </Button>
                     </div>
                   </td>
@@ -593,6 +596,7 @@ function OverviewSection({ orders, pendingPermits, contestCount, lowStock, onGo,
 }
 
 function ExportButton({ kind, label }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const { push } = useToast();
   const [busy, setBusy] = useState(false);
@@ -601,7 +605,7 @@ function ExportButton({ kind, label }) {
     try {
       await downloadExport(kind, token);
     } catch (err) {
-      push(err?.message ?? 'Export impossible.');
+      push(err?.message ?? t('admin.export.failed'));
     } finally {
       setBusy(false);
     }
@@ -609,36 +613,37 @@ function ExportButton({ kind, label }) {
   return (
     <Button variant="ghost" size="sm" onClick={handle} disabled={busy}>
       <Icon name="download" size={14} />
-      {busy ? 'Export…' : label}
+      {busy ? t('admin.export.busy') : label}
     </Button>
   );
 }
 
 function OrdersSection({ orders, onUpdateStatus }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0 }}>Commandes</h1>
-        <ExportButton kind="orders" label="Exporter en CSV" />
+        <h1 style={{ margin: 0 }}>{t('admin.orders.title')}</h1>
+        <ExportButton kind="orders" label={t('admin.actions.exportCsv')} />
       </div>
       <div className="panel">
         <table className="table">
           <thead>
             <tr>
-              <th>N°</th>
-              <th>Email</th>
-              <th>Date</th>
-              <th>Articles</th>
-              <th>Total</th>
-              <th>Statut</th>
-              <th>Action</th>
+              <th>{t('admin.tableHeaders.orderNumber')}</th>
+              <th>{t('admin.tableHeaders.email')}</th>
+              <th>{t('admin.tableHeaders.date')}</th>
+              <th>{t('admin.tableHeaders.items')}</th>
+              <th>{t('admin.tableHeaders.total')}</th>
+              <th>{t('admin.tableHeaders.status')}</th>
+              <th>{t('admin.tableHeaders.action')}</th>
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 && (
               <tr>
                 <td colSpan={7} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucune commande.
+                  {t('admin.orders.empty')}
                 </td>
               </tr>
             )}
@@ -668,7 +673,7 @@ function OrdersSection({ orders, onUpdateStatus }) {
                         size="sm"
                         onClick={() => onUpdateStatus(order.id, 'shipped')}
                       >
-                        Marquer expédiée
+                        {t('admin.actions.markShipped')}
                       </Button>
                     )}
                     {order.status === 'shipped' && (
@@ -677,7 +682,7 @@ function OrdersSection({ orders, onUpdateStatus }) {
                         size="sm"
                         onClick={() => onUpdateStatus(order.id, 'delivered')}
                       >
-                        Marquer livrée
+                        {t('admin.actions.markDelivered')}
                       </Button>
                     )}
                     {(order.status === 'paid' || order.status === 'shipped') && (
@@ -687,14 +692,14 @@ function OrdersSection({ orders, onUpdateStatus }) {
                         onClick={() => {
                           if (
                             window.confirm(
-                              `Annuler la commande ${order.id} ? Le stock sera restauré.`,
+                              t('admin.orders.confirmCancel', { id: order.id }),
                             )
                           ) {
                             onUpdateStatus(order.id, 'cancelled');
                           }
                         }}
                       >
-                        Annuler
+                        {t('admin.actions.cancel')}
                       </Button>
                     )}
                   </div>
@@ -709,32 +714,33 @@ function OrdersSection({ orders, onUpdateStatus }) {
 }
 
 function PermisSection({ permits, onUpdate }) {
+  const { t } = useTranslation();
   const list = permits ?? [];
   return (
     <>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0 }}>Demandes de permis</h1>
-        <ExportButton kind="permits" label="Exporter en CSV" />
+        <h1 style={{ margin: 0 }}>{t('admin.permits.title')}</h1>
+        <ExportButton kind="permits" label={t('admin.actions.exportCsv')} />
       </div>
       <div className="panel">
         <table className="table">
           <thead>
             <tr>
-              <th>Référence</th>
-              <th>Demandeur</th>
-              <th>Type</th>
-              <th>Déposé</th>
-              <th>Pièces</th>
-              <th>Montant</th>
-              <th>Statut</th>
-              <th>Action</th>
+              <th>{t('admin.tableHeaders.reference')}</th>
+              <th>{t('admin.tableHeaders.applicant')}</th>
+              <th>{t('admin.tableHeaders.type')}</th>
+              <th>{t('admin.tableHeaders.submitted')}</th>
+              <th>{t('admin.tableHeaders.documents')}</th>
+              <th>{t('admin.tableHeaders.amount')}</th>
+              <th>{t('admin.tableHeaders.status')}</th>
+              <th>{t('admin.tableHeaders.action')}</th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 && (
               <tr>
                 <td colSpan={8} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucune demande en cours.
+                  {t('admin.permits.empty')}
                 </td>
               </tr>
             )}
@@ -795,14 +801,14 @@ function PermisSection({ permits, onUpdate }) {
                         size="sm"
                         onClick={() => onUpdate(p.id, 'approved')}
                       >
-                        Approuver
+                        {t('admin.actions.approve')}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onUpdate(p.id, 'rejected')}
                       >
-                        Rejeter
+                        {t('admin.actions.reject')}
                       </Button>
                     </div>
                   )}
@@ -869,6 +875,7 @@ function buildContestPayload(form) {
 }
 
 function ContestForm({ initial, onCancel, onSubmit }) {
+  const { t } = useTranslation();
   const isCreate = !initial;
   const [form, setForm] = useState(() => contestFormState(initial));
   const [error, setError] = useState('');
@@ -883,7 +890,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
     try {
       await onSubmit(buildContestPayload(form));
     } catch (err) {
-      setError(err?.message ?? 'Erreur inconnue.');
+      setError(err?.message ?? t('admin.contest.unknownError'));
       setSubmitting(false);
       return;
     }
@@ -894,11 +901,11 @@ function ContestForm({ initial, onCancel, onSubmit }) {
     <div className="panel" style={{ padding: 'var(--sp-5)', marginBottom: 'var(--sp-5)' }}>
       <form onSubmit={submit} className="stack-md" noValidate>
         <h3 style={{ margin: 0 }}>
-          {isCreate ? 'Nouveau concours' : `Éditer ${initial.title}`}
+          {isCreate ? t('admin.contest.newContest') : t('admin.contest.editContest', { title: initial.title })}
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
           <div className="field">
-            <label>Identifiant (slug)<span className="req">*</span></label>
+            <label>{t('admin.contest.identifier')}<span className="req">*</span></label>
             <input
               className="input mono"
               value={form.id}
@@ -909,13 +916,13 @@ function ContestForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Titre<span className="req">*</span></label>
+            <label>{t('admin.contest.titleField')}<span className="req">*</span></label>
             <input className="input" value={form.title} onChange={update('title')} required />
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
           <div className="field">
-            <label>Date ISO<span className="req">*</span></label>
+            <label>{t('admin.contest.isoDate')}<span className="req">*</span></label>
             <input
               className="input mono"
               value={form.date}
@@ -925,7 +932,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Date affichée<span className="req">*</span></label>
+            <label>{t('admin.contest.displayDate')}<span className="req">*</span></label>
             <input
               className="input mono"
               value={form.dateDisplay}
@@ -936,20 +943,20 @@ function ContestForm({ initial, onCancel, onSubmit }) {
           </div>
         </div>
         <div className="field">
-          <label>Lieu<span className="req">*</span></label>
+          <label>{t('admin.contest.location')}<span className="req">*</span></label>
           <input className="input" value={form.lieu} onChange={update('lieu')} required />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}>
           <div className="field">
-            <label>Distance</label>
+            <label>{t('admin.contest.distance')}</label>
             <input className="input" value={form.distance} onChange={update('distance')} placeholder="12 km" />
           </div>
           <div className="field">
-            <label>Format</label>
+            <label>{t('admin.contest.formatField')}</label>
             <input className="input" value={form.format} onChange={update('format')} placeholder="Individuel" />
           </div>
           <div className="field">
-            <label>Prix (€)</label>
+            <label>{t('admin.contest.price')}</label>
             <input
               className="input mono"
               type="number"
@@ -962,7 +969,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
           <div className="field">
-            <label>Inscrits actuels</label>
+            <label>{t('admin.contest.currentRegistrations')}</label>
             <input
               className="input mono"
               type="number"
@@ -972,7 +979,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Places max</label>
+            <label>{t('admin.contest.maxSpots')}</label>
             <input
               className="input mono"
               type="number"
@@ -983,7 +990,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
           </div>
         </div>
         <div className="field">
-          <label>Espèces (séparées par virgules)</label>
+          <label>{t('admin.contest.speciesField')}</label>
           <input
             className="input mono"
             value={form.species}
@@ -992,7 +999,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Règlement</label>
+          <label>{t('admin.contest.rules')}</label>
           <textarea
             className="textarea"
             rows={3}
@@ -1003,10 +1010,10 @@ function ContestForm({ initial, onCancel, onSubmit }) {
         {error && <div className="error">{error}</div>}
         <div className="row">
           <Button variant="ghost" onClick={onCancel} type="button" disabled={submitting}>
-            Annuler
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={submitting}>
-            {submitting ? 'Enregistrement…' : isCreate ? 'Créer le concours' : 'Enregistrer'}
+            {submitting ? t('admin.contest.saving') : isCreate ? t('admin.contest.createCta') : t('common.save')}
           </Button>
         </div>
       </form>
@@ -1015,6 +1022,7 @@ function ContestForm({ initial, onCancel, onSubmit }) {
 }
 
 function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelete, notify }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState('list');
   const [viewingId, setViewingId] = useState(null);
   const { registrations } = useAdminContestRegistrations();
@@ -1024,23 +1032,23 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
 
   const handleCreate = async (payload) => {
     await onCreate(payload);
-    notify(`Concours « ${payload.title} » créé.`);
+    notify(t('admin.contest.created', { title: payload.title }));
     setMode('list');
   };
 
   const handleUpdate = (id) => async (payload) => {
     await onUpdate(id, payload);
-    notify(`Concours « ${payload.title} » mis à jour.`);
+    notify(t('admin.contest.updated', { title: payload.title }));
     setMode('list');
   };
 
   const handleDelete = async (contest) => {
-    if (!window.confirm(`Supprimer définitivement « ${contest.title} » ?`)) return;
+    if (!window.confirm(t('admin.contest.confirmDelete', { title: contest.title }))) return;
     try {
       await onDelete(contest.id);
-      notify(`Concours « ${contest.title} » supprimé.`);
+      notify(t('admin.contest.deleted', { title: contest.title }));
     } catch (err) {
-      notify(err?.message ?? 'Suppression impossible.');
+      notify(err?.message ?? t('admin.contest.deleteFailed'));
     }
   };
 
@@ -1050,12 +1058,12 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
         className="row"
         style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-4)' }}
       >
-        <h1 style={{ margin: 0 }}>Concours</h1>
+        <h1 style={{ margin: 0 }}>{t('admin.contests.title')}</h1>
         {mode === 'list' && (
           <div className="row" style={{ gap: 'var(--sp-2)' }}>
-            <ExportButton kind="contestRegistrations" label="Exporter inscriptions CSV" />
+            <ExportButton kind="contestRegistrations" label={t('admin.actions.exportRegistrationsCsv')} />
             <Button variant="primary" onClick={() => setMode('create')}>
-              + Ajouter un concours
+              {t('admin.actions.addContest')}
             </Button>
           </div>
         )}
@@ -1076,19 +1084,19 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
         <table className="table">
           <thead>
             <tr>
-              <th>Titre</th>
-              <th>Date</th>
-              <th>Lieu</th>
-              <th>Inscrits</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{t('admin.tableHeaders.title')}</th>
+              <th>{t('admin.tableHeaders.date')}</th>
+              <th>{t('admin.tableHeaders.location')}</th>
+              <th>{t('admin.tableHeaders.registrations')}</th>
+              <th>{t('admin.tableHeaders.status')}</th>
+              <th>{t('admin.tableHeaders.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {remoteContests.length === 0 && (
               <tr>
                 <td colSpan={6} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucun concours. Ajoutez-en un pour démarrer.
+                  {t('admin.contests.empty')}
                 </td>
               </tr>
             )}
@@ -1109,7 +1117,7 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
                   </td>
                   <td>
                     <Badge status={full ? 'rejected' : 'approved'}>
-                      {full ? 'Complet' : 'Ouvert'}
+                      {full ? t('admin.contests.full') : t('admin.contests.open')}
                     </Badge>
                   </td>
                   <td>
@@ -1119,21 +1127,21 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
                         size="sm"
                         onClick={() => setViewingId(c.id)}
                       >
-                        Voir inscrits
+                        {t('admin.contests.viewRegistrations')}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setMode(`edit:${c.id}`)}
                       >
-                        Éditer
+                        {t('common.edit')}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(c)}
                       >
-                        Supprimer
+                        {t('common.delete')}
                       </Button>
                     </div>
                   </td>
@@ -1156,6 +1164,7 @@ function ConcoursSection({ contests: remoteContests, onCreate, onUpdate, onDelet
 }
 
 function ContestRegistrationsModal({ contest, registrations, onClose }) {
+  const { t } = useTranslation();
   if (!contest) return null;
   return (
     <>
@@ -1195,7 +1204,7 @@ function ContestRegistrationsModal({ contest, registrations, onClose }) {
                 fontWeight: 500,
               }}
             >
-              Inscrits — {contest.title}
+              {t('admin.contests.registrationsHeader', { title: contest.title })}
             </h3>
             <div className="soft mono" style={{ fontSize: 'var(--fs-12)' }}>
               {contest.dateDisplay} · {contest.lieu} · {registrations.length}/{contest.max}
@@ -1205,24 +1214,24 @@ function ContestRegistrationsModal({ contest, registrations, onClose }) {
             type="button"
             className="icon-btn"
             onClick={onClose}
-            aria-label="Fermer"
+            aria-label={t('common.close')}
           >
             ×
           </button>
         </div>
         {registrations.length === 0 ? (
           <p className="soft" style={{ textAlign: 'center', padding: 'var(--sp-6) 0' }}>
-            Aucune inscription pour ce concours.
+            {t('admin.contests.noRegistrations')}
           </p>
         ) : (
           <table className="table">
             <thead>
               <tr>
-                <th>Email</th>
-                <th>Catégorie</th>
-                <th>Permis</th>
-                <th>Statut</th>
-                <th>Date</th>
+                <th>{t('admin.tableHeaders.email')}</th>
+                <th>{t('admin.tableHeaders.category')}</th>
+                <th>{t('admin.tableHeaders.permit')}</th>
+                <th>{t('admin.tableHeaders.status')}</th>
+                <th>{t('admin.tableHeaders.date')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1326,10 +1335,20 @@ function buildPayload(form) {
 }
 
 function ProductForm({ initial, onCancel, onSubmit }) {
+  const { t } = useTranslation();
   const isCreate = !initial;
   const [form, setForm] = useState(() => toFormState(initial));
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const productCategories = [
+    { id: 'cannes', label: t('admin.productCategories.rods') },
+    { id: 'moulinets', label: t('admin.productCategories.reels') },
+    { id: 'leurres', label: t('admin.productCategories.lures') },
+    { id: 'soies-lignes', label: t('admin.productCategories.lines') },
+    { id: 'vetements', label: t('admin.productCategories.clothing') },
+    { id: 'accessoires', label: t('admin.productCategories.accessories') },
+  ];
 
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
@@ -1340,7 +1359,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
     try {
       await onSubmit(buildPayload(form));
     } catch (err) {
-      setError(err?.message ?? 'Erreur inconnue.');
+      setError(err?.message ?? t('admin.product.unknownError'));
       setSubmitting(false);
       return;
     }
@@ -1352,14 +1371,14 @@ function ProductForm({ initial, onCancel, onSubmit }) {
       <form onSubmit={submit} className="stack-md" noValidate>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <h3 style={{ margin: 0 }}>
-            {isCreate ? 'Nouveau produit' : `Éditer ${initial.name}`}
+            {isCreate ? t('admin.product.newProduct') : t('admin.product.editProduct', { name: initial.name })}
           </h3>
         </div>
         <div
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}
         >
           <div className="field">
-            <label>Identifiant (slug)<span className="req">*</span></label>
+            <label>{t('admin.products.id')}<span className="req">*</span></label>
             <input
               className="input mono"
               value={form.id}
@@ -1370,7 +1389,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>SKU<span className="req">*</span></label>
+            <label>{t('admin.products.sku')}<span className="req">*</span></label>
             <input
               className="input mono"
               value={form.sku}
@@ -1380,20 +1399,20 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           </div>
         </div>
         <div className="field">
-          <label>Nom<span className="req">*</span></label>
+          <label>{t('admin.products.name')}<span className="req">*</span></label>
           <input className="input" value={form.name} onChange={update('name')} required />
         </div>
         <div
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
         >
           <div className="field">
-            <label>Catégorie<span className="req">*</span></label>
+            <label>{t('admin.products.category')}<span className="req">*</span></label>
             <select
               className="select"
               value={form.category}
               onChange={update('category')}
             >
-              {PRODUCT_CATEGORIES.map((c) => (
+              {productCategories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.label}
                 </option>
@@ -1401,11 +1420,11 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             </select>
           </div>
           <div className="field">
-            <label>Technique</label>
+            <label>{t('admin.products.technique')}</label>
             <input className="input" value={form.technique} onChange={update('technique')} />
           </div>
           <div className="field">
-            <label>Marque</label>
+            <label>{t('admin.products.brand')}</label>
             <input className="input" value={form.brand} onChange={update('brand')} />
           </div>
         </div>
@@ -1413,7 +1432,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
         >
           <div className="field">
-            <label>Prix (€)<span className="req">*</span></label>
+            <label>{t('admin.products.price')}<span className="req">*</span></label>
             <input
               className="input mono"
               type="number"
@@ -1425,7 +1444,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Prix barré</label>
+            <label>{t('admin.products.wasPrice')}</label>
             <input
               className="input mono"
               type="number"
@@ -1436,7 +1455,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Stock<span className="req">*</span></label>
+            <label>{t('admin.products.stock')}<span className="req">*</span></label>
             <input
               className="input mono"
               type="number"
@@ -1451,7 +1470,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-3)' }}
         >
           <div className="field">
-            <label>Note (0-5)</label>
+            <label>{t('admin.products.rating')}</label>
             <input
               className="input mono"
               type="number"
@@ -1463,7 +1482,7 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Nombre d'avis</label>
+            <label>{t('admin.products.reviews')}</label>
             <input
               className="input mono"
               type="number"
@@ -1473,17 +1492,17 @@ function ProductForm({ initial, onCancel, onSubmit }) {
             />
           </div>
           <div className="field">
-            <label>Type d'eau</label>
+            <label>{t('admin.products.water')}</label>
             <input
               className="input"
               value={form.water}
               onChange={update('water')}
-              placeholder="rivière, lac, mer…"
+              placeholder={t('admin.products.waterPlaceholder')}
             />
           </div>
         </div>
         <div className="field">
-          <label>Espèces (séparées par des virgules)</label>
+          <label>{t('admin.products.species')}</label>
           <input
             className="input mono"
             value={form.species}
@@ -1492,18 +1511,18 @@ function ProductForm({ initial, onCancel, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Photo du produit</label>
+          <label>{t('admin.products.photo')}</label>
           <ImageUploadField
             value={form.imageUrl}
             onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
           />
         </div>
         <div className="field">
-          <label>Étiquette du placeholder (fallback texte si pas d'URL)</label>
+          <label>{t('admin.products.placeholderLabel')}</label>
           <input className="input" value={form.img} onChange={update('img')} />
         </div>
         <div className="field">
-          <label>Description</label>
+          <label>{t('admin.products.description')}</label>
           <textarea
             className="textarea"
             rows={3}
@@ -1533,6 +1552,7 @@ function ProductsSection({
   onReplenish,
   notify,
 }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState('list'); // 'list' | 'create' | number(id)
   const editing = typeof mode === 'string' && mode.startsWith('edit:')
     ? products.find((p) => p.id === mode.slice(5))
@@ -1540,23 +1560,23 @@ function ProductsSection({
 
   const handleCreate = async (payload) => {
     await onCreate(payload);
-    notify(`Produit « ${payload.name} » créé.`);
+    notify(t('admin.product.created', { name: payload.name }));
     setMode('list');
   };
 
   const handleUpdate = (id) => async (payload) => {
     await onUpdate(id, payload);
-    notify(`Produit « ${payload.name} » mis à jour.`);
+    notify(t('admin.product.updated', { name: payload.name }));
     setMode('list');
   };
 
   const handleDelete = async (product) => {
-    if (!window.confirm(`Supprimer définitivement « ${product.name} » ?`)) return;
+    if (!window.confirm(t('admin.product.confirmDelete', { name: product.name }))) return;
     try {
       await onDelete(product.id);
-      notify(`Produit « ${product.name} » supprimé.`);
+      notify(t('admin.product.deleted', { name: product.name }));
     } catch (err) {
-      notify(err?.message ?? 'Suppression impossible.');
+      notify(err?.message ?? t('admin.product.deleteFailed'));
     }
   };
 
@@ -1566,10 +1586,10 @@ function ProductsSection({
         className="row"
         style={{ justifyContent: 'space-between', marginBottom: 'var(--sp-4)' }}
       >
-        <h1 style={{ margin: 0 }}>Produits</h1>
+        <h1 style={{ margin: 0 }}>{t('admin.products.title')}</h1>
         {mode === 'list' && (
           <Button variant="primary" onClick={() => setMode('create')}>
-            + Ajouter un produit
+            {t('admin.actions.addProduct')}
           </Button>
         )}
       </div>
@@ -1594,19 +1614,19 @@ function ProductsSection({
         <table className="table">
           <thead>
             <tr>
-              <th>Ref</th>
-              <th>Produit</th>
-              <th>Catégorie</th>
-              <th>Prix</th>
-              <th>Stock</th>
-              <th>Actions</th>
+              <th>{t('admin.tableHeaders.ref')}</th>
+              <th>{t('admin.tableHeaders.product')}</th>
+              <th>{t('admin.tableHeaders.category')}</th>
+              <th>{t('admin.tableHeaders.price')}</th>
+              <th>{t('admin.tableHeaders.stock')}</th>
+              <th>{t('admin.tableHeaders.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {products.length === 0 && (
               <tr>
                 <td colSpan={6} className="soft" style={{ padding: 'var(--sp-4)' }}>
-                  Aucun produit. Ajoutez-en un pour démarrer.
+                  {t('admin.products.empty')}
                 </td>
               </tr>
             )}
@@ -1641,21 +1661,21 @@ function ProductsSection({
                       size="sm"
                       onClick={() => setMode(`edit:${p.id}`)}
                     >
-                      Éditer
+                      {t('common.edit')}
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onReplenish?.(p)}
                     >
-                      Réapprovisionner
+                      {t('admin.products.restock')}
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(p)}
                     >
-                      Supprimer
+                      {t('common.delete')}
                     </Button>
                   </div>
                 </td>
@@ -1670,6 +1690,7 @@ function ProductsSection({
 
 export function AdminPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { logout } = useAuth();
   const { push } = useToast();
   const { orders, updateStatus: updateOrderStatus } = useAdminOrders();
@@ -1695,20 +1716,20 @@ export function AdminPage() {
 
   const handleReplenish = async (product) => {
     const raw = window.prompt(
-      `Combien d'unités ajouter à « ${product.name} » ? (stock actuel : ${product.stock})`,
+      t('admin.replenishPrompt', { name: product.name, stock: product.stock }),
       '10',
     );
     if (!raw) return;
     const qty = Number.parseInt(raw, 10);
     if (!Number.isFinite(qty) || qty <= 0) {
-      push('Quantité invalide.');
+      push(t('admin.invalidQty'));
       return;
     }
     try {
       await replenish(product.id, qty);
-      push(`+${qty} unités sur « ${product.name} ».`);
+      push(t('admin.replenishDone', { qty, name: product.name }));
     } catch (err) {
-      push(err?.message ?? 'Réapprovisionnement impossible.');
+      push(err?.message ?? t('admin.replenishFailed'));
     }
   };
 
@@ -1721,10 +1742,10 @@ export function AdminPage() {
             ADMIN
           </span>
         </div>
-        {GROUPS.map((group) => (
-          <div key={group}>
-            <div className="nav-group-label">{group}</div>
-            {SECTIONS.filter((s) => s.group === group).map((s) => (
+        {GROUP_KEYS.map((groupKey) => (
+          <div key={groupKey}>
+            <div className="nav-group-label">{t(`admin.groups.${groupKey}`)}</div>
+            {SECTION_DEFS.filter((s) => s.groupKey === groupKey).map((s) => (
               <button
                 key={s.id}
                 type="button"
@@ -1732,7 +1753,7 @@ export function AdminPage() {
                 onClick={() => setSection(s.id)}
               >
                 {s.icon && <SectionIcon name={s.icon} />}
-                {s.label}
+                {t(`admin.sidebar.${s.i18nKey}`)}
               </button>
             ))}
           </div>
@@ -1742,10 +1763,10 @@ export function AdminPage() {
           style={{ marginTop: 'auto' }}
           onClick={() => navigate('/')}
         >
-          ← Retour au site
+          ← {t('admin.backToSite')}
         </button>
         <button type="button" onClick={logout}>
-          Se déconnecter
+          {t('admin.sidebar.logout')}
         </button>
       </aside>
 
