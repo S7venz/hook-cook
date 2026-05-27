@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 import { SectionIcon } from '../components/ui/SectionIcon.jsx';
 
@@ -8,124 +9,45 @@ import { SectionIcon } from '../components/ui/SectionIcon.jsx';
  * #engagements). Accessible depuis le footer (colonne Marque) et
  * indirectement en SEO — une vraie page éditoriale au ton artisan
  * cohérent avec l'identité Carnet du site.
+ *
+ * Contenu éditorial intégralement piloté par les locales i18n
+ * (clés `about.history`, `about.workshops`, `about.commitments`).
+ * Chaque section déclare ses paragraphes / éléments comme tableaux
+ * dans le JSON pour rester facilement éditable sans toucher au JSX.
  */
 
 const SECTIONS = [
-  {
-    id: 'histoire',
-    icon: 'compass',
-    eyebrow: 'Depuis 2008',
-    title: 'Notre histoire',
-    body: (
-      <>
-        <p className="hc-dropcap">
-          Hook &amp; Cook ouvre en 2008 dans une petite échoppe de la rue de
-          l'Alsace à Perpignan. À l'époque, un comptoir, trois cannes mouche
-          accrochées au mur et une boîte de mouches montées à la main par
-          Jean-Marc Peyre, ancien guide sur la Têt.
-        </p>
-        <p>
-          Dix-huit ans plus tard, la boutique s'est agrandie et le catalogue
-          couvre toutes les techniques — mouche, carnassiers, surfcasting,
-          carpe — mais l'approche reste la même : sélectionner chaque produit
-          comme si c'était nous qui allions pêcher avec. Pas de catalogue
-          algorithmique, pas de fournisseur d'Asie anonyme. Des cannes qu'on
-          lance, des moulinets qu'on démonte, des appâts qu'on teste sur la
-          Têt avant de les mettre en rayon.
-        </p>
-        <p>
-          Aujourd'hui, l'équipe compte cinq pêcheurs. On organise trois ou
-          quatre concours par an sur les eaux locales (Têt, Vinça, Tech,
-          Agly), on accompagne les débutants et on continue de monter nos
-          propres mouches à la boutique les matins d'hiver.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'ateliers',
-    icon: 'rod',
-    eyebrow: 'Made in France',
-    title: 'Ateliers partenaires',
-    body: (
-      <>
-        <p className="hc-dropcap">
-          Une partie de notre offre est produite directement par des ateliers
-          français avec qui on travaille en direct, sans intermédiaire. Ça
-          garantit la qualité, la traçabilité, et ça fait vivre le savoir-faire
-          artisanal local.
-        </p>
-        <ul>
-          <li>
-            <strong>Atelier Peyre (66)</strong> — Jean-Marc monte à la main les
-            blanks carbone de la gamme Hook &amp; Cook Sauvage à Prades.
-            Porte-moulinets en noyer tourné, ligatures au fil de soie. Une
-            demi-douzaine de cannes par mois.
-          </li>
-          <li>
-            <strong>Cordier Roubinet (38)</strong> — un des derniers cordiers
-            français à tresser ses soies manuellement sur un métier centenaire.
-            Cœur 16 brins, lissage à la cire d'abeille.
-          </li>
-          <li>
-            <strong>Tournon (42)</strong> — fabricant historique d'hameçons et
-            d'accessoires fins. Production dans la Loire, acier zingué, finition
-            black.
-          </li>
-          <li>
-            <strong>Mouches du Conflent</strong> — collectif de monteurs
-            amateurs pour qui on référence les imitations locales (Sedge de la
-            Têt, BWO d'Olette, Peute noire).
-          </li>
-        </ul>
-      </>
-    ),
-  },
-  {
-    id: 'engagements',
-    icon: 'leaf',
-    eyebrow: 'Ce qu\'on défend',
-    title: 'Engagements',
-    body: (
-      <>
-        <h3>Transparence du sourcing</h3>
-        <p className="hc-dropcap">
-          Chaque fiche produit indique l'origine, l'atelier ou le fabricant.
-          Quand le produit vient d'Asie (c'est le cas de certains leurres de
-          masse), on le dit. Pas de packaging trompeur.
-        </p>
-
-        <h3>Pêche responsable</h3>
-        <p>
-          On promeut le no-kill sur les espèces fragiles (truite fario, ombre
-          commun). Les concours qu'on organise sont systématiquement en
-          no-kill, avec hameçons sans ardillon obligatoires. On fournit les
-          tapis de réception et les épuisettes en caoutchouc gratuitement.
-        </p>
-
-        <h3>Respect des quotas et ouvertures</h3>
-        <p>
-          Chaque fiche espèce du site affiche le calendrier d'ouverture
-          officiel en première catégorie. Les permis vendus sur Hook &amp;
-          Cook sont validés par la Fédération départementale des
-          Pyrénées-Orientales.
-        </p>
-
-        <h3>Impact carbone</h3>
-        <p>
-          Expédition Colissimo neutre en carbone (compensation via La Poste),
-          emballages carton recyclé, pas de plastique gonflé. Pour les
-          produits locaux (ateliers 66/42/38), livraison groupée une fois par
-          semaine.
-        </p>
-      </>
-    ),
-  },
+  { id: 'histoire', icon: 'compass', key: 'history' },
+  { id: 'ateliers', icon: 'rod', key: 'workshops' },
+  { id: 'engagements', icon: 'leaf', key: 'commitments' },
 ];
+
+function renderArray(items, kind = 'p') {
+  if (!Array.isArray(items)) return null;
+  if (kind === 'ul') {
+    return (
+      <ul>
+        {items.map((html, i) => (
+          // eslint-disable-next-line react/no-danger
+          <li key={i} dangerouslySetInnerHTML={{ __html: html }} />
+        ))}
+      </ul>
+    );
+  }
+  return items.map((html, i) => (
+    <p
+      key={i}
+      className={i === 0 ? 'hc-dropcap' : undefined}
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  ));
+}
 
 export function AboutPage() {
   const { hash } = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Scroll à l'ancre au montage ET à chaque changement de hash,
   // avec un léger délai pour laisser le layout se stabiliser.
@@ -142,7 +64,7 @@ export function AboutPage() {
     <div className="page">
       <div className="page-container" style={{ maxWidth: 760 }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          À propos
+          {t('about.eyebrow')}
         </div>
         <h1
           style={{
@@ -154,65 +76,81 @@ export function AboutPage() {
             margin: '0 0 var(--sp-6)',
           }}
         >
-          Une boutique tenue par des{' '}
-          <em style={{ color: 'var(--accent)', fontWeight: 300 }}>pêcheurs</em>.
+          <Trans i18nKey="about.title" components={{ em: <em style={{ color: 'var(--accent)', fontWeight: 300 }} /> }} />
         </h1>
         <p className="lede" style={{ fontSize: 'var(--fs-18)', marginBottom: 'var(--sp-10)' }}>
-          Installés depuis 2008 à Perpignan, on sélectionne chaque produit avec
-          la même exigence : aurait-on plaisir à pêcher avec ?
+          {t('about.lede')}
         </p>
 
-        {SECTIONS.map((s, i) => (
-          <section
-            key={s.id}
-            id={s.id}
-            className="legal-content"
-            style={{
-              paddingTop: 'var(--sp-10)',
-              paddingBottom: 'var(--sp-6)',
-              borderTop: i === 0 ? '1px solid var(--hairline)' : 'none',
-              scrollMarginTop: 'var(--sp-10)',
-            }}
-          >
-            {i > 0 && (
-              <div className="hc-ornament" aria-hidden="true">
-                <svg
-                  viewBox="0 0 40 12"
-                  width="40"
-                  height="12"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ color: 'var(--accent)' }}
-                >
-                  {/* Vaguelette + point — rappel visuel eau & hameçon */}
-                  <path
-                    d="M 2 6 Q 8 2 14 6 T 26 6 T 38 6"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    fill="none"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="20" cy="6" r="1.6" fill="currentColor" />
-                </svg>
-              </div>
-            )}
-            <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
-              {s.icon && <SectionIcon name={s.icon} />}
-              {s.eyebrow}
-            </div>
-            <h2
+        {SECTIONS.map((s, i) => {
+          const base = `about.${s.key}`;
+          const paragraphs = t(`${base}.paragraphs`, { returnObjects: true, defaultValue: [] });
+          const list = t(`${base}.list`, { returnObjects: true, defaultValue: null });
+          const headings = t(`${base}.headings`, { returnObjects: true, defaultValue: null });
+          return (
+            <section
+              key={s.id}
+              id={s.id}
+              className="legal-content"
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'var(--fs-32)',
-                fontWeight: 500,
-                letterSpacing: '-0.02em',
-                margin: '0 0 var(--sp-5)',
+                paddingTop: 'var(--sp-10)',
+                paddingBottom: 'var(--sp-6)',
+                borderTop: i === 0 ? '1px solid var(--hairline)' : 'none',
+                scrollMarginTop: 'var(--sp-10)',
               }}
             >
-              {s.title}
-            </h2>
-            {s.body}
-          </section>
-        ))}
+              {i > 0 && (
+                <div className="hc-ornament" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 40 12"
+                    width="40"
+                    height="12"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{ color: 'var(--accent)' }}
+                  >
+                    <path
+                      d="M 2 6 Q 8 2 14 6 T 26 6 T 38 6"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="20" cy="6" r="1.6" fill="currentColor" />
+                  </svg>
+                </div>
+              )}
+              <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
+                {s.icon && <SectionIcon name={s.icon} />}
+                {t(`${base}.eyebrow`)}
+              </div>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--fs-32)',
+                  fontWeight: 500,
+                  letterSpacing: '-0.02em',
+                  margin: '0 0 var(--sp-5)',
+                }}
+              >
+                {t(`${base}.title`)}
+              </h2>
+
+              {/* Section "Engagements" : structure avec sous-titres + paragraphes alternés */}
+              {Array.isArray(headings) && headings.map((h, idx) => (
+                <div key={idx}>
+                  <h3>{h.title}</h3>
+                  {renderArray(h.paragraphs)}
+                </div>
+              ))}
+
+              {/* Section "Histoire" : paragraphes simples */}
+              {!headings && Array.isArray(paragraphs) && renderArray(paragraphs)}
+
+              {/* Section "Ateliers" : liste */}
+              {list && renderArray(list, 'ul')}
+            </section>
+          );
+        })}
 
         <div
           style={{
@@ -223,7 +161,7 @@ export function AboutPage() {
           }}
         >
           <Button variant="primary" size="lg" onClick={() => navigate('/boutique')}>
-            Découvrir la boutique
+            {t('about.cta')}
           </Button>
         </div>
       </div>

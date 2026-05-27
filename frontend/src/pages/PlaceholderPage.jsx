@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button.jsx';
 
 export function PlaceholderPage({ eyebrow, title, description }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <div className="page">
       <div className="page-container">
@@ -43,10 +45,10 @@ export function PlaceholderPage({ eyebrow, title, description }) {
             style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'center', flexWrap: 'wrap' }}
           >
             <Button variant="ghost" size="lg" onClick={() => navigate('/')}>
-              ← Retour à l'accueil
+              ← {t('placeholder.backHome')}
             </Button>
             <Button variant="primary" size="lg" onClick={() => navigate('/boutique')}>
-              Parcourir la boutique
+              {t('placeholder.browseShop')}
             </Button>
           </div>
         </div>

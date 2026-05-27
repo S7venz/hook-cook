@@ -256,6 +256,8 @@
       "technique": "Technique",
       "priceMin": "Prix minimum",
       "priceMax": "Prix maximum",
+      "priceMinShort": "Min",
+      "priceMaxShort": "Max",
       "inStock": "En stock uniquement",
       "clearAll": "Tout effacer"
     },
@@ -608,6 +610,68 @@
       "update": "Mettre à jour"
     }
   },
+  "placeholder": {
+    "backHome": "Retour à l'accueil",
+    "browseShop": "Parcourir la boutique"
+  },
+  "about": {
+    "eyebrow": "À propos",
+    "title": "Une boutique tenue par des <em>pêcheurs</em>.",
+    "lede": "Installés depuis 2008 à Perpignan, on sélectionne chaque produit avec la même exigence : aurait-on plaisir à pêcher avec ?",
+    "cta": "Découvrir la boutique",
+    "history": {
+      "eyebrow": "Depuis 2008",
+      "title": "Notre histoire",
+      "paragraphs": [
+        "Hook &amp; Cook ouvre en 2008 dans une petite échoppe de la rue de l'Alsace à Perpignan. À l'époque, un comptoir, trois cannes mouche accrochées au mur et une boîte de mouches montées à la main par Jean-Marc Peyre, ancien guide sur la Têt.",
+        "Dix-huit ans plus tard, la boutique s'est agrandie et le catalogue couvre toutes les techniques — mouche, carnassiers, surfcasting, carpe — mais l'approche reste la même : sélectionner chaque produit comme si c'était nous qui allions pêcher avec. Pas de catalogue algorithmique, pas de fournisseur d'Asie anonyme. Des cannes qu'on lance, des moulinets qu'on démonte, des appâts qu'on teste sur la Têt avant de les mettre en rayon.",
+        "Aujourd'hui, l'équipe compte cinq pêcheurs. On organise trois ou quatre concours par an sur les eaux locales (Têt, Vinça, Tech, Agly), on accompagne les débutants et on continue de monter nos propres mouches à la boutique les matins d'hiver."
+      ]
+    },
+    "workshops": {
+      "eyebrow": "Made in France",
+      "title": "Ateliers partenaires",
+      "paragraphs": [
+        "Une partie de notre offre est produite directement par des ateliers français avec qui on travaille en direct, sans intermédiaire. Ça garantit la qualité, la traçabilité, et ça fait vivre le savoir-faire artisanal local."
+      ],
+      "list": [
+        "<strong>Atelier Peyre (66)</strong> — Jean-Marc monte à la main les blanks carbone de la gamme Hook &amp; Cook Sauvage à Prades. Porte-moulinets en noyer tourné, ligatures au fil de soie. Une demi-douzaine de cannes par mois.",
+        "<strong>Cordier Roubinet (38)</strong> — un des derniers cordiers français à tresser ses soies manuellement sur un métier centenaire. Cœur 16 brins, lissage à la cire d'abeille.",
+        "<strong>Tournon (42)</strong> — fabricant historique d'hameçons et d'accessoires fins. Production dans la Loire, acier zingué, finition black.",
+        "<strong>Mouches du Conflent</strong> — collectif de monteurs amateurs pour qui on référence les imitations locales (Sedge de la Têt, BWO d'Olette, Peute noire)."
+      ]
+    },
+    "commitments": {
+      "eyebrow": "Ce qu'on défend",
+      "title": "Engagements",
+      "headings": [
+        {
+          "title": "Transparence du sourcing",
+          "paragraphs": [
+            "Chaque fiche produit indique l'origine, l'atelier ou le fabricant. Quand le produit vient d'Asie (c'est le cas de certains leurres de masse), on le dit. Pas de packaging trompeur."
+          ]
+        },
+        {
+          "title": "Pêche responsable",
+          "paragraphs": [
+            "On promeut le no-kill sur les espèces fragiles (truite fario, ombre commun). Les concours qu'on organise sont systématiquement en no-kill, avec hameçons sans ardillon obligatoires. On fournit les tapis de réception et les épuisettes en caoutchouc gratuitement."
+          ]
+        },
+        {
+          "title": "Respect des quotas et ouvertures",
+          "paragraphs": [
+            "Chaque fiche espèce du site affiche le calendrier d'ouverture officiel en première catégorie. Les permis vendus sur Hook &amp; Cook sont validés par la Fédération départementale des Pyrénées-Orientales."
+          ]
+        },
+        {
+          "title": "Impact carbone",
+          "paragraphs": [
+            "Expédition Colissimo neutre en carbone (compensation via La Poste), emballages carton recyclé, pas de plastique gonflé. Pour les produits locaux (ateliers 66/42/38), livraison groupée une fois par semaine."
+          ]
+        }
+      ]
+    }
+  },
   "legal": {
     "terms": "CGV",
     "privacy": "Politique de confidentialité",
@@ -615,6 +679,45 @@
     "cookies": "Cookies",
     "about": "À propos",
     "help": "Aide / FAQ"
+  },
+  "about": {
+    "eyebrow": "À propos",
+    "titleStart": "Une boutique tenue par des",
+    "titleEm": "pêcheurs",
+    "lede": "Installés depuis 2008 à Perpignan, on sélectionne chaque produit avec la même exigence : aurait-on plaisir à pêcher avec ?",
+    "sections": {
+      "story": {
+        "eyebrow": "Depuis 2008",
+        "title": "Notre histoire",
+        "p1": "Hook & Cook ouvre en 2008 dans une petite échoppe à Perpignan. À l'époque, un comptoir, trois cannes mouche et une boîte de mouches montées à la main par Jean-Marc Peyre, ancien guide sur la Têt.",
+        "p2": "Dix-huit ans plus tard, la boutique s'est agrandie et le catalogue couvre toutes les techniques. L'approche reste la même : sélectionner chaque produit comme si c'était nous qui allions pêcher avec.",
+        "p3": "Aujourd'hui, cinq pêcheurs composent l'équipe. On organise trois ou quatre concours par an sur les eaux locales et on continue de monter nos propres mouches à la boutique les matins d'hiver."
+      },
+      "workshops": {
+        "eyebrow": "Made in France",
+        "title": "Ateliers partenaires",
+        "intro": "Une partie de notre offre est produite directement par des ateliers français avec qui on travaille en direct, sans intermédiaire. Ça garantit la qualité, la traçabilité, et ça fait vivre le savoir-faire artisanal local.",
+        "items": [
+          "Atelier Peyre (66) — Jean-Marc monte à la main les blanks carbone de la gamme Hook & Cook Sauvage à Prades.",
+          "Cordier Roubinet (38) — un des derniers cordiers français à tresser ses soies manuellement sur un métier centenaire.",
+          "Tournon (42) — fabricant historique d'hameçons et d'accessoires fins.",
+          "Mouches du Conflent — collectif de monteurs amateurs pour qui on référence les imitations locales."
+        ]
+      },
+      "commitments": {
+        "eyebrow": "Ce qu'on défend",
+        "title": "Engagements",
+        "sourcingTitle": "Transparence du sourcing",
+        "sourcingBody": "Chaque fiche produit indique l'origine, l'atelier ou le fabricant. Pas de packaging trompeur.",
+        "responsibleTitle": "Pêche responsable",
+        "responsibleBody": "On promeut le no-kill sur les espèces fragiles. Les concours qu'on organise sont systématiquement en no-kill, avec hameçons sans ardillon obligatoires.",
+        "quotaTitle": "Respect des quotas et ouvertures",
+        "quotaBody": "Chaque fiche espèce du site affiche le calendrier d'ouverture officiel. Les permis vendus sur Hook & Cook sont validés par la Fédération départementale.",
+        "carbonTitle": "Impact carbone",
+        "carbonBody": "Expédition Colissimo neutre en carbone, emballages carton recyclé, pas de plastique gonflé."
+      }
+    },
+    "cta": "Découvrir la boutique"
   },
   "errors": {
     "notFound": {

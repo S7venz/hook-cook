@@ -256,6 +256,8 @@
       "technique": "Technique",
       "priceMin": "Minimum price",
       "priceMax": "Maximum price",
+      "priceMinShort": "Min",
+      "priceMaxShort": "Max",
       "inStock": "In stock only",
       "clearAll": "Clear all"
     },
@@ -606,6 +608,68 @@
       "description": "Description",
       "create": "Create product",
       "update": "Update"
+    }
+  },
+  "placeholder": {
+    "backHome": "Back to home",
+    "browseShop": "Browse the shop"
+  },
+  "about": {
+    "eyebrow": "About",
+    "title": "A shop run by <em>anglers</em>.",
+    "lede": "Based in Perpignan since 2008, we curate every product with the same question in mind: would we enjoy fishing with it?",
+    "cta": "See the shop",
+    "history": {
+      "eyebrow": "Since 2008",
+      "title": "Our story",
+      "paragraphs": [
+        "Hook &amp; Cook opened in 2008 in a small shop on rue de l'Alsace in Perpignan. Back then: a counter, three fly rods hanging on the wall, and a box of flies hand-tied by Jean-Marc Peyre, a former guide on the Têt river.",
+        "Eighteen years later, the shop has grown and the catalogue covers every technique — fly, predator, surfcasting, carp — but the approach stays the same: pick every product as if we were going to fish with it ourselves. No algorithmic catalogue, no anonymous Asian supplier. Rods we cast, reels we strip down, lures we test on the Têt before they hit the shelf.",
+        "Today the team is five anglers. We organise three or four contests a year on local waters (Têt, Vinça, Tech, Agly), we coach beginners, and we still tie our own flies in the shop on winter mornings."
+      ]
+    },
+    "workshops": {
+      "eyebrow": "Made in France",
+      "title": "Partner workshops",
+      "paragraphs": [
+        "Part of our range is produced directly by French workshops we work with in direct trade, no middlemen. It guarantees quality, traceability, and keeps local artisan know-how alive."
+      ],
+      "list": [
+        "<strong>Atelier Peyre (66)</strong> — Jean-Marc hand-mounts the carbon blanks of the Hook &amp; Cook Sauvage range in Prades. Walnut-turned reel seats, silk-thread guides. Half a dozen rods a month.",
+        "<strong>Cordier Roubinet (38)</strong> — one of the last French rope makers to weave their fly lines by hand on a hundred-year-old loom. 16-strand core, beeswax finishing.",
+        "<strong>Tournon (42)</strong> — historic French manufacturer of hooks and fine accessories. Made in the Loire region, zinc-plated steel, black finish.",
+        "<strong>Mouches du Conflent</strong> — collective of amateur fly tiers we source our local imitations from (Têt Sedge, Olette BWO, Black Peute)."
+      ]
+    },
+    "commitments": {
+      "eyebrow": "What we stand for",
+      "title": "Commitments",
+      "headings": [
+        {
+          "title": "Sourcing transparency",
+          "paragraphs": [
+            "Every product page states the origin, workshop or manufacturer. When a product comes from Asia (that's the case for some mass-market lures), we say so. No deceptive packaging."
+          ]
+        },
+        {
+          "title": "Responsible fishing",
+          "paragraphs": [
+            "We promote catch-and-release on fragile species (brown trout, grayling). The contests we organise are always no-kill, with mandatory barbless hooks. We provide reception mats and rubber landing nets for free."
+          ]
+        },
+        {
+          "title": "Quotas and openings",
+          "paragraphs": [
+            "Every species page on the site displays the official opening calendar for first-category waters. Permits sold on Hook &amp; Cook are validated by the Federation of the Pyrénées-Orientales department."
+          ]
+        },
+        {
+          "title": "Carbon footprint",
+          "paragraphs": [
+            "Carbon-neutral Colissimo shipping (compensation via La Poste), recycled cardboard packaging, no inflated plastic. For local products (workshops in 66/42/38), grouped delivery once a week."
+          ]
+        }
+      ]
     }
   },
   "legal": {

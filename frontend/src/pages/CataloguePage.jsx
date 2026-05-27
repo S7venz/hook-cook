@@ -144,7 +144,7 @@ function FiltersPanel({
             min="0"
             step="1"
             className="input mono"
-            placeholder="Min"
+            placeholder={t('catalog.filters.priceMinShort')}
             aria-label={t('catalog.filters.priceMin')}
             value={filters.priceMin}
             onChange={(e) => onSetPrice('priceMin', e.target.value)}
@@ -157,7 +157,7 @@ function FiltersPanel({
             min="0"
             step="1"
             className="input mono"
-            placeholder="Max"
+            placeholder={t('catalog.filters.priceMaxShort')}
             aria-label={t('catalog.filters.priceMax')}
             value={filters.priceMax}
             onChange={(e) => onSetPrice('priceMax', e.target.value)}
