@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Page d'aide / FAQ. Questions-réponses repliables avec la logique
@@ -325,11 +326,13 @@ function Accordion({ title, defaultOpen, children }) {
 }
 
 export function HelpPage() {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith('en');
   return (
     <div className="page">
       <div className="page-container" style={{ maxWidth: 760 }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          Centre d'aide
+          {t('help.eyebrow')}
         </div>
         <h1
           style={{
@@ -340,19 +343,36 @@ export function HelpPage() {
             margin: '0 0 var(--sp-5)',
           }}
         >
-          Comment on peut vous aider ?
+          {t('help.title')}
         </h1>
         <p className="lede" style={{ marginBottom: 'var(--sp-8)' }}>
-          Les réponses aux questions les plus courantes. Si vous ne trouvez pas,
-          écrivez-nous à{' '}
+          {t('help.lede')}{' '}
           <a
             href="mailto:contact@hookcook.fr"
             style={{ color: 'var(--accent)', borderBottom: '1px solid currentColor' }}
           >
             contact@hookcook.fr
           </a>
-          {' '}— on répond sous 24h ouvrées.
+          {' '}— {t('help.responseTime')}
         </p>
+
+        {isEn && (
+          <div
+            className="card"
+            style={{
+              padding: 'var(--sp-3) var(--sp-4)',
+              background: 'color-mix(in oklch, var(--info) 6%, var(--bg-elev))',
+              borderLeftWidth: 3,
+              borderLeftStyle: 'solid',
+              borderLeftColor: 'var(--info)',
+              fontSize: 'var(--fs-13)',
+              marginBottom: 'var(--sp-6)',
+            }}
+          >
+            <strong>{t('help.frenchOnly.title')}</strong>
+            <div style={{ marginTop: 4 }}>{t('help.frenchOnly.body')}</div>
+          </div>
+        )}
 
         {CATEGORIES.map((cat) => (
           <section
@@ -397,10 +417,10 @@ export function HelpPage() {
               marginBottom: 'var(--sp-3)',
             }}
           >
-            Vous n'avez pas trouvé ?
+            {t('help.notFoundCard.title')}
           </div>
           <p className="soft" style={{ margin: '0 0 var(--sp-4)' }}>
-            Écrivez-nous directement — on répond en personne, pas un bot.
+            {t('help.notFoundCard.subtitle')}
           </p>
           <a
             href="mailto:contact@hookcook.fr"

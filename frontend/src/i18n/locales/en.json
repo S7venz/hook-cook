@@ -734,6 +734,37 @@
       ]
     }
   },
+  "help": {
+    "eyebrow": "Help center",
+    "title": "How can we help?",
+    "lede": "Answers to the most common questions. If you can't find what you need, email us at",
+    "responseTime": "we reply within one business day.",
+    "frenchOnly": {
+      "title": "FAQ available in French only",
+      "body": "The FAQ below is in French. For help in English, email contact@hookcook.fr — we usually reply within one business day."
+    },
+    "notFoundCard": {
+      "title": "Didn't find what you were looking for?",
+      "subtitle": "Write us directly — a real person replies, not a bot."
+    }
+  },
+  "legalPage": {
+    "eyebrow": "Legal information · updated {{date}}",
+    "notFound": {
+      "title": "Page not found.",
+      "subtitle": "No legal page matches this link."
+    },
+    "titles": {
+      "mentions-legales": "Legal notice",
+      "cgv": "Terms and conditions of sale",
+      "confidentialite": "Privacy policy",
+      "cookies": "Cookie policy"
+    },
+    "frenchOnly": {
+      "title": "Legal text in French",
+      "body": "The legal terms below apply to the French market. The English UI is offered for convenience; the legally binding version remains the French text."
+    }
+  },
   "legal": {
     "terms": "Terms of sale",
     "privacy": "Privacy policy",

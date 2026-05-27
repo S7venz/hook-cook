@@ -1,10 +1,15 @@
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Pages légales servies depuis une route unique /legal/:slug pour
  * mutualiser le layout et les styles. Contenu en français,
  * juridiquement correct pour un e-commerce FR (éditeur, hébergeur,
  * cookies, RGPD, CGV, droit de rétractation, etc.).
+ *
+ * Note i18n : le corps des pages reste en français car ce sont les
+ * textes juridiques officiels applicables à la juridiction française.
+ * En mode EN, un bandeau d'avertissement est affiché en tête de page.
  */
 
 const LEGAL = {
@@ -288,24 +293,28 @@ const LEGAL = {
 
 export function LegalPage() {
   const { slug } = useParams();
+  const { t, i18n } = useTranslation();
   const entry = LEGAL[slug];
 
   if (!entry) {
     return (
       <div className="page">
         <div className="page-container" style={{ textAlign: 'center', padding: 'var(--sp-16) 0' }}>
-          <h1>Page introuvable.</h1>
-          <p className="soft">Aucune page légale ne correspond à ce lien.</p>
+          <h1>{t('legalPage.notFound.title')}</h1>
+          <p className="soft">{t('legalPage.notFound.subtitle')}</p>
         </div>
       </div>
     );
   }
 
+  const isEn = i18n.language?.startsWith('en');
+  // Titres traduits côté i18n quand dispo, sinon fallback FR du LEGAL
+  const i18nTitle = t(`legalPage.titles.${slug}`, { defaultValue: entry.title });
   return (
     <div className="page">
       <div className="page-container" style={{ maxWidth: 760 }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          Informations légales · mis à jour le {entry.updated}
+          {t('legalPage.eyebrow', { date: entry.updated })}
         </div>
         <h1
           style={{
@@ -316,8 +325,25 @@ export function LegalPage() {
             margin: '0 0 var(--sp-6)',
           }}
         >
-          {entry.title}
+          {i18nTitle}
         </h1>
+        {isEn && (
+          <div
+            className="card"
+            style={{
+              padding: 'var(--sp-3) var(--sp-4)',
+              background: 'color-mix(in oklch, var(--info) 6%, var(--bg-elev))',
+              borderLeftWidth: 3,
+              borderLeftStyle: 'solid',
+              borderLeftColor: 'var(--info)',
+              fontSize: 'var(--fs-13)',
+              marginBottom: 'var(--sp-5)',
+            }}
+          >
+            <strong>{t('legalPage.frenchOnly.title')}</strong>
+            <div style={{ marginTop: 4 }}>{t('legalPage.frenchOnly.body')}</div>
+          </div>
+        )}
         <article className="legal-content">{entry.body}</article>
       </div>
     </div>
