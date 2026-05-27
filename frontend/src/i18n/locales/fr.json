@@ -552,6 +552,11 @@
   },
   "account": {
     "title": "Mon compte",
+    "greeting": "Bonjour, {{name}}",
+    "navAria": "Navigation compte",
+    "session": {
+      "title": "Session"
+    },
     "tabs": {
       "overview": "Aperçu",
       "orders": "Commandes",
@@ -563,6 +568,12 @@
       "settings": "Paramètres"
     },
     "overview": {
+      "active": "actif",
+      "registered": "inscrits",
+      "shortcuts": "Raccourcis",
+      "shortcutOrders": "Mes commandes",
+      "shortcutPermit": "Mon permis",
+      "shortcutLog": "Carnet de prise",
       "stats": {
         "permits": "Permis",
         "catches": "Prises saisies",
@@ -572,6 +583,12 @@
     },
     "orders": {
       "empty": "Vous n'avez pas encore commandé.",
+      "emptyTitle": "Pas encore de commande.",
+      "emptyDescription": "Votre prochaine commande apparaîtra ici avec son numéro de suivi.",
+      "orderNumber": "Commande {{id}}",
+      "preparing": "Préparation…",
+      "downloadInvoice": "Télécharger la facture",
+      "downloadFailed": "Téléchargement impossible.",
       "status": {
         "paid": "Payée",
         "shipped": "Expédiée",
@@ -579,25 +596,90 @@
         "cancelled": "Annulée",
         "pending": "En attente de paiement",
         "paymentFailed": "Paiement échoué"
-      },
-      "downloadInvoice": "Facture PDF"
+      }
+    },
+    "permits": {
+      "emptyTitle": "Aucun permis en cours.",
+      "emptyDescription": "Faites votre demande en 4 gestes. Traitement sous 2 jours ouvrés.",
+      "requestCta": "Demander mon permis",
+      "stamp": "PERMIS VALIDÉ",
+      "submittedOn": "déposé le"
+    },
+    "contests": {
+      "emptyTitle": "Aucune inscription à un concours.",
+      "emptyDescription": "Le calendrier local affiche les prochaines dates et catégories.",
+      "exploreCta": "Voir les concours à venir",
+      "registered": "Inscrit"
     },
     "log": {
       "addEntry": "+ Ajouter une prise",
+      "newEntry": "Nouvelle prise",
       "speciesLabel": "Espèce",
       "sizeLabel": "Taille (cm)",
       "weightLabel": "Poids (g)",
       "spotLabel": "Lieu",
-      "baitLabel": "Appât",
+      "baitLabel": "Appât / mouche",
       "weatherLabel": "Météo",
       "dateLabel": "Date",
       "photoLabel": "Photo",
       "save": "Enregistrer la prise",
-      "empty": "Aucune prise enregistrée pour le moment."
+      "empty": "Aucune prise enregistrée pour le moment.",
+      "emptyTitle": "Votre carnet est vide.",
+      "emptyDescription": "Enregistrez votre première prise pour lancer votre saison.",
+      "countSeason_one": "{{count}} prise · saison 2026",
+      "countSeason_other": "{{count}} prises · saison 2026",
+      "removeEntryAria": "Supprimer la prise du {{date}}"
     },
     "favorites": {
+      "loading": "Chargement de vos favoris…",
       "empty": "Aucun favori pour l'instant.",
+      "emptyTitle": "Aucun favori pour l'instant.",
+      "emptyDescription": "Cliquez sur le cœur d'un produit pour le retrouver ici.",
       "remove": "Retirer des favoris"
+    },
+    "addresses": {
+      "emptyTitle": "Aucune adresse enregistrée.",
+      "emptyDescription": "Ajoutez votre adresse de livraison depuis la section Paramètres pour gagner du temps au checkout.",
+      "addCta": "Renseigner mon adresse",
+      "shippingAddress": "Adresse de livraison",
+      "tel": "Tel"
+    },
+    "profile": {
+      "myInfo": "Mes informations",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "emailHint": "L'email de connexion ne peut pas être modifié depuis cette page.",
+      "phone": "Téléphone",
+      "phonePlaceholder": "06 12 34 56 78",
+      "defaultAddress": "Adresse de livraison par défaut",
+      "addressLine": "Adresse",
+      "addressPlaceholder": "14 rue des Arènes",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "country": "Pays",
+      "saving": "Enregistrement…",
+      "updated": "Profil mis à jour.",
+      "updateFailed": "Échec de la mise à jour."
+    },
+    "gdpr": {
+      "sectionTitle": "Données personnelles · RGPD",
+      "downloadTitle": "Télécharger mes données",
+      "downloadBody": "Export JSON complet : profil, commandes, permis, inscriptions concours, carnet, favoris, avis, alertes stock.",
+      "preparing": "Préparation…",
+      "exportCta": "Exporter",
+      "exportDone": "Export téléchargé — conformité RGPD.",
+      "exportFailed": "Export impossible.",
+      "deleteTitle": "Supprimer mon compte",
+      "deleteBody": "Anonymise vos données. Les commandes restent conservées 10 ans pour obligation fiscale mais sont détachées de votre identité.",
+      "irreversible": "Action irréversible.",
+      "typeToConfirm": "Tapez",
+      "toConfirm": "pour confirmer",
+      "confirmHint": "Tapez SUPPRIMER pour confirmer.",
+      "deleting": "Suppression…",
+      "deleteFinal": "Supprimer définitivement",
+      "deleteDone": "Compte anonymisé — vous êtes déconnecté.",
+      "deleteFailed": "Suppression impossible."
     },
     "settings": {
       "profile": "Profil",

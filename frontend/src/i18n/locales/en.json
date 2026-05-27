@@ -552,6 +552,11 @@
   },
   "account": {
     "title": "My account",
+    "greeting": "Hello, {{name}}",
+    "navAria": "Account navigation",
+    "session": {
+      "title": "Session"
+    },
     "tabs": {
       "overview": "Overview",
       "orders": "Orders",
@@ -563,6 +568,12 @@
       "settings": "Settings"
     },
     "overview": {
+      "active": "active",
+      "registered": "registered",
+      "shortcuts": "Shortcuts",
+      "shortcutOrders": "My orders",
+      "shortcutPermit": "My permit",
+      "shortcutLog": "Catch log",
       "stats": {
         "permits": "Permits",
         "catches": "Catches logged",
@@ -572,6 +583,12 @@
     },
     "orders": {
       "empty": "You haven't ordered yet.",
+      "emptyTitle": "No orders yet.",
+      "emptyDescription": "Your next order will appear here with its tracking number.",
+      "orderNumber": "Order {{id}}",
+      "preparing": "Preparing…",
+      "downloadInvoice": "Download invoice",
+      "downloadFailed": "Download failed.",
       "status": {
         "paid": "Paid",
         "shipped": "Shipped",
@@ -579,25 +596,90 @@
         "cancelled": "Cancelled",
         "pending": "Awaiting payment",
         "paymentFailed": "Payment failed"
-      },
-      "downloadInvoice": "PDF invoice"
+      }
+    },
+    "permits": {
+      "emptyTitle": "No active permit.",
+      "emptyDescription": "Apply in 4 steps. Processed within 2 working days.",
+      "requestCta": "Request my permit",
+      "stamp": "PERMIT APPROVED",
+      "submittedOn": "submitted on"
+    },
+    "contests": {
+      "emptyTitle": "No contest registrations.",
+      "emptyDescription": "The local calendar lists upcoming dates and categories.",
+      "exploreCta": "See upcoming contests",
+      "registered": "Registered"
     },
     "log": {
       "addEntry": "+ Add a catch",
+      "newEntry": "New catch",
       "speciesLabel": "Species",
       "sizeLabel": "Size (cm)",
       "weightLabel": "Weight (g)",
       "spotLabel": "Spot",
-      "baitLabel": "Bait",
+      "baitLabel": "Bait / fly",
       "weatherLabel": "Weather",
       "dateLabel": "Date",
       "photoLabel": "Photo",
       "save": "Save the catch",
-      "empty": "No catches recorded yet."
+      "empty": "No catches recorded yet.",
+      "emptyTitle": "Your log is empty.",
+      "emptyDescription": "Record your first catch to start the season.",
+      "countSeason_one": "{{count}} catch · 2026 season",
+      "countSeason_other": "{{count}} catches · 2026 season",
+      "removeEntryAria": "Delete the catch from {{date}}"
     },
     "favorites": {
+      "loading": "Loading your favorites…",
       "empty": "No favorites yet.",
+      "emptyTitle": "No favorites yet.",
+      "emptyDescription": "Click the heart on a product to find it here.",
       "remove": "Remove from favorites"
+    },
+    "addresses": {
+      "emptyTitle": "No address saved.",
+      "emptyDescription": "Add your shipping address from the Settings section to save time at checkout.",
+      "addCta": "Add my address",
+      "shippingAddress": "Shipping address",
+      "tel": "Tel"
+    },
+    "profile": {
+      "myInfo": "My information",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "emailHint": "The login email cannot be changed from this page.",
+      "phone": "Phone",
+      "phonePlaceholder": "06 12 34 56 78",
+      "defaultAddress": "Default shipping address",
+      "addressLine": "Address",
+      "addressPlaceholder": "14 rue des Arènes",
+      "postalCode": "Postal code",
+      "city": "City",
+      "country": "Country",
+      "saving": "Saving…",
+      "updated": "Profile updated.",
+      "updateFailed": "Update failed."
+    },
+    "gdpr": {
+      "sectionTitle": "Personal data · GDPR",
+      "downloadTitle": "Download my data",
+      "downloadBody": "Full JSON export: profile, orders, permits, contest registrations, log, favorites, reviews, stock alerts.",
+      "preparing": "Preparing…",
+      "exportCta": "Export",
+      "exportDone": "Export downloaded — GDPR compliant.",
+      "exportFailed": "Export failed.",
+      "deleteTitle": "Delete my account",
+      "deleteBody": "Anonymises your data. Orders are kept 10 years for fiscal obligation but detached from your identity.",
+      "irreversible": "Irreversible action.",
+      "typeToConfirm": "Type",
+      "toConfirm": "to confirm",
+      "confirmHint": "Type SUPPRIMER to confirm.",
+      "deleting": "Deleting…",
+      "deleteFinal": "Delete permanently",
+      "deleteDone": "Account anonymised — you are signed out.",
+      "deleteFailed": "Deletion failed."
     },
     "settings": {
       "profile": "Profile",

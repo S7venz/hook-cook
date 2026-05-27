@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '../components/ui/Badge.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { EmptyState } from '../components/ui/EmptyState.jsx';
@@ -22,16 +23,21 @@ import { useToast } from '../lib/toast.js';
 import { useWishlist } from '../lib/wishlist.js';
 import { ProductCard } from '../components/ProductCard.jsx';
 
-const TABS = [
-  { id: 'apercu', label: 'Aperçu', icon: 'compass' },
-  { id: 'commandes', label: 'Commandes', icon: 'cart' },
-  { id: 'permis', label: 'Permis', icon: 'permit' },
-  { id: 'concours', label: 'Concours', icon: 'trophy' },
-  { id: 'carnet', label: 'Carnet de prise', icon: 'fish' },
-  { id: 'favoris', label: 'Favoris', icon: 'fly' },
-  { id: 'adresses', label: 'Adresses', icon: 'pin' },
-  { id: 'parametres', label: 'Paramètres', icon: 'carnet' },
+const TAB_DEFS = [
+  { id: 'apercu', i18nKey: 'overview', icon: 'compass' },
+  { id: 'commandes', i18nKey: 'orders', icon: 'cart' },
+  { id: 'permis', i18nKey: 'permits', icon: 'permit' },
+  { id: 'concours', i18nKey: 'contests', icon: 'trophy' },
+  { id: 'carnet', i18nKey: 'log', icon: 'fish' },
+  { id: 'favoris', i18nKey: 'favorites', icon: 'fly' },
+  { id: 'adresses', i18nKey: 'addresses', icon: 'pin' },
+  { id: 'parametres', i18nKey: 'settings', icon: 'carnet' },
 ];
+
+function useTabs() {
+  const { t } = useTranslation();
+  return TAB_DEFS.map((d) => ({ ...d, label: t(`account.tabs.${d.i18nKey}`) }));
+}
 
 function StatCard({ label, value, small }) {
   return (
@@ -46,30 +52,31 @@ function StatCard({ label, value, small }) {
 }
 
 function Overview({ carnetCount, orderCount, contestCount, hasPermit, onTab }) {
+  const { t } = useTranslation();
   return (
     <div className="stack-lg">
       <div className="stats-row">
-        <StatCard label="Permis" value={hasPermit ? '1' : '0'} small={hasPermit ? 'actif' : ''} />
-        <StatCard label="Prises saisies" value={carnetCount} />
-        <StatCard label="Commandes" value={orderCount} />
-        <StatCard label="Concours" value={contestCount} small={contestCount > 0 ? 'inscrits' : ''} />
+        <StatCard label={t('account.overview.stats.permits')} value={hasPermit ? '1' : '0'} small={hasPermit ? t('account.overview.active') : ''} />
+        <StatCard label={t('account.overview.stats.catches')} value={carnetCount} />
+        <StatCard label={t('account.overview.stats.orders')} value={orderCount} />
+        <StatCard label={t('account.overview.stats.contests')} value={contestCount} small={contestCount > 0 ? t('account.overview.registered') : ''} />
       </div>
       <div className="card" style={{ padding: 'var(--sp-5)' }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          Raccourcis
+          {t('account.overview.shortcuts')}
         </div>
         <div
           className="row"
           style={{ gap: 'var(--sp-2)', flexWrap: 'wrap' }}
         >
           <Button variant="ghost" size="sm" onClick={() => onTab('commandes')}>
-            Mes commandes
+            {t('account.overview.shortcutOrders')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onTab('permis')}>
-            Mon permis
+            {t('account.overview.shortcutPermit')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onTab('carnet')}>
-            Carnet de prise
+            {t('account.overview.shortcutLog')}
           </Button>
         </div>
       </div>
@@ -78,6 +85,7 @@ function Overview({ carnetCount, orderCount, contestCount, hasPermit, onTab }) {
 }
 
 function OrdersTab({ orders, onShop }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const { push } = useToast();
   const [downloadingId, setDownloadingId] = useState(null);
@@ -87,7 +95,7 @@ function OrdersTab({ orders, onShop }) {
     try {
       await downloadInvoice(reference, token);
     } catch (err) {
-      push(err?.message ?? 'Téléchargement impossible.');
+      push(err?.message ?? t('account.orders.downloadFailed'));
     } finally {
       setDownloadingId(null);
     }
@@ -97,11 +105,11 @@ function OrdersTab({ orders, onShop }) {
     return (
       <EmptyState
         illus="box"
-        title="Pas encore de commande."
-        description="Votre prochaine commande apparaîtra ici avec son numéro de suivi."
+        title={t('account.orders.emptyTitle')}
+        description={t('account.orders.emptyDescription')}
       >
         <Button variant="primary" onClick={onShop}>
-          Parcourir la boutique
+          {t('placeholder.browseShop')}
         </Button>
       </EmptyState>
     );
@@ -116,7 +124,7 @@ function OrdersTab({ orders, onShop }) {
                 className="disp"
                 style={{ fontSize: 'var(--fs-20)', fontWeight: 500 }}
               >
-                Commande {order.id}
+                {t('account.orders.orderNumber', { id: order.id })}
               </div>
               <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
                 {new Intl.DateTimeFormat('fr-FR', {
@@ -157,7 +165,7 @@ function OrdersTab({ orders, onShop }) {
               disabled={downloadingId === order.id}
             >
               <Icon name="download" size={14} />
-              {downloadingId === order.id ? 'Préparation…' : 'Télécharger la facture'}
+              {downloadingId === order.id ? t('account.orders.preparing') : t('account.orders.downloadInvoice')}
             </Button>
           </div>
         </div>
@@ -167,6 +175,7 @@ function OrdersTab({ orders, onShop }) {
 }
 
 function PermisTab({ permit, onStart }) {
+  const { t } = useTranslation();
   // Pluie de poissons une seule fois quand l'utilisateur découvre que
   // son permis vient d'être approuvé. Persisté en localStorage pour
   // ne pas se rejouer à chaque visite.
@@ -185,11 +194,11 @@ function PermisTab({ permit, onStart }) {
     return (
       <EmptyState
         illus="permit"
-        title="Aucun permis en cours."
-        description="Faites votre demande en 4 gestes. Traitement sous 2 jours ouvrés."
+        title={t('account.permits.emptyTitle')}
+        description={t('account.permits.emptyDescription')}
       >
         <Button variant="primary" onClick={onStart}>
-          Demander mon permis
+          {t('account.permits.requestCta')}
         </Button>
       </EmptyState>
     );
@@ -200,7 +209,7 @@ function PermisTab({ permit, onStart }) {
       <FishRain count={28} duration={4000} active={celebrate} />
       {approved && celebrate && (
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--sp-3)' }}>
-          <HookStamp label="PERMIS VALIDÉ" size={88} />
+          <HookStamp label={t('account.permits.stamp')} size={88} />
         </div>
       )}
       <div className="card" style={{ padding: 'var(--sp-5)' }}>
@@ -213,7 +222,7 @@ function PermisTab({ permit, onStart }) {
               {permit.typeTitle}
             </div>
             <div className="mono soft" style={{ fontSize: 'var(--fs-12)' }}>
-              {permit.id} · déposé le{' '}
+              {permit.id} · {t('account.permits.submittedOn')}{' '}
               {new Intl.DateTimeFormat('fr-FR').format(new Date(permit.submittedAt))}
             </div>
           </div>
@@ -227,15 +236,16 @@ function PermisTab({ permit, onStart }) {
 }
 
 function ConcoursTab({ inscribed, onExplore }) {
+  const { t } = useTranslation();
   if (inscribed.length === 0) {
     return (
       <EmptyState
         illus="trophy"
-        title="Aucune inscription à un concours."
-        description="Le calendrier local affiche les prochaines dates et catégories."
+        title={t('account.contests.emptyTitle')}
+        description={t('account.contests.emptyDescription')}
       >
         <Button variant="primary" onClick={onExplore}>
-          Voir les concours à venir
+          {t('account.contests.exploreCta')}
         </Button>
       </EmptyState>
     );
@@ -256,7 +266,7 @@ function ConcoursTab({ inscribed, onExplore }) {
                 {contest.dateDisplay} · {contest.lieu}
               </div>
             </div>
-            <Badge status="approved">Inscrit</Badge>
+            <Badge status="approved">{t('account.contests.registered')}</Badge>
           </div>
         </div>
       ))}
@@ -265,6 +275,7 @@ function ConcoursTab({ inscribed, onExplore }) {
 }
 
 function CarnetForm({ onSubmit, onCancel }) {
+  const { t } = useTranslation();
   const { species: speciesList } = useReferenceData();
   const [species, setSpecies] = useState('truite');
   const [taille, setTaille] = useState('');
@@ -296,10 +307,10 @@ function CarnetForm({ onSubmit, onCancel }) {
       style={{ padding: 'var(--sp-5)' }}
       noValidate
     >
-      <div className="eyebrow">Nouvelle prise</div>
+      <div className="eyebrow">{t('account.log.newEntry')}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
         <div className="field">
-          <label>Espèce</label>
+          <label>{t('account.log.speciesLabel')}</label>
           <select
             className="select"
             value={species}
@@ -313,7 +324,7 @@ function CarnetForm({ onSubmit, onCancel }) {
           </select>
         </div>
         <div className="field">
-          <label>Date</label>
+          <label>{t('account.log.dateLabel')}</label>
           <input
             className="input"
             type="date"
@@ -324,7 +335,7 @@ function CarnetForm({ onSubmit, onCancel }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
         <div className="field">
-          <label>Taille (cm)</label>
+          <label>{t('account.log.sizeLabel')}</label>
           <input
             className="input"
             type="number"
@@ -335,7 +346,7 @@ function CarnetForm({ onSubmit, onCancel }) {
           />
         </div>
         <div className="field">
-          <label>Poids (g)</label>
+          <label>{t('account.log.weightLabel')}</label>
           <input
             className="input"
             type="number"
@@ -346,7 +357,7 @@ function CarnetForm({ onSubmit, onCancel }) {
         </div>
       </div>
       <div className="field">
-        <label>Lieu</label>
+        <label>{t('account.log.spotLabel')}</label>
         <input
           className="input"
           value={spot}
@@ -355,15 +366,15 @@ function CarnetForm({ onSubmit, onCancel }) {
         />
       </div>
       <div className="field">
-        <label>Appât / mouche</label>
+        <label>{t('account.log.baitLabel')}</label>
         <input className="input" value={bait} onChange={(e) => setBait(e.target.value)} />
       </div>
       <div className="row">
         <Button variant="ghost" onClick={onCancel} type="button">
-          Annuler
+          {t('common.cancel')}
         </Button>
         <Button variant="primary" type="submit" disabled={!taille || !spot}>
-          Enregistrer la prise
+          {t('account.log.save')}
         </Button>
       </div>
     </form>
@@ -371,6 +382,7 @@ function CarnetForm({ onSubmit, onCancel }) {
 }
 
 function CarnetTab({ entries, onAdd, onRemove }) {
+  const { t } = useTranslation();
   const { species: speciesList } = useReferenceData();
   const [showForm, setShowForm] = useState(false);
 
@@ -383,11 +395,11 @@ function CarnetTab({ entries, onAdd, onRemove }) {
     <div className="stack-lg">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <div className="eyebrow">
-          {entries.length} prise{entries.length > 1 ? 's' : ''} · saison 2026
+          {t('account.log.countSeason', { count: entries.length })}
         </div>
         {!showForm && (
           <Button variant="primary" size="sm" onClick={() => setShowForm(true)}>
-            <Icon name="plus" size={14} /> Ajouter une prise
+            <Icon name="plus" size={14} /> {t('account.log.addEntry')}
           </Button>
         )}
       </div>
@@ -397,11 +409,11 @@ function CarnetTab({ entries, onAdd, onRemove }) {
       {entries.length === 0 && !showForm && (
         <EmptyState
           illus="fish"
-          title="Votre carnet est vide."
-          description="Enregistrez votre première prise pour lancer votre saison."
+          title={t('account.log.emptyTitle')}
+          description={t('account.log.emptyDescription')}
         >
           <Button variant="primary" size="sm" onClick={() => setShowForm(true)}>
-            <Icon name="plus" size={14} /> Ajouter une prise
+            <Icon name="plus" size={14} /> {t('account.log.addEntry')}
           </Button>
         </EmptyState>
       )}
@@ -424,7 +436,7 @@ function CarnetTab({ entries, onAdd, onRemove }) {
                     type="button"
                     className="icon-btn"
                     onClick={() => onRemove(entry.id)}
-                    aria-label={`Supprimer la prise du ${entry.date}`}
+                    aria-label={t('account.log.removeEntryAria', { date: entry.date })}
                     style={{ width: 28, height: 28 }}
                   >
                     <Icon name="trash" size={14} />
@@ -460,6 +472,7 @@ function CarnetTab({ entries, onAdd, onRemove }) {
 }
 
 function ProfileForm({ user, onSubmit }) {
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState(user.firstName ?? '');
   const [lastName, setLastName] = useState(user.lastName ?? '');
   const [phone, setPhone] = useState(user.phone ?? '');
@@ -485,18 +498,18 @@ function ProfileForm({ user, onSubmit }) {
     });
     setSaving(false);
     if (result.ok) {
-      setFeedback({ kind: 'ok', message: 'Profil mis à jour.' });
+      setFeedback({ kind: 'ok', message: t('account.profile.updated') });
     } else {
-      setFeedback({ kind: 'error', message: result.error ?? 'Échec de la mise à jour.' });
+      setFeedback({ kind: 'error', message: result.error ?? t('account.profile.updateFailed') });
     }
   };
 
   return (
     <form onSubmit={submit} className="card stack-md" style={{ padding: 'var(--sp-5)' }} noValidate>
-      <div className="eyebrow">Mes informations</div>
+      <div className="eyebrow">{t('account.profile.myInfo')}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-3)' }}>
         <div className="field">
-          <label>Prénom<span className="req">*</span></label>
+          <label>{t('account.profile.firstName')}<span className="req">*</span></label>
           <input
             className="input"
             value={firstName}
@@ -505,7 +518,7 @@ function ProfileForm({ user, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Nom<span className="req">*</span></label>
+          <label>{t('account.profile.lastName')}<span className="req">*</span></label>
           <input
             className="input"
             value={lastName}
@@ -515,37 +528,37 @@ function ProfileForm({ user, onSubmit }) {
         </div>
       </div>
       <div className="field">
-        <label>Email</label>
+        <label>{t('account.profile.email')}</label>
         <input className="input mono" value={user.email} disabled />
-        <div className="hint">L'email de connexion ne peut pas être modifié depuis cette page.</div>
+        <div className="hint">{t('account.profile.emailHint')}</div>
       </div>
       <div className="field">
-        <label>Téléphone</label>
+        <label>{t('account.profile.phone')}</label>
         <input
           className="input"
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="06 12 34 56 78"
+          placeholder={t('account.profile.phonePlaceholder')}
         />
       </div>
       <div className="eyebrow" style={{ marginTop: 'var(--sp-3)' }}>
-        Adresse de livraison par défaut
+        {t('account.profile.defaultAddress')}
       </div>
       <div className="field">
-        <label>Adresse</label>
+        <label>{t('account.profile.addressLine')}</label>
         <input
           className="input"
           value={addressLine}
           onChange={(e) => setAddressLine(e.target.value)}
-          placeholder="14 rue des Arènes"
+          placeholder={t('account.profile.addressPlaceholder')}
         />
       </div>
       <div
         style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 'var(--sp-3)' }}
       >
         <div className="field">
-          <label>Code postal</label>
+          <label>{t('account.profile.postalCode')}</label>
           <input
             className="input"
             value={postalCode}
@@ -553,7 +566,7 @@ function ProfileForm({ user, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Ville</label>
+          <label>{t('account.profile.city')}</label>
           <input
             className="input"
             value={city}
@@ -561,7 +574,7 @@ function ProfileForm({ user, onSubmit }) {
           />
         </div>
         <div className="field">
-          <label>Pays</label>
+          <label>{t('account.profile.country')}</label>
           <input
             className="input"
             value={country}
@@ -575,7 +588,7 @@ function ProfileForm({ user, onSubmit }) {
       {feedback.kind === 'error' && <div className="error">{feedback.message}</div>}
       <div>
         <Button variant="primary" type="submit" disabled={saving}>
-          {saving ? 'Enregistrement…' : 'Enregistrer'}
+          {saving ? t('account.profile.saving') : t('common.save')}
         </Button>
       </div>
     </form>
@@ -583,16 +596,17 @@ function ProfileForm({ user, onSubmit }) {
 }
 
 function SettingsTab({ user, onLogout, onSubmit }) {
+  const { t } = useTranslation();
   return (
     <div className="stack-lg">
       <ProfileForm user={user} onSubmit={onSubmit} />
       <GdprPanel onLogout={onLogout} />
       <div className="card" style={{ padding: 'var(--sp-5)' }}>
         <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-          Session
+          {t('account.session.title')}
         </div>
         <Button variant="ghost" onClick={onLogout}>
-          Se déconnecter
+          {t('account.settings.logout')}
         </Button>
       </div>
     </div>
@@ -600,6 +614,7 @@ function SettingsTab({ user, onLogout, onSubmit }) {
 }
 
 function GdprPanel({ onLogout }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const { push } = useToast();
   const [exporting, setExporting] = useState(false);
@@ -611,9 +626,9 @@ function GdprPanel({ onLogout }) {
     setExporting(true);
     try {
       await downloadGdprExport(token);
-      push('Export téléchargé — conformité RGPD.');
+      push(t('account.gdpr.exportDone'));
     } catch (err) {
-      push(err?.message ?? 'Export impossible.');
+      push(err?.message ?? t('account.gdpr.exportFailed'));
     } finally {
       setExporting(false);
     }
@@ -621,16 +636,16 @@ function GdprPanel({ onLogout }) {
 
   const handleDelete = async () => {
     if (confirmText !== 'SUPPRIMER') {
-      push('Tapez SUPPRIMER pour confirmer.');
+      push(t('account.gdpr.confirmHint'));
       return;
     }
     setDeleting(true);
     try {
       await deleteAccount(token);
-      push('Compte anonymisé — vous êtes déconnecté.');
+      push(t('account.gdpr.deleteDone'));
       onLogout();
     } catch (err) {
-      push(err?.message ?? 'Suppression impossible.');
+      push(err?.message ?? t('account.gdpr.deleteFailed'));
     } finally {
       setDeleting(false);
       setConfirmOpen(false);
@@ -640,7 +655,7 @@ function GdprPanel({ onLogout }) {
   return (
     <div className="card" style={{ padding: 'var(--sp-5)' }}>
       <div className="eyebrow" style={{ marginBottom: 'var(--sp-3)' }}>
-        Données personnelles · RGPD
+        {t('account.gdpr.sectionTitle')}
       </div>
 
       <div
@@ -656,16 +671,15 @@ function GdprPanel({ onLogout }) {
       >
         <div>
           <div style={{ fontWeight: 500, marginBottom: 'var(--sp-1)' }}>
-            Télécharger mes données
+            {t('account.gdpr.downloadTitle')}
           </div>
           <p className="soft" style={{ margin: 0, fontSize: 'var(--fs-13)' }}>
-            Export JSON complet : profil, commandes, permis, inscriptions concours,
-            carnet, favoris, avis, alertes stock.
+            {t('account.gdpr.downloadBody')}
           </p>
         </div>
         <Button variant="ghost" onClick={handleExport} disabled={exporting}>
           <Icon name="download" size={14} />
-          {exporting ? 'Préparation…' : 'Exporter'}
+          {exporting ? t('account.gdpr.preparing') : t('account.gdpr.exportCta')}
         </Button>
       </div>
 
@@ -677,16 +691,15 @@ function GdprPanel({ onLogout }) {
             color: 'var(--err)',
           }}
         >
-          Supprimer mon compte
+          {t('account.gdpr.deleteTitle')}
         </div>
         <p className="soft" style={{ margin: '0 0 var(--sp-3)', fontSize: 'var(--fs-13)' }}>
-          Anonymise vos données. Les commandes restent conservées 10 ans pour
-          obligation fiscale mais sont détachées de votre identité.{' '}
-          <strong>Action irréversible.</strong>
+          {t('account.gdpr.deleteBody')}{' '}
+          <strong>{t('account.gdpr.irreversible')}</strong>
         </p>
         {!confirmOpen ? (
           <Button variant="ghost" onClick={() => setConfirmOpen(true)}>
-            Supprimer mon compte
+            {t('account.gdpr.deleteTitle')}
           </Button>
         ) : (
           <div
@@ -699,7 +712,7 @@ function GdprPanel({ onLogout }) {
             }}
           >
             <p style={{ margin: 0, fontSize: 'var(--fs-13)' }}>
-              Tapez <span className="mono">SUPPRIMER</span> pour confirmer.
+              {t('account.gdpr.typeToConfirm')} <span className="mono">SUPPRIMER</span> {t('account.gdpr.toConfirm')}.
             </p>
             <input
               className="input mono"
@@ -718,7 +731,7 @@ function GdprPanel({ onLogout }) {
                 }}
                 disabled={deleting}
               >
-                Annuler
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="accent"
@@ -726,7 +739,7 @@ function GdprPanel({ onLogout }) {
                 onClick={handleDelete}
                 disabled={deleting || confirmText !== 'SUPPRIMER'}
               >
-                {deleting ? 'Suppression…' : 'Supprimer définitivement'}
+                {deleting ? t('account.gdpr.deleting') : t('account.gdpr.deleteFinal')}
               </Button>
             </div>
           </div>
@@ -737,23 +750,24 @@ function GdprPanel({ onLogout }) {
 }
 
 function FavorisTab({ onShop }) {
+  const { t } = useTranslation();
   const { productIds, loading } = useWishlist();
   const { products } = useProducts();
   const favorites = products.filter((p) => productIds.has(p.id));
 
   if (loading) {
-    return <p className="soft">Chargement de vos favoris…</p>;
+    return <p className="soft">{t('account.favorites.loading')}</p>;
   }
 
   if (favorites.length === 0) {
     return (
       <EmptyState
         illus="heart"
-        title="Aucun favori pour l'instant."
-        description="Cliquez sur le cœur d'un produit pour le retrouver ici."
+        title={t('account.favorites.emptyTitle')}
+        description={t('account.favorites.emptyDescription')}
       >
         <Button variant="primary" onClick={onShop}>
-          Parcourir la boutique
+          {t('placeholder.browseShop')}
         </Button>
       </EmptyState>
     );
@@ -769,16 +783,17 @@ function FavorisTab({ onShop }) {
 }
 
 function AddressesTab({ user, onGoSettings }) {
+  const { t } = useTranslation();
   const hasAddress = user.addressLine && user.city;
   if (!hasAddress) {
     return (
       <EmptyState
         illus="box"
-        title="Aucune adresse enregistrée."
-        description="Ajoutez votre adresse de livraison depuis la section Paramètres pour gagner du temps au checkout."
+        title={t('account.addresses.emptyTitle')}
+        description={t('account.addresses.emptyDescription')}
       >
         <Button variant="primary" onClick={onGoSettings}>
-          Renseigner mon adresse
+          {t('account.addresses.addCta')}
         </Button>
       </EmptyState>
     );
@@ -789,7 +804,7 @@ function AddressesTab({ user, onGoSettings }) {
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
             <div className="eyebrow" style={{ marginBottom: 'var(--sp-2)' }}>
-              Adresse de livraison
+              {t('account.addresses.shippingAddress')}
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--fs-20)', fontWeight: 500 }}>
               {user.firstName} {user.lastName}
@@ -807,12 +822,12 @@ function AddressesTab({ user, onGoSettings }) {
             </div>
             {user.phone && (
               <div className="mono soft" style={{ marginTop: 'var(--sp-2)' }}>
-                Tel : {user.phone}
+                {t('account.addresses.tel')} : {user.phone}
               </div>
             )}
           </div>
           <Button variant="ghost" onClick={onGoSettings}>
-            Modifier
+            {t('common.edit')}
           </Button>
         </div>
       </div>
@@ -836,13 +851,13 @@ export function AccountPage() {
   // Initial tab depuis le hash (deep linking footer → /compte#carnet).
   // Si le hash n'est pas un tab valide, fallback sur "apercu".
   const hashTab = hash?.slice(1);
-  const initialTab = TABS.some((t) => t.id === hashTab) ? hashTab : 'apercu';
+  const initialTab = TAB_DEFS.some((tb) => tb.id === hashTab) ? hashTab : 'apercu';
   const [tab, setTab] = useState(initialTab);
 
   // Quand l'utilisateur navigue avec le bouton retour/avant du navigateur,
   // le hash change mais on était déjà sur /compte → resynchronise.
   useEffect(() => {
-    if (hashTab && TABS.some((t) => t.id === hashTab) && hashTab !== tab) {
+    if (hashTab && TAB_DEFS.some((tb) => tb.id === hashTab) && hashTab !== tab) {
       setTab(hashTab);
     }
   }, [hashTab]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -853,6 +868,9 @@ export function AccountPage() {
     logout();
     navigate('/');
   };
+
+  const tabs = useTabs();
+  const { t: tt } = useTranslation();
 
   return (
     <div className="page">
@@ -866,20 +884,20 @@ export function AccountPage() {
             margin: '0 0 var(--sp-8)',
           }}
         >
-          Bonjour, {user.firstName}
+          {tt('account.greeting', { name: user.firstName })}
         </h1>
 
         <div className="account-layout">
-          <nav className="account-nav" aria-label="Navigation compte">
-            {TABS.map((t) => (
+          <nav className="account-nav" aria-label={tt('account.navAria')}>
+            {tabs.map((tb) => (
               <button
-                key={t.id}
+                key={tb.id}
                 type="button"
-                className={tab === t.id ? 'active' : ''}
-                onClick={() => setTab(t.id)}
+                className={tab === tb.id ? 'active' : ''}
+                onClick={() => setTab(tb.id)}
               >
-                {t.icon && <SectionIcon name={t.icon} />}
-                {t.label}
+                {tb.icon && <SectionIcon name={tb.icon} />}
+                {tb.label}
               </button>
             ))}
           </nav>
