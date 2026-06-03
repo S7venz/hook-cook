@@ -59,6 +59,13 @@ class JwtService {
                 .compact()
     }
 
+    // Volontairement résilient : un JWT mal formé, une signature invalide,
+    // un secret rotaté, ou même une exception interne JJWT ne doit jamais
+    // crasher la chaîne d'authentification — on retourne null et le
+    // contrôleur appelant traduit ça en 401. catch(Throwable) couvre aussi
+    // les Error (StackOverflow, OutOfMemory issus du parsing) pour la même
+    // raison.
+    @SuppressWarnings(['CatchThrowable', 'ReturnNullFromCatchBlock'])
     Claims parse(String token) {
         try {
             return Jwts.parser()

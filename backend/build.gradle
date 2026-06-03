@@ -17,6 +17,7 @@ apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
 apply plugin:"jacoco"
+apply plugin:"codenarc"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
 
@@ -120,4 +121,32 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
+}
+
+// CodeNarc — analyse statique du code Groovy.
+// Lancer : `./gradlew codenarcMain`
+// Rapport HTML : build/reports/codenarc/main.html (consultable au navigateur)
+//
+// Les violations ne bloquent pas le build (ignoreFailures = true) : le but
+// est de produire un rapport consulté avant chaque release et avant de
+// commiter du code sensible (services métier, accès BDD, sécurité).
+codenarc {
+    toolVersion = '3.5.0'
+    configFile = file("$projectDir/config/codenarc/ruleset.groovy")
+    ignoreFailures = true
+    reportFormat = 'html'
+}
+
+codenarcMain {
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+// Pas d'analyse sur le code de test — les specs Spock utilisent des
+// patterns volontairement différents (given:/when:/then: labels, méthodes
+// nommées avec des espaces, etc.) qui généreraient du bruit.
+tasks.matching { it.name in ['codenarcTest', 'codenarcIntegrationTest'] }.configureEach {
+    enabled = false
 }

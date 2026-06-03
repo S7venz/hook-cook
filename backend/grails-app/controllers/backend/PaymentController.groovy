@@ -30,6 +30,12 @@ class PaymentController {
     ContestRegistrationService contestRegistrationService
     WebhookIdempotencyService webhookIdempotencyService
 
+    // Les `return` dans les catch blocks sont l'idiome Grails standard
+    // pour court-circuiter une action après avoir écrit la réponse HTTP
+    // (cf. response.status + render() qui les précèdent). La règle CodeNarc
+    // est trop pessimiste ici — aucun appelant ne consomme la valeur de
+    // retour d'une action de contrôleur.
+    @SuppressWarnings('ReturnNullFromCatchBlock')
     def webhook() {
         String sigHeader = request.getHeader('Stripe-Signature')
         if (!sigHeader) {

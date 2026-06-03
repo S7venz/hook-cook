@@ -24,6 +24,10 @@ class UploadController {
         dir
     }
 
+    // Le `return` après response.status / render() est l'idiome Grails
+    // pour court-circuiter l'action — la valeur de retour n'est jamais
+    // consommée par le moteur de contrôleurs.
+    @SuppressWarnings('ReturnNullFromCatchBlock')
     def upload() {
         Map check = authService.userFromRequest(request)
         if (!check.user) {
@@ -57,7 +61,7 @@ class UploadController {
         file.inputStream.withStream { stream ->
             read = stream.read(head)
         }
-        if (read < 4 || !isKnownImageSignature(head, ext)) {
+        if (read < 4 || !isKnownImageSignature(head)) {
             response.status = 415
             render([error: 'Le contenu du fichier ne correspond pas à une image valide.'] as JSON)
             return
@@ -138,7 +142,7 @@ class UploadController {
      * dont le contenu ne commence pas par une en-tête d'image valide,
      * même si l'extension semble OK. Couvre JPEG, PNG, GIF, WebP, AVIF.
      */
-    private static boolean isKnownImageSignature(byte[] h, String ext) {
+    private static boolean isKnownImageSignature(byte[] h) {
         if (h.length < 4) return false
         // JPEG : FF D8 FF
         if (h[0] == (byte) 0xFF && h[1] == (byte) 0xD8 && h[2] == (byte) 0xFF) return true

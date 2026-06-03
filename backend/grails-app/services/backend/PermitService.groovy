@@ -1,7 +1,6 @@
 package backend
 
 import grails.gorm.transactions.Transactional
-import groovy.json.JsonOutput
 
 import java.time.Instant
 import java.time.ZoneId
@@ -20,7 +19,7 @@ class PermitService {
         "FR-2026-${suffix}"
     }
 
-    private static DateTimeFormatter FMT = DateTimeFormatter
+    private static final DateTimeFormatter FMT = DateTimeFormatter
             .ofPattern('dd/MM/yyyy HH:mm').withZone(ZoneId.systemDefault())
 
     private static List<Map> pendingPaymentHistory(Instant now) {

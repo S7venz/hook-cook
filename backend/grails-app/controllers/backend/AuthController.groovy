@@ -95,10 +95,10 @@ class AuthController {
     }
 
     private Map userPayload(User user, String token) {
-        Map user_data = user.toApiMap()
+        Map userData = user.toApiMap()
         if (token) {
-            return [user: user_data, token: token]
+            return [user: userData, token: token]
         }
-        [user: user_data]
+        [user: userData]
     }
 }

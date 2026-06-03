@@ -37,12 +37,23 @@ jobs:
         working-directory: backend
         run: ./gradlew --no-daemon test jacocoTestReport --console=plain
 
+      - name: Run CodeNarc (analyse statique Groovy)
+        working-directory: backend
+        run: ./gradlew --no-daemon codenarcMain --console=plain
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
           path: backend/build/reports/jacoco/test/
+
+      - name: Upload CodeNarc report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-codenarc
+          path: backend/build/reports/codenarc/
 
   frontend:
     name: Frontend (Vite / Vitest)
