@@ -101,6 +101,7 @@ plugins:
             Accueil: Home
             Architecture: Architecture
             Vue d'ensemble: Overview
+            Modélisation UML: UML modeling
             API REST: REST API
             Référence: Reference
             Données: Data
@@ -112,6 +113,10 @@ plugins:
             Plan de tests: Test plan
             Veille technologique et sécurité: Tech watch and security
             "Audits (RGAA + perf + éco-conception)": "Audits (a11y + perf + eco-design)"
+            Sécurité: Security
+            "Spécifications de sécurité": "Security specifications"
+            Déploiement: Deployment
+            "Procédure de déploiement": "Deployment procedure"
   - glightbox:
       touchNavigation: true
       loop: false
@@ -175,6 +180,7 @@ nav:
   - Accueil: index.md
   - Architecture:
     - Vue d'ensemble: ARCHITECTURE.md
+    - Modélisation UML: MODELISATION.md
   - API REST:
     - Référence: API.md
   - Données:
@@ -186,3 +192,7 @@ nav:
     - Plan de tests: PLAN-TESTS.md
     - Veille technologique et sécurité: VEILLE.md
     - Audits (RGAA + perf + éco-conception): AUDITS.md
+  - Sécurité:
+    - Spécifications de sécurité: SECURITE.md
+  - Déploiement:
+    - Procédure de déploiement: DEPLOIEMENT.md

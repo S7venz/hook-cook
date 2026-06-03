@@ -335,11 +335,28 @@ Le filtre complet Spring Security (`SecurityFilterChain`) n'est pas en place —
 
 ## Documentation
 
-- [docs/API.md](docs/API.md) — documentation API exhaustive (16 sections, tous endpoints + payloads + codes d'erreur)
-- [docs/ERD.md](docs/ERD.md) — diagramme entité-relation (Mermaid rendu par GitHub)
+> Le site complet est aussi publié sur **GitHub Pages** : <https://s7venz.github.io/hook-cook/>
+
+### Architecture et modélisation
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — multicouche, polyglot persistence SQL+NoSQL, DICP par couche, éco-conception
+- [docs/MODELISATION.md](docs/MODELISATION.md) — **4 diagrammes UML** : cas d'utilisation, séquences (commande Stripe + workflow permis), composants Docker
+- [docs/ERD.md](docs/ERD.md) — diagramme entité-relation (Mermaid)
+
+### Spécifications et sécurité
+- [docs/SECURITE.md](docs/SECURITE.md) — **spécifications de sécurité consolidées** : OWASP Top 10 2021 point-par-point, DICP par couche, mesures RGPD, modèle de menace
+- [docs/VEILLE.md](docs/VEILLE.md) — veille technologique et sécurité (sources, automatisations, corrections appliquées)
+
+### API et données
+- [docs/API.md](docs/API.md) — documentation API exhaustive (17 sections, tous endpoints + payloads + codes d'erreur)
+
+### Tests et qualité
+- [docs/PLAN-TESTS.md](docs/PLAN-TESTS.md) — **7 types de tests** (unitaires Spock+Vitest, intégration, non-régression, E2E Playwright, charge k6, sécurité ZAP, recette signée) + jeu d'essai détaillé pour la commande Stripe
+- [docs/AUDITS.md](docs/AUDITS.md) — audits Lighthouse + Pa11y RGAA + Ecoindex sur 5 pages clés
+
+### Exploitation
+- [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md) — **procédure de mise en production** complète : serveur, DNS, TLS, Stripe live, backups, rollback, maintenance
 - [docs/GUIDE-UTILISATEUR.md](docs/GUIDE-UTILISATEUR.md) — manuel client (compte, achat, permis, concours, carnet, RGPD, reset mdp)
 - [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — manuel admin (produits, stats, exports CSV, permis, concours, seed démo, sécurité)
-- [docs/cahier-des-charges.md](docs/cahier-des-charges.md) — spécifications fonctionnelles du projet
 
 ## Tests
 
@@ -352,9 +369,17 @@ cd backend
 ./gradlew test
 ```
 
-Tests fournis dans `backend/src/test/groovy/backend/` :
-- `AuthServiceSpec` — register, login, BCrypt, validation
-- `JwtServiceSpec` — issue + parse roundtrip, signature invalide, token malformé
+Tests fournis dans `backend/src/test/groovy/backend/` (~18 specs Spock, voir [`docs/PLAN-TESTS.md`](docs/PLAN-TESTS.md) pour le détail).
+
+### Qualité de code — CodeNarc (analyse statique Groovy)
+
+```bash
+cd backend
+./gradlew codenarcMain
+# rapport HTML : build/reports/codenarc/main.html
+```
+
+Configuration dans `backend/config/codenarc/ruleset.groovy` — focus bugs probables (priorité 1-2), sécurité, imports et concurrence. Le rapport est aussi produit automatiquement par la CI et téléchargeable comme artifact `backend-codenarc`.
 
 ## Scripts utiles
 
