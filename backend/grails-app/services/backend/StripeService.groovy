@@ -54,21 +54,7 @@ class StripeService {
         if (!isConfigured()) {
             throw new IllegalStateException('Stripe non configuré.')
         }
-        long amountInCents = amount.multiply(BigDecimal.valueOf(100)).longValue()
-
-        PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
-                .setAmount(amountInCents)
-                .setCurrency(currency)
-                .setAutomaticPaymentMethods(
-                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                .setEnabled(true)
-                                .build()
-                )
-        metadata?.each { String k, String v ->
-            if (v != null) builder.putMetadata(k, v)
-        }
-
-        PaymentIntent pi = PaymentIntent.create(builder.build())
+        PaymentIntent pi = PaymentIntent.create(buildPaymentIntentParams(amount, metadata))
         [
                 paymentIntentId: pi.id,
                 clientSecret   : pi.clientSecret,
@@ -112,5 +98,25 @@ class StripeService {
         }
         if (!paymentIntentId) return null
         PaymentIntent.retrieve(paymentIntentId)
+    }
+
+    // Construit les paramètres du PaymentIntent : conversion euros -> centimes,
+    // devise, métadonnées. Isolé de l'appel réseau PaymentIntent.create(...) pour
+    // pouvoir vérifier la conversion sans toucher à Stripe.
+    protected PaymentIntentCreateParams buildPaymentIntentParams(BigDecimal amount, Map<String, String> metadata) {
+        long amountInCents = amount.multiply(BigDecimal.valueOf(100)).longValue()
+
+        PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
+                .setAmount(amountInCents)
+                .setCurrency(currency)
+                .setAutomaticPaymentMethods(
+                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                .setEnabled(true)
+                                .build()
+                )
+        metadata?.each { String k, String v ->
+            if (v != null) builder.putMetadata(k, v)
+        }
+        builder.build()
     }
 }
