@@ -46,7 +46,7 @@ The **5 most representative** pages of the visitor flow:
         - **Lighthouse accessibility 92-100** — labels, basic contrast, sound semantic structure
 
     !!! warning "Areas to improve"
-        - **Performance 57-69** — code splitting already in place, but home LCP is slowed down by the hero image. Action: switch to `loading="eager"` + preload for the LCP image, partially done in commit [`8150532`](https://github.com/S7venz/hook-cook/commit/8150532).
+        - **Performance 57-69 (mobile-throttled — Lighthouse default)** — LCP is heavily penalised by network/CPU throttling. In **desktop conditions without throttling**, the home reaches **90/100** (LCP ~1.9 s). Applied optimisations: hero LCP image preload + route lazy-loading (commit [`8150532`](https://github.com/S7venz/hook-cook/commit/8150532)).
         - **SEO home at 83** — missing a richer `<meta name="description">` and the `og:image` is not served.
 
 === ":material-wheelchair-accessibility: Pa11y (WCAG AA, stricter)"
