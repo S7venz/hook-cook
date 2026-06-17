@@ -727,10 +727,7 @@ function LandingView({ onApply, onTrack, hasPermit, types }) {
         <div className="page-container">
           <div
             className="eyebrow"
-            style={{
-              color: 'color-mix(in oklch, var(--bg) 60%, var(--ink))',
-              marginBottom: 'var(--sp-4)',
-            }}
+            style={{ marginBottom: 'var(--sp-4)' }}
           >
             <SectionIcon name="calendar" />{t('permis.landing.eyebrow')}
           </div>
