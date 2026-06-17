@@ -428,7 +428,7 @@ export function ConcoursPage() {
               </div>
             </div>
 
-            <aside style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>
+            <div style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>
               <div
                 className="card"
                 style={{ padding: 'var(--sp-6)', textAlign: 'center' }}
@@ -495,7 +495,7 @@ export function ConcoursPage() {
                   Permis en cours de validité requis
                 </div>
               </div>
-            </aside>
+            </div>
           </div>
         </section>
       </div>

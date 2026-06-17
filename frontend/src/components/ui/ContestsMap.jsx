@@ -76,7 +76,13 @@ export function ContestsMap({ contests = [] }) {
       >
         <TileLayer url={TILE_URL} />
         {pins.map((p) => (
-          <Marker key={p.id} position={[p.coords.lat, p.coords.lng]} icon={icon}>
+          <Marker
+            key={p.id}
+            position={[p.coords.lat, p.coords.lng]}
+            icon={icon}
+            title={p.title}
+            alt={p.title}
+          >
             <Popup>
               <strong>{p.title}</strong>
               <br />

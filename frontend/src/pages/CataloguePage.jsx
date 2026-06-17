@@ -322,7 +322,7 @@ export function CataloguePage() {
             />
           </aside>
 
-          <main className="catalog-main">
+          <div className="catalog-main">
             <div className="catalog-header">
               <div>
                 <h1>{t('catalog.title')}</h1>
@@ -422,7 +422,7 @@ export function CataloguePage() {
                 ))}
               </div>
             )}
-          </main>
+          </div>
         </div>
       </div>
 
