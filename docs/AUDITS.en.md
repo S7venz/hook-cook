@@ -49,26 +49,39 @@ The **5 most representative** pages of the visitor flow:
         - **Performance 57-69** — code splitting already in place, but home LCP is slowed down by the hero image. Action: switch to `loading="eager"` + preload for the LCP image, partially done in commit [`8150532`](https://github.com/S7venz/hook-cook/commit/8150532).
         - **SEO home at 83** — missing a richer `<meta name="description">` and the `og:image` is not served.
 
-=== ":material-wheelchair-accessibility: Pa11y (WCAG 2.0 AA, stricter)"
+=== ":material-wheelchair-accessibility: Pa11y (WCAG AA, stricter)"
 
-    Pa11y / axe-core goes deeper than Lighthouse and applies the
-    **WCAG 2.0 AA** standard (technical equivalent of RGAA 4.1 for web
-    content).
+    Pa11y / axe-core goes deeper than Lighthouse and applies the **WCAG AA**
+    standard (technical equivalent of RGAA 4.1 for web content). Mind how you
+    read its count: it mixes two families.
 
-    | Page | Errors | Warnings | Notices |
-    | --- | :---: | :---: | :---: |
-    | home       | :material-alert:{ style="color:#f44336" } **85** | 0 | 0 |
-    | boutique   | :material-alert:{ style="color:#f44336" } **61** | 0 | 0 |
-    | concours   | :material-alert:{ style="color:#ff9800" } 51 | 0 | 0 |
-    | permis     | :material-alert:{ style="color:#ff9800" } 37 | 0 | 0 |
-    | connexion  | :material-alert:{ style="color:#ff9800" } 30 | 0 | 0 |
+    - the **violations** actually measured (axe `violations`);
+    - the **needs-review** items (axe `incomplete`, which Pa11y still shows as
+      "Error"): text over a product image, over a gradient or under the
+      `mix-blend-mode` background texture, and modern `oklch()` / `color-mix()`
+      colours that axe-core cannot parse. **These are not measured failures.**
 
-    !!! danger "Top 3 error categories (all pages combined)"
-        | Category | Occurrences | Cause | RGAA level |
+    | Page | Real violations | Needs-review |
+    | --- | :---: | :---: |
+    | home       | :material-check-circle:{ style="color:#4caf50" } **0** | ~53 |
+    | boutique   | :material-check-circle:{ style="color:#4caf50" } **0** | ~47 |
+    | concours   | :material-check-circle:{ style="color:#4caf50" } **0** | ~44 |
+    | permis     | :material-check-circle:{ style="color:#4caf50" } **0** | ~34 |
+    | connexion  | :material-check-circle:{ style="color:#4caf50" } **0** | ~27 |
+
+    !!! success "0 real violation, in both light and dark themes"
+        After the fixes described below, an all-rules re-audit (axe
+        `violations`) finds **no** violation on the 5 pages, in both themes.
+        The remaining items are *needs-review* flags inherent to image-rich
+        pages, to be confirmed visually.
+
+    !!! note "What the audit had actually found — now fixed"
+        | Category | Detail | Real cause | RGAA |
         | --- | :---: | --- | :---: |
-        | `color-contrast` | **245** | Light grey text on light background below the 4.5:1 threshold | 10.3 |
-        | `nested-interactive` | 15 | Nested buttons or links (clickable card + favorite button) | 7.1 |
-        | `aria-command-name` | 4 | Icon-only buttons without `aria-label` | 11.2 |
+        | `color-contrast` | 1 token + 1 override | `--ink-mute` (oklch) too dark in dark theme (4.39:1); washed-out Permits heading in light theme (2.56:1) | 3.2 |
+        | `nested-interactive` | 4 | Product cards `role="button"` containing buttons | 7.1 |
+        | `landmark` | 4 | Nested second `<main>`; non-top-level `<aside>` | 12.6 |
+        | `aria-command-name` | 4 | Interactive Leaflet markers without a name | 11.2 |
 
 === ":material-leaf: Eco-design (Ecoindex)"
 
@@ -133,79 +146,57 @@ Tools used:
 
 </div>
 
-## 3. Prioritized action plan
+## 3. Fixes applied
 
-### :material-numeric-1-circle-outline: High priority — Colour contrast
+The audit mainly served to **isolate the real violations** from the
+*needs-review* noise. All were fixed at the root; the re-audit confirms
+**0 violation** on the 5 pages, in both light and dark themes.
 
-!!! danger "245 violations across 5 pages"
-    **RGAA 3.2** criterion (text contrast) — by far the most common defect
-    and the easiest to fix.
+### :material-numeric-1-circle-outline: Text contrast (RGAA 3.2)
 
-**Root cause**: the theme palette uses **light grey `#bdbdbd`** for
-secondary text (product subtitles, metadata, form hints). On a white
-background the ratio is **2.8:1**, below the WCAG AA threshold (4.5:1).
+**Real cause**: secondary text uses the `--ink-mute` token, defined in `oklch`
+in `frontend/src/styles/tokens.css` (the project does not use Tailwind). In
+**dark** theme, `oklch(0.60 …)` came out at **4.39:1** on the panels; and a
+heading on the Permits page, in **light** theme, at **2.56:1** (an overly
+washed-out `color-mix`).
 
-**Proposed fix**:
+**Fix**:
 ```css
-/* Before — frontend tailwind config */
---color-text-muted: #bdbdbd;   /* 2.8:1 — KO */
-
-/* After */
---color-text-muted: #595959;   /* 7.0:1 — OK AA + AAA */
+/* tokens.css — dark theme: lighten the secondary text */
+--ink-mute: oklch(0.70 0.015 85);   /* 4.39:1 → 6.5:1 — AA OK */
 ```
 
-Estimated effort: ~1 h (single variable swap + visual review).
+Plus removal, on the Permits heading, of the
+`color-mix(in oklch, var(--bg) 60%, var(--ink))` override: the element falls
+back to `--ink-mute`, AA-compliant in both themes.
 
 ---
 
-### :material-numeric-2-circle-outline: Medium priority — Home performance
+### :material-numeric-2-circle-outline: Nested interactive controls (RGAA 7.1)
 
-**Cause**: LCP delayed by the `peche-3000.webp` hero image (~180 KB) loaded
-without preload.
-
-**Proposed fix**:
-```html
-<!-- frontend/index.html — added to <head> -->
-<link rel="preload" as="image" href="/img/hero.webp"
-      fetchpriority="high" type="image/webp">
-```
-
-Estimated gain: ~15 Performance points (LCP -1.2 s on fast 3G).
+Product cards were `role="button"` elements that themselves contained buttons
+(favorite, add-to-cart). Reworked using the **stretched-link** pattern: the
+card is no longer a button, its title becomes a real link whose `::after`
+covers the whole surface, and the buttons remain separately focusable.
 
 ---
 
-### :material-numeric-3-circle-outline: Low priority — Icon-only buttons
+### :material-numeric-3-circle-outline: Page landmarks (RGAA 12.6)
 
-**Cause**: 4 buttons (favorites, share, close-modal) have no accessible
-label. A screen reader will simply say "button" without context.
-
-**Proposed fix**:
-```jsx
-// Before
-<button onClick={toggleFav}><HeartIcon /></button>
-
-// After
-<button onClick={toggleFav} aria-label="Add to favorites">
-  <HeartIcon />
-</button>
-```
-
-Estimated effort: 30 min.
+A nested second `<main>` (catalogue) and a non-top-level `<aside>` (contests),
+brought back to plain `<div>`s: one `<main>` per page, consistent landmarks for
+screen readers.
 
 ---
 
-### :material-numeric-4-circle-outline: Low priority — Home SEO
+### :material-numeric-4-circle-outline: Accessible marker names (RGAA 11.2)
 
-Additions in `frontend/index.html`:
+The Leaflet markers on the contests map, interactive but anonymous, now carry
+the contest name via the `title` / `alt` attributes.
 
-```html
-<meta name="description" content="Hook & Cook — fishing shop, permits and contests in Perpignan...">
-<meta property="og:title" content="Hook & Cook">
-<meta property="og:description" content="...">
-<meta property="og:image" content="/img/og-cover.jpg">
-```
-
-Estimated effort: 15 min.
+!!! tip "Remaining item — SEO (outside accessibility)"
+    Home SEO stays at **83/100**: per-page meta descriptions, JSON-LD structured
+    data and a sitemap are the identified levers.
 
 ## 4. Detailed reports (interactive HTML)
 
@@ -278,8 +269,9 @@ site, copy them into `docs/audits/` and `git push`.
 ---
 
 <small>
-*Audits run on 2026-05-26 against the local development environment
-(Docker Compose). Scores will vary slightly depending on network latency
-and system load — re-run the script for up-to-date figures before the
-defence.*
+*Initial audits run on 2026-05-26 against the local environment (Docker
+Compose). Accessibility re-audit after fixes: **0 real violation** (axe
+`violations`, all rules) on the 5 pages, in both light and dark themes.
+Performance scores vary slightly with network latency and system load —
+re-run the script for up-to-date figures before the defence.*
 </small>

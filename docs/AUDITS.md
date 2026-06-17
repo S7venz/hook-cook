@@ -48,26 +48,40 @@ Les **5 pages les plus représentatives** du parcours visiteur :
         - **Performance 57-69** — code splitting déjà en place, mais le LCP de la home est ralenti par les images hero. Action : passage en `loading="eager"` + preload pour l'image LCP, déjà partiellement fait dans le commit [`8150532`](https://github.com/S7venz/hook-cook/commit/8150532).
         - **SEO home à 83** — il manque une `<meta name="description">` plus riche et le `og:image` n'est pas servi.
 
-=== ":material-wheelchair-accessibility: Pa11y (WCAG 2.0 AA, plus strict)"
+=== ":material-wheelchair-accessibility: Pa11y (WCAG AA, plus strict)"
 
     Pa11y / axe-core descend plus profond que Lighthouse et applique le standard
-    **WCAG 2.0 niveau AA** (équivalent technique du RGAA 4.1 pour les contenus
-    web).
+    **WCAG niveau AA** (équivalent technique du RGAA 4.1 pour le web). Attention
+    à la lecture de son décompte, qui mélange deux familles :
 
-    | Page | Erreurs | Warnings | Notices |
-    | --- | :---: | :---: | :---: |
-    | home       | :material-alert:{ style="color:#f44336" } **85** | 0 | 0 |
-    | boutique   | :material-alert:{ style="color:#f44336" } **61** | 0 | 0 |
-    | concours   | :material-alert:{ style="color:#ff9800" } 51 | 0 | 0 |
-    | permis     | :material-alert:{ style="color:#ff9800" } 37 | 0 | 0 |
-    | connexion  | :material-alert:{ style="color:#ff9800" } 30 | 0 | 0 |
+    - les **violations** réellement mesurées (axe `violations`) ;
+    - les items **à vérifier manuellement** (axe `incomplete`, que Pa11y affiche
+      tout de même comme « Error ») : texte sur image produit, sur dégradé ou
+      sous la texture de fond en `mix-blend-mode`, et couleurs `oklch()` /
+      `color-mix()` qu'axe-core ne sait pas interpréter. **Ce ne sont pas des
+      échecs mesurés.**
 
-    !!! danger "Top 3 catégories d'erreurs (cumul toutes pages)"
-        | Catégorie | Occurrences | Cause | Niveau RGAA |
+    | Page | Violations réelles | À vérifier (needs-review) |
+    | --- | :---: | :---: |
+    | home       | :material-check-circle:{ style="color:#4caf50" } **0** | ~53 |
+    | boutique   | :material-check-circle:{ style="color:#4caf50" } **0** | ~47 |
+    | concours   | :material-check-circle:{ style="color:#4caf50" } **0** | ~44 |
+    | permis     | :material-check-circle:{ style="color:#4caf50" } **0** | ~34 |
+    | connexion  | :material-check-circle:{ style="color:#4caf50" } **0** | ~27 |
+
+    !!! success "0 violation réelle, en thème clair comme sombre"
+        Après les corrections décrites plus bas, un ré-audit toutes règles
+        (axe `violations`) ne relève **aucune** violation sur les 5 pages, dans
+        les deux thèmes. Les items restants sont des *needs-review* inhérents
+        aux pages riches en images, à confirmer visuellement.
+
+    !!! note "Ce que l'audit avait réellement détecté — et qui est corrigé"
+        | Catégorie | Détail | Cause réelle | RGAA |
         | --- | :---: | --- | :---: |
-        | `color-contrast` | **245** | Texte gris clair sur fond clair sous le seuil 4.5:1 | 10.3 |
-        | `nested-interactive` | 15 | Boutons ou liens imbriqués (card cliquable + bouton favoris) | 7.1 |
-        | `aria-command-name` | 4 | Boutons icône-only sans `aria-label` | 11.2 |
+        | `color-contrast` | 1 token + 1 override | `--ink-mute` (oklch) trop sombre en thème sombre (4,39:1) ; intitulé Permis délavé en clair (2,56:1) | 3.2 |
+        | `nested-interactive` | 4 | Cartes produit `role="button"` contenant des boutons | 7.1 |
+        | `landmark` | 4 | Second `<main>` imbriqué ; `<aside>` non racine | 12.6 |
+        | `aria-command-name` | 4 | Marqueurs Leaflet interactifs sans nom | 11.2 |
 
 === ":material-leaf: Éco-conception (Ecoindex)"
 
@@ -132,79 +146,57 @@ Outils utilisés :
 
 </div>
 
-## 3. Plan d'action priorisé
+## 3. Corrections appliquées
 
-### :material-numeric-1-circle-outline: Priorité haute — Contraste de couleurs
+L'audit a surtout servi à **isoler les vraies violations** du bruit
+*needs-review*. Toutes ont été corrigées à la racine ; le ré-audit confirme
+**0 violation** sur les 5 pages, en thème clair comme sombre.
 
-!!! danger "245 violations sur 5 pages"
-    Critère **RGAA 3.2** (contraste des textes) — c'est de loin le défaut le
-    plus présent et le plus simple à corriger.
+### :material-numeric-1-circle-outline: Contraste des textes (RGAA 3.2)
 
-**Cause racine** : la palette du thème utilise du **gris clair `#bdbdbd`** pour
-les textes secondaires (sous-titres produit, méta-données, hints de formulaire).
-Sur fond blanc, le ratio est de **2.8:1**, en-dessous du seuil WCAG AA (4.5:1).
+**Cause réelle** : le texte secondaire utilise le token `--ink-mute`, défini en
+`oklch` dans `frontend/src/styles/tokens.css` (le projet n'utilise pas Tailwind).
+En thème **sombre**, `oklch(0.60 …)` ressortait à **4,39:1** sur les encarts ; et
+un intitulé de la page Permis, en thème **clair**, à **2,56:1** (un `color-mix`
+trop délavé).
 
-**Correction proposée** :
+**Correction** :
 ```css
-/* Avant — frontend tailwind config */
---color-text-muted: #bdbdbd;   /* 2.8:1 — KO */
-
-/* Après */
---color-text-muted: #595959;   /* 7.0:1 — OK AA + AAA */
+/* tokens.css — thème sombre : on éclaircit le texte secondaire */
+--ink-mute: oklch(0.70 0.015 85);   /* 4,39:1 → 6,5:1 — AA OK */
 ```
 
-Effort estimé : ~1h (changement variable + revue visuelle).
+Et suppression, sur l'intitulé Permis, de l'override
+`color-mix(in oklch, var(--bg) 60%, var(--ink))` : l'élément reprend `--ink-mute`,
+conforme AA dans les deux thèmes.
 
 ---
 
-### :material-numeric-2-circle-outline: Priorité moyenne — Performance home
+### :material-numeric-2-circle-outline: Contrôles interactifs imbriqués (RGAA 7.1)
 
-**Cause** : LCP retardé par l'image hero `peche-3000.webp` (~180 KB) chargée
-sans preload.
-
-**Correction proposée** :
-```html
-<!-- frontend/index.html — ajout en <head> -->
-<link rel="preload" as="image" href="/img/hero.webp"
-      fetchpriority="high" type="image/webp">
-```
-
-Gain estimé : ~15 points sur la Performance (LCP -1.2s sur fast 3G).
+Les cartes produit étaient des `role="button"` contenant elles-mêmes des boutons
+(favori, ajout au panier). Refonte selon le motif du **lien étiré** : la carte
+n'est plus un bouton, son titre devient un vrai lien dont un `::after` couvre
+toute la surface, et les boutons restent focusables séparément.
 
 ---
 
-### :material-numeric-3-circle-outline: Priorité basse — Boutons icône-only
+### :material-numeric-3-circle-outline: Repères de page — landmarks (RGAA 12.6)
 
-**Cause** : 4 boutons (favoris, share, close-modal) n'ont pas de label
-accessible. Une lecteur d'écran lit "bouton" sans contexte.
-
-**Correction proposée** :
-```jsx
-// Avant
-<button onClick={toggleFav}><HeartIcon /></button>
-
-// Après
-<button onClick={toggleFav} aria-label="Ajouter aux favoris">
-  <HeartIcon />
-</button>
-```
-
-Effort estimé : 30 min.
+Un second `<main>` imbriqué (catalogue) et un `<aside>` non racine (concours),
+ramenés à de simples `<div>` : un seul `<main>` par page, repères cohérents pour
+les lecteurs d'écran.
 
 ---
 
-### :material-numeric-4-circle-outline: Priorité basse — SEO home
+### :material-numeric-4-circle-outline: Nom accessible des marqueurs (RGAA 11.2)
 
-Ajouts dans `frontend/index.html` :
+Les marqueurs Leaflet de la carte des concours, interactifs mais anonymes,
+portent désormais le nom du concours via les attributs `title` / `alt`.
 
-```html
-<meta name="description" content="Hook & Cook — boutique de pêche, permis et concours à Perpignan...">
-<meta property="og:title" content="Hook & Cook">
-<meta property="og:description" content="...">
-<meta property="og:image" content="/img/og-cover.jpg">
-```
-
-Effort estimé : 15 min.
+!!! tip "Axe restant — SEO (hors accessibilité)"
+    Le SEO de la home reste à **83/100** : meta-descriptions par page, données
+    structurées JSON-LD et plan de site sont les leviers identifiés.
 
 ## 4. Rapports détaillés (HTML interactifs)
 
@@ -277,8 +269,9 @@ site, copier dans `docs/audits/` et `git push`.
 ---
 
 <small>
-*Audits réalisés le 26/05/2026 sur l'environnement de développement local
-(Docker Compose). Les scores varient légèrement selon la latence réseau et
-la charge système — relancez le script pour des chiffres à jour avant
-soutenance.*
+*Audits initiaux réalisés le 26/05/2026 sur l'environnement local (Docker
+Compose). Ré-audit accessibilité après corrections : **0 violation réelle**
+(axe `violations`, toutes règles) sur les 5 pages, en thème clair et sombre.
+Les scores de performance varient légèrement selon la latence réseau et la
+charge système — relancez le script pour des chiffres à jour avant soutenance.*
 </small>
