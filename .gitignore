@@ -35,6 +35,9 @@ database/data/
 *.sqlite
 *.db
 
+# Sauvegardes de base générées par scripts/backup.sh
+backups/
+
 backend/uploads/*
 !backend/uploads/.gitkeep
 
