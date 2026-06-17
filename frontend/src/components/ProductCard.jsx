@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Badge } from './ui/Badge.jsx';
 import { Button } from './ui/Button.jsx';
@@ -49,8 +49,6 @@ export function ProductCard({ product }) {
     : Number(product.rating) >= 4.5 ? 'favori'
     : null;
 
-  const open = () => navigate(`/boutique/${product.id}`);
-
   const handleAdd = (event) => {
     event.stopPropagation();
     if (soldOut) return;
@@ -58,21 +56,8 @@ export function ProductCard({ product }) {
     push(`Ajouté : ${product.name}`);
   };
 
-  const handleKey = (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      open();
-    }
-  };
-
   return (
-    <div
-      className={`product-card ${soldOut ? 'sold-out' : ''}`.trim()}
-      role="button"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={handleKey}
-    >
+    <div className={`product-card ${soldOut ? 'sold-out' : ''}`.trim()}>
       <div className="card-media" style={{ position: 'relative' }}>
         <Placeholder
           label={product.img}
@@ -113,7 +98,9 @@ export function ProductCard({ product }) {
       </div>
       <div className="info">
         <div className="cat">{category?.name}</div>
-        <div className="name">{product.name}</div>
+        <div className="name">
+          <Link className="card-link" to={`/boutique/${product.id}`}>{product.name}</Link>
+        </div>
         <div className="price-row">
           <span className="price">{formatPrice(product.price)}</span>
           <span className="species-tag">{tags.slice(0, 2).join(' · ')}</span>

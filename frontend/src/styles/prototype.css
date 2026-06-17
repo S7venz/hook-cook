@@ -359,6 +359,17 @@ body { overflow-x: hidden; }
   position: absolute; inset: auto var(--sp-2) var(--sp-2) var(--sp-2);
   opacity: 0; transform: translateY(8px);
   transition: opacity var(--dur-fast), transform var(--dur-fast);
+  z-index: 2; /* au-dessus du lien étiré .card-link::after */
+}
+
+/* Lien produit « étiré » : tout le visuel de la carte est cliquable via un
+   ::after en overlay, sans imbriquer le lien dans un conteneur interactif.
+   Évite le pattern interdit « interactif dans interactif » (WCAG 4.1.2) :
+   la carte n'est plus role="button", seuls le nom (lien) et les boutons
+   favori/panier sont focusables, et chacun reste cliquable séparément. */
+.product-card .card-link { color: inherit; text-decoration: none; }
+.product-card .card-link::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
 }
 .product-card:hover .add-overlay, .product-card:focus-within .add-overlay {
   opacity: 1; transform: translateY(0);

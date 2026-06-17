@@ -4,7 +4,12 @@ import { render } from '@testing-library/react';
 // On isole la logique d'affichage de ProductCard : router, i18n et contextes
 // (panier, auth, favoris, toast, référentiels) sont mockés, les composants
 // enfants stubbés. Le rendu devient déterministe.
-vi.mock('react-router-dom', () => ({ useNavigate: () => () => {} }));
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => () => {},
+  Link: ({ children, to, className }) => (
+    <a href={to} className={className}>{children}</a>
+  ),
+}));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key, opts) => (opts && opts.count != null ? `${key} (${opts.count})` : key),
